@@ -5,27 +5,42 @@ import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
+import android.widget.Button;
+import android.widget.EditText;
 import android.widget.TextView;
 
 
-public class WorkSpacesActivity extends ActionBarActivity {
+public class LoginActivity extends ActionBarActivity {
+
+    private EditText username = null;
+    private Button button = null;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_work_spaces);
+        setContentView(R.layout.activity_login);
 
-        TextView text = (TextView)findViewById(R.id.textView4);
-        Intent intent = getIntent();
-        String str = intent.getStringExtra("location");
-        text.setText(str);
+        username = (EditText)findViewById(R.id.editText2);
+        button = (Button)findViewById(R.id.button4);
+
+        button.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                Intent intent = new Intent(LoginActivity.this, WorkSpacesActivity.class);
+                intent.putExtra("location", "You are logged in as " + username.getText().toString());
+                startActivity(intent);
+
+            }
+        });
+
     }
-
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.menu_work_spaces, menu);
+        getMenuInflater().inflate(R.menu.menu_login, menu);
         return true;
     }
 
@@ -43,4 +58,5 @@ public class WorkSpacesActivity extends ActionBarActivity {
 
         return super.onOptionsItemSelected(item);
     }
+
 }
