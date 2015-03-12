@@ -1,4 +1,4 @@
-package pt.ulisboa.tecnico.cmov.airdesk_cmov;
+package pt.ulisboa.tecnico.cmov.airdesk_cmov.Activities;
 
 import android.content.Intent;
 import android.support.v7.app.ActionBarActivity;
@@ -7,47 +7,41 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
+import android.widget.EditText;
+
+import pt.ulisboa.tecnico.cmov.airdesk_cmov.R;
 
 
-public class MainActivity extends ActionBarActivity {
+public class LoginActivity extends ActionBarActivity {
 
+    private EditText username = null;
     private Button button = null;
-    private Button button2 = null;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
+        setContentView(R.layout.activity_login);
 
-        button = (Button)findViewById(R.id.button6);
-        button2 = (Button)findViewById(R.id.button5);
+        username = (EditText)findViewById(R.id.editText2);
+        button = (Button)findViewById(R.id.button4);
 
         button.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
 
-                Intent intent2 = new Intent(MainActivity.this, LoginActivity.class);
-                startActivity(intent2);
-
-            }
-        });
-
-        button2.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-
-                Intent intent = new Intent(MainActivity.this, registerActivity.class);
+                Intent intent = new Intent(LoginActivity.this, WorkSpacesActivity.class);
+                intent.putExtra("location", "You are logged in as " + username.getText().toString());
                 startActivity(intent);
 
             }
         });
-    }
 
+    }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.menu_main, menu);
+        getMenuInflater().inflate(R.menu.menu_login, menu);
         return true;
     }
 
@@ -65,4 +59,5 @@ public class MainActivity extends ActionBarActivity {
 
         return super.onOptionsItemSelected(item);
     }
+
 }

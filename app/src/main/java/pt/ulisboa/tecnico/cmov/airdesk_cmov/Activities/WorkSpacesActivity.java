@@ -1,4 +1,4 @@
-package pt.ulisboa.tecnico.cmov.airdesk_cmov;
+package pt.ulisboa.tecnico.cmov.airdesk_cmov.Activities;
 
 import android.content.Intent;
 import android.support.v7.app.ActionBarActivity;
@@ -6,6 +6,8 @@ import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.TextView;
+
+import pt.ulisboa.tecnico.cmov.airdesk_cmov.R;
 
 
 public class WorkSpacesActivity extends ActionBarActivity {
