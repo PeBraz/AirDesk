@@ -21,8 +21,6 @@ public class registerActivity extends ActionBarActivity {
     private EditText email = null;
     private EditText password = null;
 
-    private User user = null;
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
 
@@ -42,8 +40,7 @@ public class registerActivity extends ActionBarActivity {
             @Override
             public void onClick(View v) {
 
-                user = new User(username.getText().toString(), email.getText().toString(), password.getText().toString());
-                datasource.createUser(user);
+                datasource.createUser(new User(username.getText().toString(),password.getText().toString(),email.getText().toString()));
 
                 Intent intent = new Intent(registerActivity.this, WorkSpacesActivity.class);
                 intent.putExtra("location", "You are logged in as " + username.getText().toString());

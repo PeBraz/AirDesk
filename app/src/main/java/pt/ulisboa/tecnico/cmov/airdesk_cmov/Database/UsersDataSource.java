@@ -25,28 +25,25 @@ public class UsersDataSource {
         database = dbHelper.getWritableDatabase();
     }
 
-    public User createUser(User user) {
+    public void createUser(User user) {
+
         ContentValues values = new ContentValues();
         values.put(MySQLiteHelper.COLUMN_USERNAME, user.getUsername());
         values.put(MySQLiteHelper.COLUMN_PASSWORD, user.getPassword());
         values.put(MySQLiteHelper.COLUMN_EMAIL, user.getEmail());
-        long insertId = database.insert(MySQLiteHelper.TABLE_USERS, null, values);
-        Cursor cursor = database.query(MySQLiteHelper.TABLE_USERS, allColumns, MySQLiteHelper.COLUMN_ID + " = " + insertId, null, null, null, null);
-        cursor.moveToFirst();
-        User newUser = cursorToUser(cursor);
-        cursor.close();
-        return newUser;
+        database.insert(MySQLiteHelper.TABLE_USERS, null, values);
+
     }
 
-    public List<String> getAllUsers() {
+    public List<User> getAllUsers() {
 
-        List<String> users = new ArrayList<>();
+        List<User> users = new ArrayList<>();
         Cursor cursor = database.query(MySQLiteHelper.TABLE_USERS, allColumns, null, null, null, null, null);
 
         cursor.moveToFirst();
         while (!cursor.isAfterLast()) {
             User user = cursorToUser(cursor);
-            users.add(user.getUsername());
+            users.add(user);
             cursor.moveToNext();
         }
         cursor.close();
@@ -57,6 +54,8 @@ public class UsersDataSource {
         User user = new User();
         user.setId(cursor.getLong(0));
         user.setUsername(cursor.getString(1));
+        user.setPassword(cursor.getString(2));
+        user.setEmail(cursor.getString(3));
         return user;
     }
 
