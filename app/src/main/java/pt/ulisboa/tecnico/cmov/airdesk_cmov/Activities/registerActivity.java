@@ -7,6 +7,7 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.Toast;
 
 import pt.ulisboa.tecnico.cmov.airdesk_cmov.Database.UsersDataSource;
 import pt.ulisboa.tecnico.cmov.airdesk_cmov.R;
@@ -42,8 +43,9 @@ public class registerActivity extends ActionBarActivity {
 
                 datasource.createUser(new User(username.getText().toString(),password.getText().toString(),email.getText().toString()));
 
-                Intent intent = new Intent(registerActivity.this, WorkSpacesActivity.class);
-                intent.putExtra("location", "You are logged in as " + username.getText().toString());
+                Toast.makeText(registerActivity.this, "User created. Please sign in.", Toast.LENGTH_SHORT).show();
+
+                Intent intent = new Intent(registerActivity.this, MainActivity.class);
                 startActivity(intent);
             }
         });
