@@ -15,7 +15,7 @@ public class UsersDataSource {
 
     private SQLiteDatabase database;
     private MySQLiteHelper dbHelper;
-    private String[] allColumns = { MySQLiteHelper.COLUMN_ID, MySQLiteHelper.COLUMN_USER };
+    private String[] allColumns = { MySQLiteHelper.COLUMN_ID, MySQLiteHelper.COLUMN_USERNAME, MySQLiteHelper.COLUMN_PASSWORD, MySQLiteHelper.COLUMN_EMAIL};
 
     public UsersDataSource(Context context) {
         dbHelper = new MySQLiteHelper(context);
@@ -25,13 +25,11 @@ public class UsersDataSource {
         database = dbHelper.getWritableDatabase();
     }
 
-    public void close() {
-        dbHelper.close();
-    }
-
     public User createUser(User user) {
         ContentValues values = new ContentValues();
-        values.put(MySQLiteHelper.COLUMN_USER, user.getUsername());
+        values.put(MySQLiteHelper.COLUMN_USERNAME, user.getUsername());
+        values.put(MySQLiteHelper.COLUMN_PASSWORD, user.getPassword());
+        values.put(MySQLiteHelper.COLUMN_EMAIL, user.getEmail());
         long insertId = database.insert(MySQLiteHelper.TABLE_USERS, null, values);
         Cursor cursor = database.query(MySQLiteHelper.TABLE_USERS, allColumns, MySQLiteHelper.COLUMN_ID + " = " + insertId, null, null, null, null);
         cursor.moveToFirst();
@@ -40,21 +38,15 @@ public class UsersDataSource {
         return newUser;
     }
 
-    public void deleteUser(User user) {
-        long id = User.getId();
-        System.out.println("User deleted with id: " + id);
-        database.delete(MySQLiteHelper.TABLE_USERS, MySQLiteHelper.COLUMN_ID + " = " + id, null);
-    }
+    public List<String> getAllUsers() {
 
-    public List<User> getAllUsers() {
-
-        List<User> users = new ArrayList<>();
+        List<String> users = new ArrayList<>();
         Cursor cursor = database.query(MySQLiteHelper.TABLE_USERS, allColumns, null, null, null, null, null);
 
         cursor.moveToFirst();
         while (!cursor.isAfterLast()) {
             User user = cursorToUser(cursor);
-            users.add(user);
+            users.add(user.getUsername());
             cursor.moveToNext();
         }
         cursor.close();
