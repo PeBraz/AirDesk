@@ -3,10 +3,11 @@ package pt.ulisboa.tecnico.cmov.airdesk_cmov.Activities;
 import android.content.Intent;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.Toast;
+
 import java.util.List;
 import pt.ulisboa.tecnico.cmov.airdesk_cmov.Database.UsersDataSource;
 import pt.ulisboa.tecnico.cmov.airdesk_cmov.R;
@@ -21,7 +22,6 @@ public class LoginActivity extends ActionBarActivity {
 
     private EditText username = null;
     private EditText password = null;
-    private Button button = null;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -33,7 +33,7 @@ public class LoginActivity extends ActionBarActivity {
 
         username = (EditText)findViewById(R.id.editText2);
         password = (EditText)findViewById(R.id.editText3);
-        button = (Button)findViewById(R.id.button4);
+        Button button = (Button) findViewById(R.id.button4);
 
         button.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -41,14 +41,22 @@ public class LoginActivity extends ActionBarActivity {
 
                 allUsers = datasource.getAllUsers();
 
-                for(User user : allUsers){
+                for (User user : allUsers) {
 
-                    if(user.getUsername().equals(username.getText().toString()) && user.getPassword().equals(password.getText().toString())){
+                    if (user.getUsername().equals(username.getText().toString()) && user.getPassword().equals(password.getText().toString())) {
+
+                        Toast.makeText(LoginActivity.this, "Welcome to AirDesk.", Toast.LENGTH_SHORT).show();
 
                         Intent intent = new Intent(LoginActivity.this, WorkSpacesActivity.class);
                         intent.putExtra("location", "You are logged in as " + username.getText().toString());
                         startActivity(intent);
                     }
+
+                    else if (user.getUsername().equals(username.getText().toString()) && !user.getPassword().equals(password.getText().toString()))
+
+                        Toast.makeText(LoginActivity.this, "Wrong password. Try again.", Toast.LENGTH_SHORT).show();
+
+                    else Toast.makeText(LoginActivity.this, "Your are not registered yet, please sign up.", Toast.LENGTH_SHORT).show();
                 }
             }
         });

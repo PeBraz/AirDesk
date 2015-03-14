@@ -9,6 +9,8 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 
+import java.util.List;
+
 import pt.ulisboa.tecnico.cmov.airdesk_cmov.Database.UsersDataSource;
 import pt.ulisboa.tecnico.cmov.airdesk_cmov.R;
 import pt.ulisboa.tecnico.cmov.airdesk_cmov.User;
@@ -17,6 +19,8 @@ import pt.ulisboa.tecnico.cmov.airdesk_cmov.User;
 public class registerActivity extends ActionBarActivity {
 
     private UsersDataSource datasource;
+
+    private List<User> allUsers;
 
     private EditText username = null;
     private EditText email = null;
@@ -41,16 +45,47 @@ public class registerActivity extends ActionBarActivity {
             @Override
             public void onClick(View v) {
 
-                datasource.createUser(new User(username.getText().toString(),password.getText().toString(),email.getText().toString()));
+                if (("".equals(username.getText().toString().trim()) || "".equals(email.getText().toString().trim())) || "".equals(password.getText().toString().trim())){
+                    Toast.makeText(registerActivity.this, "A value is missing!", Toast.LENGTH_LONG).show();
+                    return;
+                }
 
-                Toast.makeText(registerActivity.this, "User created. Please sign in.", Toast.LENGTH_SHORT).show();
+                User u = new User(username.getText().toString(),password.getText().toString(),email.getText().toString());
 
-                Intent intent = new Intent(registerActivity.this, MainActivity.class);
-                startActivity(intent);
+                boolean isAllowed = checkUser(u);
+
+                if(!isAllowed){
+
+                    datasource.createUser(u);
+                    Toast.makeText(registerActivity.this, "User created. Please sign in.", Toast.LENGTH_SHORT).show();
+                    Intent intent = new Intent(registerActivity.this, MainActivity.class);
+                    startActivity(intent);
+                }
+
+                else Toast.makeText(registerActivity.this, "Email or username already exists. Try again.", Toast.LENGTH_SHORT).show();
             }
         });
 
     }
 
+    private boolean checkUser(User user){
 
+        boolean flag = false;
+
+        allUsers = datasource.getAllUsers();
+
+        if (!allUsers.isEmpty()) {
+
+            for (User u : allUsers) {
+
+                if (u.getUsername().equals(user.getUsername()) || u.getEmail().equals(user.getEmail())) {
+
+                    flag = true;
+                    break;
+                }
+            }
+        }
+
+        return flag;
+    }
 }
