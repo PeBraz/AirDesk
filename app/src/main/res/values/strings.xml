@@ -1,9 +1,10 @@
 <resources>
-    <string name="app_name">AirDesk-CMOV</string>
-
+    <string name="app_name">Airdesk app</string>
     <string name="hello_world">Hello world!</string>
-    <string name="action_settings">Settings</string>
-    <string name="title_activity_login">LoginActivity</string>
-    <string name="title_activity_main">MainActivity</string>
-    <string name="title_activity_register">registerActivity</string>
+    <string name="action_settings">My account</string>
+    <string name="title_activity_login">Login</string>
+    <string name="title_activity_main">Airkdesk</string>
+    <string name="title_activity_register">Register account</string>
+    <string name="title_activity_user_settings_activity">User account</string>
+    <string name="title_activity_work_spaces">Workspaces</string>
 </resources>
