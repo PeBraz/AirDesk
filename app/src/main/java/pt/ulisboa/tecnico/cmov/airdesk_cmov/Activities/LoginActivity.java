@@ -11,6 +11,7 @@ import android.widget.Toast;
 import java.util.List;
 import pt.ulisboa.tecnico.cmov.airdesk_cmov.Database.UsersDataSource;
 import pt.ulisboa.tecnico.cmov.airdesk_cmov.R;
+import pt.ulisboa.tecnico.cmov.airdesk_cmov.Sessions.SessionManager;
 import pt.ulisboa.tecnico.cmov.airdesk_cmov.User;
 
 
@@ -22,6 +23,8 @@ public class LoginActivity extends ActionBarActivity {
 
     private EditText username = null;
     private EditText password = null;
+
+    SessionManager session;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -45,10 +48,11 @@ public class LoginActivity extends ActionBarActivity {
 
                     if (user.getUsername().equals(username.getText().toString()) && user.getPassword().equals(password.getText().toString())) {
 
-                        Toast.makeText(LoginActivity.this, "Welcome to AirDesk.", Toast.LENGTH_SHORT).show();
+                        session = new SessionManager(getApplicationContext());
+                        session.createLoginSession(username.getText().toString());
 
+                        Toast.makeText(LoginActivity.this, "Welcome to AirDesk.", Toast.LENGTH_SHORT).show();
                         Intent intent = new Intent(LoginActivity.this, WorkSpacesActivity.class);
-                        intent.putExtra("location", "You are logged in as " + username.getText().toString());
                         startActivity(intent);
                     }
 

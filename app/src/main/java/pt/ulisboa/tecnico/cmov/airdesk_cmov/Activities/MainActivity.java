@@ -14,16 +14,13 @@ import pt.ulisboa.tecnico.cmov.airdesk_cmov.R;
 
 public class MainActivity extends ActionBarActivity {
 
-    private Button button = null;
-    private Button button2 = null;
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        button = (Button)findViewById(R.id.button6);
-        button2 = (Button)findViewById(R.id.button5);
+        Button button = (Button) findViewById(R.id.button6);
+        Button button2 = (Button) findViewById(R.id.button5);
 
         button.setOnClickListener(new View.OnClickListener() {
             @Override
