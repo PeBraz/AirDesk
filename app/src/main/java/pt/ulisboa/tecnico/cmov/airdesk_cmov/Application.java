@@ -72,8 +72,8 @@ public class Application {
 
     public static List<Workspace> getMyWorkspaces(){
 
-        List<Workspace> olaa = new ArrayList<>();
+        List<Workspace> workspaces = new ArrayList<>();
 
-        return olaa;
+        return workspaces;
     }
 }
