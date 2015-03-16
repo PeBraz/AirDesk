@@ -11,3 +11,7 @@ out/
 *.jar
 *.apk
 *.ap_
+
+
+
+*.iml
