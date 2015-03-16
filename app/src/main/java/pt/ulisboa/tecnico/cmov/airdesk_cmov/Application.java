@@ -9,6 +9,7 @@ import java.util.List;
 import pt.ulisboa.tecnico.cmov.airdesk_cmov.Activities.MainActivity;
 import pt.ulisboa.tecnico.cmov.airdesk_cmov.Activities.registerActivity;
 import pt.ulisboa.tecnico.cmov.airdesk_cmov.Database.UsersDataSource;
+import pt.ulisboa.tecnico.cmov.airdesk_cmov.Exceptions.ApplicationHasNoUserException;
 
 public class Application {
 
@@ -39,8 +40,8 @@ public class Application {
 
     }
 
-    public static void createWorkSpace(){
-        //uss tem de estar logado
+    public static void createWorkSpace() throws ApplicationHasNoUserException{
+        if (owner == null) throw new ApplicationHasNoUserException();
 
     }
 
@@ -71,9 +72,6 @@ public class Application {
     }
 
     public static List<Workspace> getMyWorkspaces(){
-
-        List<Workspace> olaa = new ArrayList<>();
-
-        return olaa;
+        return myWorkspaces;
     }
 }
