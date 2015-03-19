@@ -1,30 +1,37 @@
 package pt.ulisboa.tecnico.cmov.airdesk_cmov.Database;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
 import android.database.SQLException;
 import android.database.sqlite.SQLiteDatabase;
+import android.provider.ContactsContract;
 
-import pt.ulisboa.tecnico.cmov.airdesk_cmov.Application;
+import java.util.ArrayList;
+import java.util.List;
+
 import pt.ulisboa.tecnico.cmov.airdesk_cmov.User;
 
-public class UsersDataSource {
 
-    private SQLiteDatabase database;
-    private MySQLiteHelper dbHelper;
-    private String[] allColumns = { MySQLiteHelper.COLUMN_ID, MySQLiteHelper.COLUMN_USERNAME, MySQLiteHelper.COLUMN_PASSWORD, MySQLiteHelper.COLUMN_EMAIL};
+public class DataSource {
 
-    public UsersDataSource(Context context) {
-        dbHelper = new MySQLiteHelper(context);
+
+    private static SQLiteDatabase database;
+    private static MySQLiteHelper dbHelper;
+    //private String[] allColumns = { MySQLiteHelper.COLUMN_ID, MySQLiteHelper.COLUMN_USERNAME, MySQLiteHelper.COLUMN_PASSWORD, MySQLiteHelper.COLUMN_EMAIL};
+
+    public DataSource(Context context) {
+        DataSource.dbHelper = new MySQLiteHelper(context);
     }
 
     public void open() throws SQLException {
         database = dbHelper.getWritableDatabase();
     }
+
+    public DataSource() {
+
+    }
+
 
     public void createUser(User user) {
 
@@ -39,7 +46,7 @@ public class UsersDataSource {
     public User getUser(final String userKey) {
         final User user;
         Cursor cursor = database.rawQuery("select * from ? where ? = ? ",
-                    new String[] {MySQLiteHelper.TABLE_USERS, MySQLiteHelper.COLUMN_USERNAME, userKey});
+                new String[] {MySQLiteHelper.TABLE_USERS, MySQLiteHelper.COLUMN_USERNAME, userKey});
         cursor.moveToFirst();
         user = cursorToUser(cursor);
         cursor.close();
@@ -70,15 +77,4 @@ public class UsersDataSource {
         user.setEmail(cursor.getString(3));
         return user;
     }
-
-    public void createWorkspace() {
-        ContentValues values = new ContentValues();
-        values.put(MySQLiteHelper.USER_EMAIL, user.getUsername());
-        values.put(MySQLiteHelper.USER_PASSWORD, user.getPassword());
-        values.put(MySQLiteHelper.USER_EMAIL, user.getEmail());
-        database.insert(MySQLiteHelper.TABLE_USERS, null, values);
-
-    }
-
-
 }

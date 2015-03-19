@@ -11,6 +11,7 @@ import pt.ulisboa.tecnico.cmov.airdesk_cmov.Exceptions.UserAlreadyExistsExceptio
 public class Application {
 
     private User owner;
+    private List<Workspace> myWorkspaces;
    // private static ArrayList<Workspace> myWorkspaces; -> this will come from the database
     // private static ArrayList<Workspace> foreignWorkspaces;
 
@@ -37,8 +38,10 @@ public class Application {
 
 
 
-    public Application (String username) {
-        //find user     //this.owner = Application.getUser(username)
+    public Application (User u) {
+        this.owner = u;//find user     //this.owner = Application.getUser(username)
+        this.myWorkspaces = new ArrayList<Workspace>();
+
         //get workspace conn // this.myWorkspace = Application.getWorkspaces(username)
 
     }
@@ -72,7 +75,6 @@ public class Application {
                 }
             }
         }
-
         return flag;
     }
 
