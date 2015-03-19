@@ -16,7 +16,7 @@ public class UsersDataSource {
 
     private SQLiteDatabase database;
     private MySQLiteHelper dbHelper;
-    private String[] allColumns = { MySQLiteHelper.COLUMN_ID, MySQLiteHelper.COLUMN_USERNAME, MySQLiteHelper.COLUMN_PASSWORD, MySQLiteHelper.COLUMN_EMAIL};
+    private String[] allColumns = { MySQLiteHelper.COLUMN_ID, MySQLiteHelper.COLUMN_USERNAME, MySQLiteHelper.COLUMN_EMAIL};
 
     public UsersDataSource(Context context) {
         dbHelper = new MySQLiteHelper(context);
@@ -30,7 +30,6 @@ public class UsersDataSource {
 
         ContentValues values = new ContentValues();
         values.put(MySQLiteHelper.COLUMN_USERNAME, user.getUsername());
-        values.put(MySQLiteHelper.COLUMN_PASSWORD, user.getPassword());
         values.put(MySQLiteHelper.COLUMN_EMAIL, user.getEmail());
         database.insert(MySQLiteHelper.TABLE_USERS, null, values);
 
@@ -55,8 +54,7 @@ public class UsersDataSource {
         User user = new User();
         user.setId(cursor.getLong(0));
         user.setUsername(cursor.getString(1));
-        user.setPassword(cursor.getString(2));
-        user.setEmail(cursor.getString(3));
+        user.setEmail(cursor.getString(2));
         return user;
     }
 

@@ -9,7 +9,7 @@ import pt.ulisboa.tecnico.cmov.airdesk_cmov.Exceptions.NoUserDatabaseException;
 import pt.ulisboa.tecnico.cmov.airdesk_cmov.Exceptions.NotRegisteredException;
 import pt.ulisboa.tecnico.cmov.airdesk_cmov.Exceptions.UserAlreadyExistsException;
 import pt.ulisboa.tecnico.cmov.airdesk_cmov.Exceptions.WrongPasswordException;
-import pt.ulisboa.tecnico.cmov.airdesk_cmov.Sessions.SessionManager;
+
 
 
 public class Application {
@@ -20,14 +20,12 @@ public class Application {
 
     private static UsersDataSource dataSource = null;
 
-    private static SessionManager session;
-
-    public static void createUser(String username, String email, String password)
+    public static void createUser(String username, String email)
         throws NoUserDatabaseException, UserAlreadyExistsException {
 
         if (Application.dataSource == null) throw new NoUserDatabaseException();
 
-        User u = new User(username, email, password);
+        User u = new User(username, email);
         boolean isAllowed = checkUser(u);
 
         if (!isAllowed) dataSource.createUser(u);
@@ -76,16 +74,16 @@ public class Application {
         return flag;
     }
 
-    public static boolean login(String username, String password) throws NotRegisteredException, WrongPasswordException {
+    public static boolean login(String username) throws NotRegisteredException, WrongPasswordException {
 
         List<User> allUsers = dataSource.getAllUsers();
 
         for(User user : allUsers){
 
-            if (user.getUsername().equals(username) && user.getPassword().equals(password))
+            if (user.getEmail().equals(username))
                 return true;
 
-            if (user.getUsername().equals(username) && !user.getPassword().equals(password))
+            if (user.getEmail().equals(username))
                 throw new WrongPasswordException();
         }
 

@@ -12,6 +12,7 @@
             android:label="@string/title_activity_work_spaces" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
+
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
@@ -26,6 +27,10 @@
         <activity
             android:name=".Activities.registerActivity"
             android:label="@string/title_activity_register" >
+        </activity>
+        <activity
+            android:name=".Activities.UserSettingsActivity"
+            android:label="@string/title_activity_user_settings" >
         </activity>
     </application>
 

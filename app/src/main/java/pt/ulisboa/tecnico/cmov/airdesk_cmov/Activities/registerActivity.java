@@ -34,7 +34,6 @@ public class registerActivity extends ActionBarActivity {
 
         username = (EditText)findViewById(R.id.editText2);
         email = (EditText)findViewById(R.id.editText);
-        password = (EditText)findViewById(R.id.editText3);
 
         Button button = (Button) findViewById(R.id.button4);
 
@@ -42,13 +41,13 @@ public class registerActivity extends ActionBarActivity {
             @Override
             public void onClick(View v) {
 
-                if (("".equals(username.getText().toString().trim()) || "".equals(email.getText().toString().trim())) || "".equals(password.getText().toString().trim())){
+                if (("".equals(username.getText().toString().trim()) || "".equals(email.getText().toString().trim()))){
                     Toast.makeText(registerActivity.this, "A value is missing!", Toast.LENGTH_LONG).show();
                     return;
                 }
 
                 try {
-                    Application.createUser(username.getText().toString(),password.getText().toString(),email.getText().toString());
+                    Application.createUser(username.getText().toString(),email.getText().toString());
                     Toast.makeText(registerActivity.this, "User created. Please sign in.", Toast.LENGTH_SHORT).show();
                     Intent intent = new Intent(registerActivity.this, MainActivity.class);
                     startActivity(intent);

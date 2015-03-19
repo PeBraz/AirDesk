@@ -11,7 +11,7 @@ public class MySQLiteHelper extends SQLiteOpenHelper{
     public static final String COLUMN_ID = "id";
     public static final String COLUMN_USERNAME = "USER";
     public static final String COLUMN_EMAIL = "EMAIL";
-    public static final String COLUMN_PASSWORD = "PASSWORD";
+
 
     private static final String DATABASE_NAME = "users.db";
     private static final int DATABASE_VERSION = 1;
@@ -21,8 +21,7 @@ public class MySQLiteHelper extends SQLiteOpenHelper{
             "CREATE TABLE " + TABLE_USERS + " (" +
                     COLUMN_ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " +
                     COLUMN_USERNAME + " TEXT, " +
-                    COLUMN_EMAIL + " TEXT, " +
-                    COLUMN_PASSWORD + " TEXT);";
+                    COLUMN_EMAIL + " TEXT);";
 
     public MySQLiteHelper(Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
