@@ -1,14 +1,12 @@
 package pt.ulisboa.tecnico.cmov.airdesk_cmov;
 
-
-
 import java.util.ArrayList;
 import java.util.List;
-
 
 import pt.ulisboa.tecnico.cmov.airdesk_cmov.Database.UsersDataSource;
 import pt.ulisboa.tecnico.cmov.airdesk_cmov.Exceptions.ApplicationHasNoUserException;
 import pt.ulisboa.tecnico.cmov.airdesk_cmov.Exceptions.NoUserDatabaseException;
+import pt.ulisboa.tecnico.cmov.airdesk_cmov.Exceptions.UserAlreadyExistsException;
 
 public class Application {
 
@@ -19,27 +17,24 @@ public class Application {
     private static UsersDataSource dataSource = null;
 
     public static void createUser(String username, String email, String password)
-        throws NoUserDatabaseException{
-        if (Application.dataSource == null) throw new NoUserDatabaseException();
-        User u = new User(username,email,password);
+        throws NoUserDatabaseException, UserAlreadyExistsException {
 
+        if (Application.dataSource == null) throw new NoUserDatabaseException();
+
+        User u = new User(username, email, password);
         boolean isAllowed = checkUser(u);
 
-        if(!isAllowed){
+        if (!isAllowed) dataSource.createUser(u);
 
-            dataSource.createUser(u);
-/*            Toast.makeText(registerActivity.this, "User created. Please sign in.", Toast.LENGTH_SHORT).show();
-            Intent intent = new Intent(registerActivity.this, MainActivity.class);
-            startActivity(intent);*/
-        }
-
-/*        else Toast.makeText(registerActivity.this, "Email or username already exists. Try again.", Toast.LENGTH_SHORT).show();*/
+        else throw new UserAlreadyExistsException();
     }
 
     public static void setUsersDataSource(UsersDataSource userdb) {
         Application.dataSource = userdb;
         Application.dataSource.open();
     }
+
+
 
 
     public Application (String username) {
@@ -54,15 +49,17 @@ public class Application {
         if (owner == null)
             throw new ApplicationHasNoUserException();
 
-        this.workspace.add(name, quota, isPrivate, tags);
+        //this.workspace.add(name, quota, isPrivate, tags);
 
     }
+
+
 
     private static boolean checkUser(User user){
 
         boolean flag = false;
 
-        allUsers = dataSource.getAllUsers();
+        List<User> allUsers = dataSource.getAllUsers();
 
         if (!allUsers.isEmpty()) {
 
@@ -87,5 +84,6 @@ public class Application {
     public static List<Workspace> getMyWorkspaces(){
         List<Workspace> workspaces = new ArrayList<>();
         return workspaces;
+
     }
 }

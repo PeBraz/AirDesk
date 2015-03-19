@@ -13,15 +13,12 @@ import java.util.List;
 
 import pt.ulisboa.tecnico.cmov.airdesk_cmov.Application;
 import pt.ulisboa.tecnico.cmov.airdesk_cmov.Database.UsersDataSource;
+import pt.ulisboa.tecnico.cmov.airdesk_cmov.Exceptions.UserAlreadyExistsException;
 import pt.ulisboa.tecnico.cmov.airdesk_cmov.R;
 import pt.ulisboa.tecnico.cmov.airdesk_cmov.User;
 
 
 public class registerActivity extends ActionBarActivity {
-
-    private UsersDataSource datasource;
-
-    private List<User> allUsers;
 
     private EditText username = null;
     private EditText email = null;
@@ -33,8 +30,8 @@ public class registerActivity extends ActionBarActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_register);
 
-        Application.setUsersDataSource(new UsersDataSource(this));
 
+        Application.setUsersDataSource(new UsersDataSource(this));
 
 
         username = (EditText)findViewById(R.id.editText2);
@@ -52,7 +49,16 @@ public class registerActivity extends ActionBarActivity {
                     return;
                 }
 
-                Application.createUser(username.getText().toString(),password.getText().toString(),email.getText().toString());
+                try {
+                    Application.createUser(username.getText().toString(),password.getText().toString(),email.getText().toString());
+                    Toast.makeText(registerActivity.this, "User created. Please sign in.", Toast.LENGTH_SHORT).show();
+                    Intent intent = new Intent(registerActivity.this, MainActivity.class);
+                    startActivity(intent);
+                } catch (UserAlreadyExistsException e) {
+                    Toast.makeText(registerActivity.this, e.getMessage(), Toast.LENGTH_SHORT).show();
+                }
+
+
             }
         });
     }
