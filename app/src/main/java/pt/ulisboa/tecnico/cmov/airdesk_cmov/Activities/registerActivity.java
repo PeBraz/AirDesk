@@ -33,8 +33,9 @@ public class registerActivity extends ActionBarActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_register);
 
-        datasource = new UsersDataSource(this);
-        datasource.open();
+        Application.setUsersDataSource(new UsersDataSource(this));
+
+
 
         username = (EditText)findViewById(R.id.editText2);
         email = (EditText)findViewById(R.id.editText);
