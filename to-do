@@ -1,2 +1,5 @@
 implement databse: http://www.vogella.com/tutorials/AndroidSQLite/article.html
 mudar onclick listeners para o xml e fazer metodos. tirar as merdas do oncreate()
+
+
+multi-threading for intensive tasks

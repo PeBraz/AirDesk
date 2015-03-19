@@ -30,7 +30,6 @@ public class MySQLiteHelper extends SQLiteOpenHelper{
 
     private static final String USERS_CREATE =
             "CREATE TABLE " + TABLE_USERS + " (" +
-
                     USER_USERNAME + " TEXT, " +
                     USER_EMAIL + " TEXT PRIMARY KEY); ";
             //        USER_PASSWORD + " TEXT);";
@@ -38,13 +37,15 @@ public class MySQLiteHelper extends SQLiteOpenHelper{
     private static final String WORKSPACES_CREATE =
             "CREATE TABLE" + TABLE_WORKSPACES + " ( "+
                 WS_NAME + " TEXT PRIMARY KEY, " +
-                WS_QUOTA + " INT, " +
+                WS_QUOTA + " INTEGER, " +
+                WS_USER + " TEXT, " +
                 " FOREIGN KEY ("+WS_USER+") REFERENCES "+TABLE_USERS+" (" + USER_EMAIL+ "));";
 
     private static final String FILES_CREATE =
             "CREATE TABLE " + TABLE_FILES + " (" +
                     FILE_NAME + " TEXT PRIMARY KEY, " +
                     FILE_PATH + " TEXT, " +
+                    FILE_WORKSPACE + " TEXT, " +
                     " FOREIGN KEY ("+FILE_WORKSPACE+") REFERENCES "+TABLE_WORKSPACES+" (" + WS_NAME + "));";
 
     // TABLE  for workspace clients

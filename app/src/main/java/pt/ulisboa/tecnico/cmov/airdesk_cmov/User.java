@@ -48,9 +48,12 @@ public final class User {
     public final void createWorkspace(final String name, final int quota){
         this.workspacedb.create(new Workspace(name, quota, this));
     }
-   /* public final Workspace getWorkspace(final String name) {
-        this.workspacedb.
-    }*/
+    public final Workspace getWorkspace(final String name) {
+        return this.workspacedb.get(name);
+    }
 
+    public final void subscribe(Workspace workspace) {
+        //TODO -> after foreign workspaces
+    }
 
 }
