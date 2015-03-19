@@ -7,6 +7,7 @@ public class User {
 
 
     private String email;
+    private String password;
 
     public User(String username, String email) {
         this.username = username;
@@ -47,5 +48,9 @@ public class User {
 
     public String toString() {
         return username;
+    }
+
+    public String getPassword() {
+        return password;
     }
 }

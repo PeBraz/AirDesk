@@ -15,6 +15,7 @@ import pt.ulisboa.tecnico.cmov.airdesk_cmov.Exceptions.WrongPasswordException;
 public class Application {
 
     private User owner;
+    private List<Workspace> myWorkspaces;
    // private static ArrayList<Workspace> myWorkspaces; -> this will come from the database
     // private static ArrayList<Workspace> foreignWorkspaces;
 
@@ -39,11 +40,13 @@ public class Application {
     }
 
 
-    public Application (String username) {
-        //find user     //this.owner = Application.getUser(username)
-        //get workspace conn // this.myWorkspace = Application.getWorkspaces(username)
 
+    public Application (User u) {
+        this.owner = u;//find user     //this.owner = Application.getUser(username)
+        this.myWorkspaces = new ArrayList<Workspace>();
     }
+
+
 
     public void createWorkSpace(String name, int quota, boolean isPrivate, List<String> tags) throws ApplicationHasNoUserException{
         if (owner == null)
@@ -70,7 +73,6 @@ public class Application {
                 }
             }
         }
-
         return flag;
     }
 
