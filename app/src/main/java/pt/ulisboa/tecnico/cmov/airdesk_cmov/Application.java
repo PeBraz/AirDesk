@@ -5,45 +5,61 @@ import java.util.List;
 
 import pt.ulisboa.tecnico.cmov.airdesk_cmov.Database.UsersDataSource;
 import pt.ulisboa.tecnico.cmov.airdesk_cmov.Exceptions.ApplicationHasNoUserException;
+import pt.ulisboa.tecnico.cmov.airdesk_cmov.Exceptions.NoUserDatabaseException;
 import pt.ulisboa.tecnico.cmov.airdesk_cmov.Exceptions.UserAlreadyExistsException;
 
 public class Application {
 
-    private static User owner;
-    private static ArrayList<Workspace> myWorkspaces;
-    private static ArrayList<Workspace> foreignWorkspaces;
+    private User owner;
+   // private static ArrayList<Workspace> myWorkspaces; -> this will come from the database
+    // private static ArrayList<Workspace> foreignWorkspaces;
 
-    public static UsersDataSource datasource;
+    private static UsersDataSource dataSource = null;
 
-    public static void setUserDataSource(UsersDataSource userDB){
+    public static void createUser(String username, String email, String password)
+        throws NoUserDatabaseException, UserAlreadyExistsException {
 
-        Application.datasource = userDB;
-        Application.datasource.open();
-    }
+        if (Application.dataSource == null) throw new NoUserDatabaseException();
 
-    public static void createUser(String username, String email, String password) throws UserAlreadyExistsException {
-
-        User u = new User(username,email,password);
-
+        User u = new User(username, email, password);
         boolean isAllowed = checkUser(u);
 
-        if(!isAllowed) datasource.createUser(u);
+        if (!isAllowed) dataSource.createUser(u);
 
         else throw new UserAlreadyExistsException();
+    }
+
+    public static void setUsersDataSource(UsersDataSource userdb) {
+        Application.dataSource = userdb;
+        Application.dataSource.open();
+    }
+
+
+
+
+    public Application (String username) {
+        //find user     //this.owner = Application.getUser(username)
+        //get workspace conn // this.myWorkspace = Application.getWorkspaces(username)
 
     }
 
-    public static void createWorkSpace() throws ApplicationHasNoUserException{
 
-        if (owner == null) throw new ApplicationHasNoUserException();
+
+    public void createWorkSpace(String name, int quota, boolean isPrivate, List<String> tags) throws ApplicationHasNoUserException{
+        if (owner == null)
+            throw new ApplicationHasNoUserException();
+
+        //this.workspace.add(name, quota, isPrivate, tags);
 
     }
+
+
 
     private static boolean checkUser(User user){
 
         boolean flag = false;
 
-        List<User> allUsers = datasource.getAllUsers();
+        List<User> allUsers = dataSource.getAllUsers();
 
         if (!allUsers.isEmpty()) {
 
@@ -66,7 +82,8 @@ public class Application {
     }
 
     public static List<Workspace> getMyWorkspaces(){
+        List<Workspace> workspaces = new ArrayList<>();
+        return workspaces;
 
-        return myWorkspaces;
     }
 }
