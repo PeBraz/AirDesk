@@ -11,6 +11,15 @@ public class Workspace {
     private int minQuota;
     private boolean isPrivate;
 
+    public Workspace(final String name,final int quota, final User owner) {
+        this.name = name;
+        this.maxQuota = quota;
+        this.owner = owner;
+        this.isPrivate = true;
+    }
+
+    public Workspace () {}
+
     public int getMaxQuota() {
         return maxQuota;
     }
@@ -34,5 +43,13 @@ public class Workspace {
     public void createFile(String name, String content){
 
         //updateQuota
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public void setMaxQuota(int maxQuota) {
+        this.maxQuota = maxQuota;
     }
 }

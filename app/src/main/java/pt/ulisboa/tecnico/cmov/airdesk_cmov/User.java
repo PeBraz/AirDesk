@@ -1,60 +1,65 @@
 package pt.ulisboa.tecnico.cmov.airdesk_cmov;
 
-public class User {
+import pt.ulisboa.tecnico.cmov.airdesk_cmov.Database.WorkspacesDataSource;
 
-    private static long id;
+public final class User {
+
+    private final WorkspacesDataSource workspacedb;
     private String username;
     private String password;
-
     private String email;
 
-    public User(String username, String password, String email) {
+    public User(final String username,final String password,final String email) {
         this.username = username;
         this.password = password;
         this.email = email;
+        this.workspacedb = new WorkspacesDataSource();
     }
 
     public User(){
-
+        this.workspacedb = new WorkspacesDataSource();
     }
 
-    public User(String username){
-        this.username = username;
-    }
 
-    public static long getId() {
-        return id;
-    }
-
-    public void setId(long id) {
-        this.id = id;
-    }
-
-    public String getUsername() {
+    public final String getUsername() {
         return username;
     }
 
-    public void setUsername(String username) {
+    public final void setUsername(final String username) {
         this.username = username;
     }
 
-    public String getPassword() {
+    public final String getPassword() {
         return password;
     }
 
-    public void setPassword(String password) {
+    public final void setPassword(final String password) {
         this.password = password;
     }
 
-    public String getEmail() {
+    public final String getEmail() {
         return email;
     }
 
-    public void setEmail(String email) {
+    public final void setEmail(final String email) {
         this.email = email;
     }
 
-    public String toString() {
+    public final String toString() {
         return username;
     }
+
+
+
+
+    public final void createWorkspace(final String name, final int quota){
+        this.workspacedb.create(new Workspace(name, quota, this));
+    }
+   /* public final Workspace getWorkspace(final String name) {
+        this.workspacedb.
+    }*/
+
+
+
+
 }

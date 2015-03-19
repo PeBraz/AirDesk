@@ -5,7 +5,7 @@ import java.util.List;
 
 import pt.ulisboa.tecnico.cmov.airdesk_cmov.Database.UsersDataSource;
 import pt.ulisboa.tecnico.cmov.airdesk_cmov.Exceptions.ApplicationHasNoUserException;
-import pt.ulisboa.tecnico.cmov.airdesk_cmov.Exceptions.NoUserDatabaseException;
+import pt.ulisboa.tecnico.cmov.airdesk_cmov.Exceptions.NoDatabaseException;
 import pt.ulisboa.tecnico.cmov.airdesk_cmov.Exceptions.NotRegisteredException;
 import pt.ulisboa.tecnico.cmov.airdesk_cmov.Exceptions.UserAlreadyExistsException;
 import pt.ulisboa.tecnico.cmov.airdesk_cmov.Exceptions.WrongPasswordException;
@@ -19,26 +19,25 @@ public class Application {
    // private static ArrayList<Workspace> myWorkspaces; -> this will come from the database
     // private static ArrayList<Workspace> foreignWorkspaces;
 
-    private static UsersDataSource dataSource = null;
+    private static UsersDataSource userData = null;
 
     private static SessionManager session;
 
     public static void createUser(String username, String email, String password)
-        throws NoUserDatabaseException, UserAlreadyExistsException {
+        throws NoDatabaseException, UserAlreadyExistsException {
 
-        if (Application.dataSource == null) throw new NoUserDatabaseException();
+        if (Application.userData == null) throw new NoDatabaseException();
 
         User u = new User(username, email, password);
         boolean isAllowed = checkUser(u);
 
-        if (!isAllowed) dataSource.createUser(u);
+        if (!isAllowed) userData.create(u);
 
         else throw new UserAlreadyExistsException();
     }
 
     public static void setUsersDataSource(UsersDataSource userdb) {
-        Application.dataSource = userdb;
-        Application.dataSource.open();
+        Application.userData = userdb;
     }
 
 
@@ -46,7 +45,7 @@ public class Application {
     public Application (User u) {
         this.owner = u;//find user     //this.owner = Application.getUser(username)
         this.myWorkspaces = new ArrayList<Workspace>();
-
+    }
 
 
     public void createWorkSpace(String name, int quota, boolean isPrivate, List<String> tags) throws ApplicationHasNoUserException{
@@ -61,7 +60,7 @@ public class Application {
 
         boolean flag = false;
 
-        List<User> allUsers = dataSource.getAllUsers();
+        List<User> allUsers = userData.getAll();
 
         if (!allUsers.isEmpty()) {
 
@@ -79,7 +78,7 @@ public class Application {
 
     public static boolean login(String username, String password) throws NotRegisteredException, WrongPasswordException {
 
-        List<User> allUsers = dataSource.getAllUsers();
+        List<User> allUsers = userData.getAll();
 
         for(User user : allUsers){
 

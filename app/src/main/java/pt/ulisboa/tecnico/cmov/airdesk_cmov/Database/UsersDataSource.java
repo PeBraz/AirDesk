@@ -6,27 +6,27 @@ import java.util.List;
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
-import android.database.SQLException;
 import android.database.sqlite.SQLiteDatabase;
 
-import pt.ulisboa.tecnico.cmov.airdesk_cmov.Application;
 import pt.ulisboa.tecnico.cmov.airdesk_cmov.User;
 
-public class UsersDataSource {
+public class UsersDataSource extends DataSource<User>{
 
     private SQLiteDatabase database;
-    private MySQLiteHelper dbHelper;
-    private String[] allColumns = { MySQLiteHelper.COLUMN_ID, MySQLiteHelper.COLUMN_USERNAME, MySQLiteHelper.COLUMN_PASSWORD, MySQLiteHelper.COLUMN_EMAIL};
+    private String[] allColumns = { MySQLiteHelper.USER_EMAIL,
+                                    MySQLiteHelper.USER_USERNAME,
+                                    MySQLiteHelper.USER_PASSWORD};
 
     public UsersDataSource(Context context) {
-        dbHelper = new MySQLiteHelper(context);
+        super(context);
+        database = DataSource.getDatabase();
+    }
+    public UsersDataSource() {
+        database = DataSource.getDatabase();
     }
 
-    public void open() throws SQLException {
-        database = dbHelper.getWritableDatabase();
-    }
-
-    public void createUser(User user) {
+    @Override
+    public void create(User user) {
 
         ContentValues values = new ContentValues();
         values.put(MySQLiteHelper.USER_EMAIL, user.getUsername());
@@ -35,19 +35,19 @@ public class UsersDataSource {
         database.insert(MySQLiteHelper.TABLE_USERS, null, values);
 
     }
-
-    public User getUser(final String userKey) {
+    @Override
+    public User get(final String userKey) {
         final User user;
         Cursor cursor = database.rawQuery("select * from ? where ? = ? ",
-                    new String[] {MySQLiteHelper.TABLE_USERS, MySQLiteHelper.COLUMN_USERNAME, userKey});
+                    new String[] {MySQLiteHelper.TABLE_USERS, MySQLiteHelper.USER_EMAIL, userKey});
         cursor.moveToFirst();
         user = cursorToUser(cursor);
         cursor.close();
         return user;
 
     }
-
-    public List<User> getAllUsers() {
+    @Override
+    public List<User> getAll() {
 
         List<User> users = new ArrayList<>();
         Cursor cursor = database.query(MySQLiteHelper.TABLE_USERS, allColumns, null, null, null, null, null);
@@ -64,21 +64,9 @@ public class UsersDataSource {
 
     private User cursorToUser(Cursor cursor) {
         User user = new User();
-        user.setId(cursor.getLong(0));
-        user.setUsername(cursor.getString(1));
+        user.setUsername(cursor.getString(0));
+        user.setEmail(cursor.getString(1));
         user.setPassword(cursor.getString(2));
-        user.setEmail(cursor.getString(3));
         return user;
     }
-
-    public void createWorkspace() {
-        ContentValues values = new ContentValues();
-        values.put(MySQLiteHelper.USER_EMAIL, user.getUsername());
-        values.put(MySQLiteHelper.USER_PASSWORD, user.getPassword());
-        values.put(MySQLiteHelper.USER_EMAIL, user.getEmail());
-        database.insert(MySQLiteHelper.TABLE_USERS, null, values);
-
-    }
-
-
 }

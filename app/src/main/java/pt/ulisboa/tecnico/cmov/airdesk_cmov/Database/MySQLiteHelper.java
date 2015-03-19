@@ -13,17 +13,18 @@ public class MySQLiteHelper extends SQLiteOpenHelper{
     public static final String USER_EMAIL = "EMAIL";
     public static final String USER_PASSWORD = "PASSWORD";
 
-    private static final String DATABASE_NAME = "airdeskdb";
-    private static final int DATABASE_VERSION = 1;
+    public static final String DATABASE_NAME = "airdeskdb";
+    public static final int DATABASE_VERSION = 1;
 
-    private static final String TABLE_WORKSPACES = "workspaces";
-    private static final String WS_KEY = "name";
-    private static final String WS_QUOTA = "quota";
+    public static final String TABLE_WORKSPACES = "workspaces";
+    public static final String WS_NAME = "name";
+    public static final String WS_QUOTA = "quota";
+    public static final String WS_USER = "owner";
 
-    private static final String TABLE_FILES = "files";
-    private static final String FILE_WORKSPACE = "owner";
-    private static final String FILE_NAME = "filename";
-    private static final String FILE_PATH = "path";
+    public static final String TABLE_FILES = "files";
+    public static final String FILE_WORKSPACE = "workspace";
+    public static final String FILE_NAME = "filename";
+    public static final String FILE_PATH = "path";
 
 
     private static final String USERS_CREATE =
@@ -34,15 +35,15 @@ public class MySQLiteHelper extends SQLiteOpenHelper{
 
     private static final String WORKSPACES_CREATE =
             "CREATE TABLE" + TABLE_WORKSPACES + " ( "+
-                WS_KEY + " TEXT PRIMARY KEY, " +
+                WS_NAME + " TEXT PRIMARY KEY, " +
                 WS_QUOTA + " INT, " +
-                " FOREIGN KEY ("+USER_EMAIL+") REFERENCES "+TABLE_USERS+" (" + USER_EMAIL+ "));";
+                " FOREIGN KEY ("+WS_USER+") REFERENCES "+TABLE_USERS+" (" + USER_EMAIL+ "));";
 
     private static final String FILES_CREATE =
             "CREATE TABLE " + TABLE_FILES + " (" +
                     FILE_NAME + " TEXT PRIMARY KEY, " +
                     FILE_PATH + " TEXT, " +
-                    " FOREIGN KEY ("+FILE_WORKSPACE+") REFERENCES "+TABLE_WORKSPACES+" (" + WS_KEY+ "));";
+                    " FOREIGN KEY ("+FILE_WORKSPACE+") REFERENCES "+TABLE_WORKSPACES+" (" + WS_NAME + "));";
 
     // TABLE  for workspace clients
 
