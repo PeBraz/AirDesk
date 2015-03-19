@@ -8,13 +8,14 @@ import android.util.Log;
 public class MySQLiteHelper extends SQLiteOpenHelper{
 
     public static final String TABLE_USERS = "users";
+
    // public static final String USER_ID = "id";
     public static final String USER_USERNAME = "USER";
     public static final String USER_EMAIL = "EMAIL";
     public static final String USER_PASSWORD = "PASSWORD";
 
-    public static final String DATABASE_NAME = "airdeskdb";
-    public static final int DATABASE_VERSION = 1;
+    private static final String DATABASE_NAME = "airdeskdb";
+    private static final int DATABASE_VERSION = 1;
 
     public static final String TABLE_WORKSPACES = "workspaces";
     public static final String WS_NAME = "name";
@@ -29,9 +30,10 @@ public class MySQLiteHelper extends SQLiteOpenHelper{
 
     private static final String USERS_CREATE =
             "CREATE TABLE " + TABLE_USERS + " (" +
+
                     USER_USERNAME + " TEXT, " +
-                    USER_EMAIL + " TEXT PRIMARY KEY, " +
-                    USER_PASSWORD + " TEXT);";
+                    USER_EMAIL + " TEXT PRIMARY KEY); ";
+            //        USER_PASSWORD + " TEXT);";
 
     private static final String WORKSPACES_CREATE =
             "CREATE TABLE" + TABLE_WORKSPACES + " ( "+
@@ -48,16 +50,15 @@ public class MySQLiteHelper extends SQLiteOpenHelper{
     // TABLE  for workspace clients
 
 
-
     public MySQLiteHelper(Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
     }
 
     @Override
     public void onCreate(SQLiteDatabase database) {
-        database.execSQL(TABLE_USERS);
-        database.execSQL(TABLE_WORKSPACES);
-        database.execSQL(TABLE_FILES);
+        database.execSQL(USERS_CREATE);
+        database.execSQL(WORKSPACES_CREATE);
+        database.execSQL(FILES_CREATE);
     }
 
     @Override

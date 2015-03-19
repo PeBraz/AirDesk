@@ -13,9 +13,9 @@ import pt.ulisboa.tecnico.cmov.airdesk_cmov.User;
 public class UsersDataSource extends DataSource<User>{
 
     private SQLiteDatabase database;
+
     private String[] allColumns = { MySQLiteHelper.USER_EMAIL,
-                                    MySQLiteHelper.USER_USERNAME,
-                                    MySQLiteHelper.USER_PASSWORD};
+                                    MySQLiteHelper.USER_USERNAME};
 
     public UsersDataSource(Context context) {
         super(context);
@@ -29,9 +29,10 @@ public class UsersDataSource extends DataSource<User>{
     public void create(User user) {
 
         ContentValues values = new ContentValues();
+
         values.put(MySQLiteHelper.USER_EMAIL, user.getUsername());
-        values.put(MySQLiteHelper.USER_PASSWORD, user.getPassword());
         values.put(MySQLiteHelper.USER_EMAIL, user.getEmail());
+
         database.insert(MySQLiteHelper.TABLE_USERS, null, values);
 
     }
@@ -39,7 +40,7 @@ public class UsersDataSource extends DataSource<User>{
     public User get(final String userKey) {
         final User user;
         Cursor cursor = database.rawQuery("select * from ? where ? = ? ",
-                    new String[] {MySQLiteHelper.TABLE_USERS, MySQLiteHelper.USER_EMAIL, userKey});
+        new String[] {MySQLiteHelper.TABLE_USERS, MySQLiteHelper.USER_EMAIL, userKey});
         cursor.moveToFirst();
         user = cursorToUser(cursor);
         cursor.close();
@@ -66,7 +67,16 @@ public class UsersDataSource extends DataSource<User>{
         User user = new User();
         user.setUsername(cursor.getString(0));
         user.setEmail(cursor.getString(1));
-        user.setPassword(cursor.getString(2));
         return user;
     }
+
+
+    public void createWorkspace(User user) {
+        ContentValues values = new ContentValues();
+        values.put(MySQLiteHelper.USER_EMAIL, user.getUsername());
+        values.put(MySQLiteHelper.USER_EMAIL, user.getEmail());
+        database.insert(MySQLiteHelper.TABLE_USERS, null, values);
+
+    }
+
 }

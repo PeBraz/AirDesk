@@ -12,7 +12,7 @@ public class SessionManager {
 
     private static final String PREF_NAME = "AndroidHivePref";
     private static final String IS_LOGIN = "IsLoggedIn";
-    public static final String KEY_USERNAME = "username";
+    public static final String KEY_EMAIL = "email";
 
     int PRIVATE_MODE = 0;
 
@@ -26,17 +26,17 @@ public class SessionManager {
         editor = pref.edit();
     }
 
-    public void createLoginSession(String username){
+    public void createLoginSession(String email){
 
         editor.putBoolean(IS_LOGIN, true);
-        editor.putString(KEY_USERNAME, username);
+        editor.putString(KEY_EMAIL, email);
         editor.commit();
     }
 
     public HashMap<String, String> getUserInfo(){
 
         HashMap<String, String> user = new HashMap<>();
-        user.put(KEY_USERNAME, pref.getString(KEY_USERNAME, null));
+        user.put(KEY_EMAIL, pref.getString(KEY_EMAIL, null));
         return user;
     }
 
@@ -64,10 +64,5 @@ public class SessionManager {
     public boolean isLoggedIn(){
         return pref.getBoolean(IS_LOGIN, false);
     }
-
-
-
-
-
 
 }

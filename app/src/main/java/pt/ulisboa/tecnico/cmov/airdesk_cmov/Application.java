@@ -23,12 +23,12 @@ public class Application {
 
     private static SessionManager session;
 
-    public static void createUser(String username, String email, String password)
+    public static void createUser(String username, String email)
         throws NoDatabaseException, UserAlreadyExistsException {
 
         if (Application.userData == null) throw new NoDatabaseException();
 
-        User u = new User(username, email, password);
+        User u = new User(username, email);
         boolean isAllowed = checkUser(u);
 
         if (!isAllowed) userData.create(u);
@@ -76,16 +76,16 @@ public class Application {
         return flag;
     }
 
-    public static boolean login(String username, String password) throws NotRegisteredException, WrongPasswordException {
+    public static boolean login(String username) throws NotRegisteredException, WrongPasswordException {
 
         List<User> allUsers = userData.getAll();
 
         for(User user : allUsers){
 
-            if (user.getUsername().equals(username) && user.getPassword().equals(password))
+            if (user.getEmail().equals(username))
                 return true;
 
-            if (user.getUsername().equals(username) && !user.getPassword().equals(password))
+            if (user.getEmail().equals(username))
                 throw new WrongPasswordException();
         }
 

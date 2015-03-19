@@ -8,18 +8,20 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 
+import java.util.List;
+
 import pt.ulisboa.tecnico.cmov.airdesk_cmov.Application;
 import pt.ulisboa.tecnico.cmov.airdesk_cmov.Database.UsersDataSource;
 import pt.ulisboa.tecnico.cmov.airdesk_cmov.Exceptions.NotRegisteredException;
 import pt.ulisboa.tecnico.cmov.airdesk_cmov.Exceptions.WrongPasswordException;
 import pt.ulisboa.tecnico.cmov.airdesk_cmov.R;
 import pt.ulisboa.tecnico.cmov.airdesk_cmov.Sessions.SessionManager;
+import pt.ulisboa.tecnico.cmov.airdesk_cmov.User;
 
 
 public class LoginActivity extends ActionBarActivity {
 
-    private EditText username = null;
-    private EditText password = null;
+    private EditText email = null;
 
     private SessionManager session;
 
@@ -28,8 +30,7 @@ public class LoginActivity extends ActionBarActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
 
-        username = (EditText)findViewById(R.id.editText2);
-        password = (EditText)findViewById(R.id.editText3);
+        email = (EditText)findViewById(R.id.editText3);
         Button button = (Button) findViewById(R.id.button4);
 
         Application.setUsersDataSource(new UsersDataSource(this));
@@ -40,9 +41,9 @@ public class LoginActivity extends ActionBarActivity {
 
                 try {
 
-                    Application.login(username.getText().toString(),password.getText().toString());
+                    Application.login(email.getText().toString());
                     session = new SessionManager(getApplicationContext());
-                    session.createLoginSession(username.getText().toString());
+                    session.createLoginSession(email.getText().toString());
                     Toast.makeText(LoginActivity.this, "Welcome to AirDesk.", Toast.LENGTH_SHORT).show();
                     Intent intent = new Intent(LoginActivity.this, WorkSpacesActivity.class);
                     startActivity(intent);

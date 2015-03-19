@@ -6,12 +6,11 @@ public final class User {
 
     private final WorkspacesDataSource workspacedb;
     private String username;
-    private String password;
     private String email;
 
-    public User(final String username,final String password,final String email) {
+
+    public User(final String username, final String email) {
         this.username = username;
-        this.password = password;
         this.email = email;
         this.workspacedb = new WorkspacesDataSource();
     }
@@ -29,13 +28,8 @@ public final class User {
         this.username = username;
     }
 
-    public final String getPassword() {
-        return password;
-    }
 
-    public final void setPassword(final String password) {
-        this.password = password;
-    }
+
 
     public final String getEmail() {
         return email;
@@ -51,15 +45,12 @@ public final class User {
 
 
 
-
     public final void createWorkspace(final String name, final int quota){
         this.workspacedb.create(new Workspace(name, quota, this));
     }
    /* public final Workspace getWorkspace(final String name) {
         this.workspacedb.
     }*/
-
-
 
 
 }
