@@ -53,7 +53,7 @@ public class registerActivity extends ActionBarActivity {
                     Intent intent = new Intent(registerActivity.this, MainActivity.class);
                     startActivity(intent);
                 } catch (UserAlreadyExistsException e) {
-                    e.getMessage();
+                    Toast.makeText(registerActivity.this, e.getMessage(), Toast.LENGTH_SHORT).show();
                 }
 
 
