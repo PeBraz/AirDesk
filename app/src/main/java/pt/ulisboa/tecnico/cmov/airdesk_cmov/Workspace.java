@@ -52,4 +52,8 @@ public class Workspace {
     public void setMaxQuota(int maxQuota) {
         this.maxQuota = maxQuota;
     }
+
+    public void invite(User u) {
+        //TODO
+    }
 }
