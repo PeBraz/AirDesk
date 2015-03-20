@@ -3,3 +3,28 @@ mudar onclick listeners para o xml e fazer metodos. tirar as merdas do oncreate(
 
 
 multi-threading for intensive tasks
+
+subscription (access list) preferences)
+
+Workspace Functionality
+    add workspace
+    change privacy settings (Private/Public)
+    change maxquota
+    add user to workspace (invite)
+    remove user from workspace 
+    remove workspace
+
+File Functionality 
+    add file 
+    edit file
+    save file
+    remove file
+
+Foreign Workspace Functionality
+    subscribe
+    unsubscribe
+
+invite 
+subscribe
+
+
