@@ -42,6 +42,8 @@ public class WorkspacesDataSource extends DataSource<Workspace>{
         Cursor cursor = database.rawQuery("select * from "+MySQLiteHelper.TABLE_WORKSPACES+" where "+MySQLiteHelper.WS_NAME+" = ? ",
                 new String[] {wsKey});
         cursor.moveToFirst();
+        if(cursor.isAfterLast())
+            return null;
         ws = cursorToWorkspace(cursor);
         cursor.close();
         return ws;

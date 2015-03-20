@@ -1,6 +1,8 @@
 package pt.ulisboa.tecnico.cmov.airdesk_cmov.Sessions;
 
 import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Set;
 
 import android.content.Context;
 import android.content.Intent;
@@ -18,21 +20,24 @@ public class SessionManager {
     int PRIVATE_MODE = 0;
 
     SharedPreferences pref;
-    Editor editor;
+    Editor login_editor;
+    Editor workspace_editor;
     Context context;
 
     public SessionManager(Context context){
         this.context = context;
         pref = context.getSharedPreferences(PREF_NAME, PRIVATE_MODE);
-        editor = pref.edit();
+        login_editor = pref.edit();
+        workspace_editor = pref.edit();
+        
     }
 
     public void createLoginSession(String email, String username){
 
-        editor.putBoolean(IS_LOGIN, true);
-        editor.putString(KEY_EMAIL, email);
-        editor.putString(KEY_USERNAME,username);
-        editor.commit();
+        login_editor.putBoolean(IS_LOGIN, true);
+        login_editor.putString(KEY_EMAIL, email);
+        login_editor.putString(KEY_USERNAME, username);
+        login_editor.commit();
     }
 
     public HashMap<String, String> getUserInfo(){
@@ -56,8 +61,8 @@ public class SessionManager {
 
     public void logoutUser(){
 
-        editor.clear();
-        editor.commit();
+        login_editor.clear();
+        login_editor.commit();
         Intent i = new Intent(context, MainActivity.class);
         i.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
         i.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);

@@ -43,6 +43,8 @@ public class FilesDataSource extends DataSource<File>{
         Cursor cursor = database.rawQuery("select * from "+MySQLiteHelper.TABLE_FILES+" where "+ MySQLiteHelper.FILE_NAME+" = ? ",
                 new String[] {filekey});
         cursor.moveToFirst();
+        if(cursor.isAfterLast())
+            return null;
         file = cursorToFile(cursor);
         cursor.close();
         return file;
