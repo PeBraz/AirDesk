@@ -30,8 +30,8 @@ public class MySQLiteHelper extends SQLiteOpenHelper{
 
     private static final String USERS_CREATE =
             "CREATE TABLE " + TABLE_USERS + " (" +
-                    USER_USERNAME + " TEXT, " +
-                    USER_EMAIL + " TEXT PRIMARY KEY); ";
+                    USER_EMAIL + " TEXT PRIMARY KEY, "+
+                    USER_USERNAME + " TEXT); ";
 
 
     private static final String WORKSPACES_CREATE =

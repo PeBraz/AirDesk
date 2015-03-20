@@ -40,8 +40,8 @@ public class FilesDataSource extends DataSource<File>{
     @Override
     public File get(final String filekey) {
         final File file;
-        Cursor cursor = database.rawQuery("select * from ? where ? = ? ",
-                new String[] {MySQLiteHelper.TABLE_FILES, MySQLiteHelper.FILE_NAME, filekey});
+        Cursor cursor = database.rawQuery("select * from "+MySQLiteHelper.TABLE_FILES+" where "+ MySQLiteHelper.FILE_NAME+" = ? ",
+                new String[] {filekey});
         cursor.moveToFirst();
         file = cursorToFile(cursor);
         cursor.close();

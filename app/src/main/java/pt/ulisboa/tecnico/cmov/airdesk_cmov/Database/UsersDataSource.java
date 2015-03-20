@@ -30,7 +30,7 @@ public class UsersDataSource extends DataSource<User>{
 
         ContentValues values = new ContentValues();
 
-        values.put(MySQLiteHelper.USER_EMAIL, user.getUsername());
+        values.put(MySQLiteHelper.USER_USERNAME, user.getUsername());
         values.put(MySQLiteHelper.USER_EMAIL, user.getEmail());
 
         database.insert(MySQLiteHelper.TABLE_USERS, null, values);
@@ -64,18 +64,9 @@ public class UsersDataSource extends DataSource<User>{
 
     private User cursorToUser(Cursor cursor) {
         User user = new User();
-        user.setUsername(cursor.getString(0));
-        user.setEmail(cursor.getString(1));
+        user.setUsername(cursor.getString(1));
+        user.setEmail(cursor.getString(0));
         return user;
-    }
-
-
-    public void createWorkspace(User user) {
-        ContentValues values = new ContentValues();
-        values.put(MySQLiteHelper.USER_EMAIL, user.getUsername());
-        values.put(MySQLiteHelper.USER_EMAIL, user.getEmail());
-        database.insert(MySQLiteHelper.TABLE_USERS, null, values);
-
     }
 
 }

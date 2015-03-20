@@ -39,8 +39,8 @@ public class WorkspacesDataSource extends DataSource<Workspace>{
     @Override
     public Workspace get(final String wsKey) {
         final Workspace ws;
-        Cursor cursor = database.rawQuery("select * from ? where ? = ? ",
-                new String[] {MySQLiteHelper.TABLE_WORKSPACES, MySQLiteHelper.WS_NAME, wsKey});
+        Cursor cursor = database.rawQuery("select * from "+MySQLiteHelper.TABLE_WORKSPACES+" where "+MySQLiteHelper.WS_NAME+" = ? ",
+                new String[] {wsKey});
         cursor.moveToFirst();
         ws = cursorToWorkspace(cursor);
         cursor.close();
