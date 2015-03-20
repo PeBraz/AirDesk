@@ -15,7 +15,6 @@ import pt.ulisboa.tecnico.cmov.airdesk_cmov.Sessions.SessionManager;
 
 public class UserSettingsActivity extends ActionBarActivity {
 
-
     SessionManager session;
 
     @Override
@@ -25,13 +24,14 @@ public class UserSettingsActivity extends ActionBarActivity {
 
         session = new SessionManager(getApplicationContext());
 
-        session.checkLogin();
-
         HashMap<String, String> user = session.getUserInfo();
-        String username = user.get(SessionManager.KEY_EMAIL);
+        String email = user.get(SessionManager.KEY_EMAIL);
+        String username = user.get(SessionManager.KEY_USERNAME);
 
         TextView textView = (TextView) findViewById(R.id.textView3);
-        textView.setText(username);
+        TextView textView1 = (TextView) findViewById(R.id.textView10);
+        textView.setText(email);
+        textView1.setText(username);
 
         Button btnLogout = (Button)findViewById(R.id.button3);
 

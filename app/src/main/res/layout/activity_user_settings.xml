@@ -10,7 +10,7 @@
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:textAppearance="?android:attr/textAppearanceLarge"
+        android:textAppearance="?android:attr/textAppearanceMedium"
         android:text="Email add:"
         android:id="@+id/textView9"
         android:layout_marginTop="33dp"
@@ -22,16 +22,36 @@
         android:layout_height="wrap_content"
         android:text="logout"
         android:id="@+id/button3"
-        android:layout_marginTop="46dp"
-        android:layout_centerHorizontal="true"
-        android:layout_alignTop="@+id/textView9" />
+        android:layout_marginTop="39dp"
+        android:layout_below="@+id/textView8"
+        android:layout_centerHorizontal="true" />
 
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:textAppearance="?android:attr/textAppearanceLarge"
+        android:textAppearance="?android:attr/textAppearanceMedium"
         android:id="@+id/textView3"
         android:layout_alignTop="@+id/textView9"
         android:layout_alignLeft="@+id/button3"
         android:layout_alignStart="@+id/button3" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textAppearance="?android:attr/textAppearanceMedium"
+        android:text="Username"
+        android:id="@+id/textView8"
+        android:layout_below="@+id/textView9"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
+        android:layout_marginTop="37dp" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textAppearance="?android:attr/textAppearanceMedium"
+        android:id="@+id/textView10"
+        android:layout_above="@+id/button3"
+        android:layout_alignLeft="@+id/textView3"
+        android:layout_alignStart="@+id/textView3" />
 </RelativeLayout>

@@ -22,6 +22,7 @@ import pt.ulisboa.tecnico.cmov.airdesk_cmov.User;
 public class LoginActivity extends ActionBarActivity {
 
     private EditText email = null;
+    private EditText username = null;
 
     private SessionManager session;
 
@@ -31,6 +32,7 @@ public class LoginActivity extends ActionBarActivity {
         setContentView(R.layout.activity_login);
 
         email = (EditText)findViewById(R.id.editText3);
+        username = (EditText)findViewById(R.id.editText4);
         Button button = (Button) findViewById(R.id.button4);
 
         Application.setUsersDataSource(new UsersDataSource(this));
@@ -43,7 +45,7 @@ public class LoginActivity extends ActionBarActivity {
 
                     Application.login(email.getText().toString());
                     session = new SessionManager(getApplicationContext());
-                    session.createLoginSession(email.getText().toString());
+                    session.createLoginSession(email.getText().toString(),username.getText().toString());
                     Toast.makeText(LoginActivity.this, "Welcome to AirDesk.", Toast.LENGTH_SHORT).show();
                     Intent intent = new Intent(LoginActivity.this, WorkSpacesActivity.class);
                     startActivity(intent);

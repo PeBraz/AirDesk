@@ -21,9 +21,6 @@ public class UsersDataSource extends DataSource<User>{
         super(context);
         database = DataSource.getDatabase();
     }
-    public UsersDataSource() {
-        database = DataSource.getDatabase();
-    }
 
     @Override
     public void create(User user) {
@@ -34,14 +31,16 @@ public class UsersDataSource extends DataSource<User>{
         values.put(MySQLiteHelper.USER_EMAIL, user.getEmail());
 
         database.insert(MySQLiteHelper.TABLE_USERS, null, values);
-
     }
+
     @Override
     public User get(final String userKey) {
         final User user;
         Cursor cursor = database.rawQuery("select * from "+MySQLiteHelper.TABLE_USERS+" where "+ MySQLiteHelper.USER_EMAIL+" = ? ",
         new String[] {userKey});
         cursor.moveToFirst();
+        if(cursor.isAfterLast())
+            return null;
         user = cursorToUser(cursor);
         return user;
     }

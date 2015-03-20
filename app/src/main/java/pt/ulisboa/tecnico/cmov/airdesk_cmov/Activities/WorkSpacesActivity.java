@@ -15,12 +15,17 @@ import pt.ulisboa.tecnico.cmov.airdesk_cmov.Sessions.SessionManager;
 
 public class WorkSpacesActivity extends ActionBarActivity {
 
+    SessionManager session;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
 
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_work_spaces);
+
+        session = new SessionManager(getApplicationContext());
+        session.checkLogin();
     }
 
     @Override
