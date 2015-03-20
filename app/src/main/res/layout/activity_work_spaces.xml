@@ -15,5 +15,5 @@
         android:id="@+id/textView4"
         android:layout_alignParentTop="true"
         android:layout_centerHorizontal="true"
-        style="@style/Base.TextAppearance.AppCompat.Headline" />
+        style="@style/Widget.AppCompat.PopupMenu" />
 </RelativeLayout>

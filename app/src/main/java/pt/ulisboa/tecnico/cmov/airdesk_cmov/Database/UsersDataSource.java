@@ -39,14 +39,13 @@ public class UsersDataSource extends DataSource<User>{
     @Override
     public User get(final String userKey) {
         final User user;
-        Cursor cursor = database.rawQuery("select * from ? where ? = ? ",
+        Cursor cursor = database.rawQuery("select * from ? where ? = ?",
         new String[] {MySQLiteHelper.TABLE_USERS, MySQLiteHelper.USER_EMAIL, userKey});
         cursor.moveToFirst();
         user = cursorToUser(cursor);
-        cursor.close();
         return user;
-
     }
+
     @Override
     public List<User> getAll() {
 

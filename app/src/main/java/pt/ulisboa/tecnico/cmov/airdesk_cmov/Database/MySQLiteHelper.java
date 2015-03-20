@@ -30,10 +30,9 @@ public class MySQLiteHelper extends SQLiteOpenHelper{
 
     private static final String USERS_CREATE =
             "CREATE TABLE " + TABLE_USERS + " (" +
-
                     USER_USERNAME + " TEXT, " +
                     USER_EMAIL + " TEXT PRIMARY KEY); ";
-            //        USER_PASSWORD + " TEXT);";
+
 
     private static final String WORKSPACES_CREATE =
             "CREATE TABLE" + TABLE_WORKSPACES + " ( "+
@@ -47,9 +46,6 @@ public class MySQLiteHelper extends SQLiteOpenHelper{
                     FILE_PATH + " TEXT, " +
                     " FOREIGN KEY ("+FILE_WORKSPACE+") REFERENCES "+TABLE_WORKSPACES+" (" + WS_NAME + "));";
 
-    // TABLE  for workspace clients
-
-
     public MySQLiteHelper(Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
     }
@@ -57,8 +53,8 @@ public class MySQLiteHelper extends SQLiteOpenHelper{
     @Override
     public void onCreate(SQLiteDatabase database) {
         database.execSQL(USERS_CREATE);
-        database.execSQL(WORKSPACES_CREATE);
-        database.execSQL(FILES_CREATE);
+        //database.execSQL(WORKSPACES_CREATE);
+        //database.execSQL(FILES_CREATE);
     }
 
     @Override

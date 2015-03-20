@@ -11,9 +11,6 @@ import java.util.List;
 import pt.ulisboa.tecnico.cmov.airdesk_cmov.Exceptions.NoDatabaseException;
 import pt.ulisboa.tecnico.cmov.airdesk_cmov.Workspace;
 
-/**
- * Created by pedro on 19-03-2015.
- */
 public class WorkspacesDataSource extends DataSource<Workspace>{
 
     private SQLiteDatabase database;

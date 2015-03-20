@@ -56,24 +56,11 @@ public class Application {
 
     }
 
-    private static boolean checkUser(User user){
+    private static boolean checkUser(User u){
 
-        boolean flag = false;
+        User user = userData.get(u.getEmail());
 
-        List<User> allUsers = userData.getAll();
-
-        if (!allUsers.isEmpty()) {
-
-            for (User u : allUsers) {
-
-                if (u.getUsername().equals(user.getUsername()) || u.getEmail().equals(user.getEmail())) {
-
-                    flag = true;
-                    break;
-                }
-            }
-        }
-        return flag;
+        return user != null;
     }
 
     public static boolean login(String username) throws NotRegisteredException, WrongPasswordException {
