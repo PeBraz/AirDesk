@@ -20,6 +20,8 @@ public class MySQLiteHelper extends SQLiteOpenHelper{
     public static final String TABLE_WORKSPACES = "workspaces";
     public static final String WS_NAME = "name";
     public static final String WS_QUOTA = "quota";
+    public static final String WS_PRIVACY = "private";
+    public static final String WS_TAGS = "tags";
     public static final String WS_USER = "owner";
 
     public static final String TABLE_FILES = "files";
@@ -35,9 +37,11 @@ public class MySQLiteHelper extends SQLiteOpenHelper{
 
 
     private static final String WORKSPACES_CREATE =
-            "CREATE TABLE" + TABLE_WORKSPACES + " ( "+
+            "CREATE TABLE " + TABLE_WORKSPACES + " ( "+
                 WS_NAME + " TEXT PRIMARY KEY, " +
                 WS_QUOTA + " INTEGER, " +
+                WS_PRIVACY + " INTEGER, " +
+                WS_TAGS + " TEXT, " +
                 WS_USER + " TEXT, " +
                 " FOREIGN KEY ("+WS_USER+") REFERENCES "+TABLE_USERS+" (" + USER_EMAIL+ "));";
 
@@ -55,8 +59,8 @@ public class MySQLiteHelper extends SQLiteOpenHelper{
     @Override
     public void onCreate(SQLiteDatabase database) {
         database.execSQL(USERS_CREATE);
-        //database.execSQL(WORKSPACES_CREATE);
-        //database.execSQL(FILES_CREATE);
+        database.execSQL(WORKSPACES_CREATE);
+        database.execSQL(FILES_CREATE);
     }
 
     @Override

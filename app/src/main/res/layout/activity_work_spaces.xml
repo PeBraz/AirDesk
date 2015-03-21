@@ -16,4 +16,13 @@
         android:layout_alignParentTop="true"
         android:layout_centerHorizontal="true"
         style="@style/Widget.AppCompat.PopupMenu" />
+
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="New "
+        android:id="@+id/new_workspace_button"
+        android:layout_below="@+id/textView4"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true" />
 </RelativeLayout>

@@ -14,7 +14,7 @@ import pt.ulisboa.tecnico.cmov.airdesk_cmov.Sessions.SessionManager;
 
 public class Application {
 
-    private User owner;
+    private static User owner = null;
     private List<Workspace> myWorkspaces;
    // private static ArrayList<Workspace> myWorkspaces; -> this will come from the database
     // private static ArrayList<Workspace> foreignWorkspaces;
@@ -40,21 +40,20 @@ public class Application {
         Application.userData = userdb;
     }
 
-
+    public static User getOwner() { return Application.owner; }
 
     public Application (User u) {
-        this.owner = u;//find user     //this.owner = Application.getUser(username)
+        Application.owner = u;//find user     //this.owner = Application.getUser(username)
         this.myWorkspaces = new ArrayList<Workspace>();
     }
-
-
+/*  User does this - delete stuff later
     public void createWorkSpace(String name, int quota, boolean isPrivate, List<String> tags) throws ApplicationHasNoUserException{
-        if (owner == null)
-            throw new ApplicationHasNoUserException();
+        //if (owner == null)    -> this is stup
+          //  throw new ApplicationHasNoUserException();
 
         //this.workspace.add(name, quota, isPrivate, tags);
 
-    }
+    }*/
 
     private static boolean checkUser(User u){
 
@@ -63,19 +62,16 @@ public class Application {
         return user != null;
     }
 
-    public static boolean login(String username) throws NotRegisteredException, WrongPasswordException {
+    public static void login(String email) throws NotRegisteredException, WrongPasswordException {
 
         List<User> allUsers = userData.getAll();
 
-        for(User user : allUsers){
-
-            if (user.getEmail().equals(username))
-                return true;
-
-            if (user.getEmail().equals(username))
-                throw new WrongPasswordException();
+        for(User user : allUsers) {
+            if (user.getEmail().equals(email)) {
+                Application.owner = user;
+                return;
+            }
         }
-
         throw new NotRegisteredException();
     }
 

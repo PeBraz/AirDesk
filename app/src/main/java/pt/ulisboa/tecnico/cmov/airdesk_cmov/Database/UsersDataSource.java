@@ -32,7 +32,12 @@ public class UsersDataSource extends DataSource<User>{
 
         database.insert(MySQLiteHelper.TABLE_USERS, null, values);
     }
-
+    @Override
+    public void save(User user) {
+        final String query = String.format("UPDATE %1$s SET %2$s= ? WHERE %3$s= ?",
+               MySQLiteHelper.TABLE_USERS, MySQLiteHelper.USER_USERNAME, MySQLiteHelper.USER_EMAIL);
+        database.rawQuery(query, new String[]{ user.getUsername(), user.getEmail()});
+    }
     @Override
     public User get(final String userKey) {
         final User user;

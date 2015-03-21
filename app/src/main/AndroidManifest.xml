@@ -32,6 +32,10 @@
             android:name=".Activities.UserSettingsActivity"
             android:label="@string/title_activity_user_settings" >
         </activity>
+        <activity
+            android:name=".Activities.NewWorkspaceActivity"
+            android:label="@string/title_activity_new_workspace" >
+        </activity>
     </application>
 
 </manifest>

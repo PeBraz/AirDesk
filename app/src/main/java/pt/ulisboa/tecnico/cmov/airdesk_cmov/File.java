@@ -1,36 +1,34 @@
 package pt.ulisboa.tecnico.cmov.airdesk_cmov;
 
-/**
- * Created by pedro on 19-03-2015.
- */
+
 public class File {
 
 
     private String name;
     private String path;
-    private String workspace;
+    private Workspace workspace;
 
     public File () {
 
     }
 
 
-    public String getName() {
+    public final String getName() {
         return name;
     }
-    public String getPath() {
+    public final String getPath() {
         return path;
     }
-    public String getWorkspace() {
+    public final Workspace getWorkspace() {
         return workspace;
     }
-    public void setName(String name) {
+    public final void setName(final String name) {
         this.name = name;
     }
-    public void setPath(String path) {
+    public final void setPath(final String path) {
         this.path = path;
     }
-    public void setWorkspace(String workspace) {
+    public final void setWorkspace(final Workspace workspace) {
         this.workspace = workspace;
     }
 

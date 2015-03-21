@@ -8,4 +8,8 @@
     <string name="title_activity_user_settings_activity">User account</string>
     <string name="title_activity_work_spaces">Workspaces</string>
     <string name="title_activity_user_settings">UserSettingsActivity</string>
+    <string name="title_activity_new_workspace">NewWorkspaceActivity</string>
+
+    <!-- new workspace activity -->
+    <string name="workspace_name">Workspace Name...</string>
 </resources>

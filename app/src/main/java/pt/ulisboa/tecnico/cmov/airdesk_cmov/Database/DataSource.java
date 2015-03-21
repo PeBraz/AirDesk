@@ -1,8 +1,7 @@
 package pt.ulisboa.tecnico.cmov.airdesk_cmov.Database;
 
-import android.content.ContentValues;
 import android.content.Context;
-import android.database.Cursor;
+
 import android.database.SQLException;
 import android.database.sqlite.SQLiteDatabase;
 
@@ -16,7 +15,6 @@ public abstract class DataSource <T>{
 
     private static SQLiteDatabase database = null;
     private static MySQLiteHelper dbHelper = null;
-    //private String[] allColumns = { MySQLiteHelper.COLUMN_ID, MySQLiteHelper.COLUMN_USERNAME, MySQLiteHelper.COLUMN_PASSWORD, MySQLiteHelper.COLUMN_EMAIL};
 
     public DataSource(Context context) throws SQLException{
         if (DataSource.database != null) return;
@@ -32,6 +30,15 @@ public abstract class DataSource <T>{
     }
 
     public abstract void create(T object);
+
+    /**
+     *  Saves an already existing object onto the database, the fields will be updated if required.
+     *  Only the attribute that serves as key will be used to find the existing entry.
+     *
+     * @param object the type of object that needs to be saved in the database
+     *
+     */
+    public abstract void save(T object);
 
     public abstract T get(final String key);
 

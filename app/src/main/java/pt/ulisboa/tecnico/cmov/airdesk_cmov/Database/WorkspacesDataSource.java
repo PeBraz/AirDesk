@@ -15,8 +15,10 @@ public class WorkspacesDataSource extends DataSource<Workspace>{
 
     private SQLiteDatabase database;
     private String[] allColumns = { MySQLiteHelper.WS_NAME,
-            MySQLiteHelper.USER_USERNAME,
-            MySQLiteHelper.USER_PASSWORD};
+                                    MySQLiteHelper.WS_QUOTA,
+                                    MySQLiteHelper.WS_PRIVACY,
+                                    MySQLiteHelper.WS_TAGS,
+                                    MySQLiteHelper.WS_USER};
 
     public WorkspacesDataSource(Context context) {
         super(context);
@@ -31,10 +33,20 @@ public class WorkspacesDataSource extends DataSource<Workspace>{
 
         ContentValues values = new ContentValues();
         values.put(MySQLiteHelper.WS_NAME, ws.getName());
-        values.put(MySQLiteHelper.WS_QUOTA, ws.getMaxQuota());
+        values.put(MySQLiteHelper.WS_QUOTA, ws.getQuota());
+        values.put(MySQLiteHelper.WS_PRIVACY, ws.getPrivacy()?"1":"0");
+        values.put(MySQLiteHelper.WS_TAGS, ws.getTags());
         values.put(MySQLiteHelper.WS_USER, ws.getOwner().getUsername());
         database.insert(MySQLiteHelper.TABLE_WORKSPACES, null, values);
 
+    }
+    @Override
+    public void save(Workspace ws) {
+        final String query = String.format("UPDATE %1$s SET %2$s= ?,%3$s= ? , %4$s= ? WHERE %5$s= ?",
+                MySQLiteHelper.TABLE_WORKSPACES, MySQLiteHelper.WS_QUOTA, MySQLiteHelper.WS_PRIVACY,
+                MySQLiteHelper.WS_USER, MySQLiteHelper.WS_NAME);
+        database.rawQuery(query, new String[]{Integer.toString(ws.getQuota()),ws.getPrivacy()?"1":"0",
+                                    ws.getOwner().getUsername(), ws.getName()});
     }
     @Override
     public Workspace get(final String wsKey) {
@@ -53,7 +65,7 @@ public class WorkspacesDataSource extends DataSource<Workspace>{
     public List<Workspace> getAll() {
 
         List<Workspace> wss = new ArrayList<Workspace>();
-        Cursor cursor = database.query(MySQLiteHelper.TABLE_USERS, allColumns, null, null, null, null, null);
+        Cursor cursor = database.query(MySQLiteHelper.TABLE_WORKSPACES, allColumns, null, null, null, null, null);
 
         cursor.moveToFirst();
         while (!cursor.isAfterLast()) {
@@ -68,7 +80,7 @@ public class WorkspacesDataSource extends DataSource<Workspace>{
     private Workspace cursorToWorkspace(Cursor cursor) {
         Workspace ws = new Workspace();
         ws.setName(cursor.getString(0));
-        ws.setMaxQuota(cursor.getInt(1));
+        ws.setQuota(cursor.getInt(1));
         //  LOAD user to get name??
         return ws;
     }
