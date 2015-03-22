@@ -17,7 +17,6 @@ public class WorkSpacesActivity extends ActionBarActivity {
 
     SessionManager session;
 
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
 
@@ -32,6 +31,22 @@ public class WorkSpacesActivity extends ActionBarActivity {
             @Override
             public void onClick(View view) {
                startActivity(new Intent(getApplicationContext(), NewWorkspaceActivity.class));
+            }
+        });
+
+        Button button2 = (Button)findViewById(R.id.my_workspaces);
+        button2.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                startActivity(new Intent(getApplicationContext(), MyWorkSpacesActivity.class));
+            }
+        });
+
+        Button button3 = (Button)findViewById(R.id.button2);
+        button3.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                startActivity(new Intent(getApplicationContext(), ForeignWorkspacesActivity.class));
             }
         });
     }

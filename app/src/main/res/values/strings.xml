@@ -12,4 +12,6 @@
 
     <!-- new workspace activity -->
     <string name="workspace_name">Workspace Name...</string>
+    <string name="title_activity_my_work_spaces">MyWorkSpacesActivity</string>
+    <string name="title_activity_foreign_workspaces">ForeignWorkspacesActivity</string>
 </resources>
