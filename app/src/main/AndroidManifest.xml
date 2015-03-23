@@ -8,8 +8,8 @@
         android:label="@string/app_name"
         android:theme="@style/AppTheme" >
         <activity
-            android:name=".Activities.WorkSpacesActivity"
-            android:label="@string/title_activity_work_spaces" >
+            android:name=".Activities.MainActivity"
+            android:label="@string/title_activity_main" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -17,8 +17,8 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".Activities.MainActivity"
-            android:label="@string/title_activity_main" >
+            android:name=".Activities.WorkSpacesActivity"
+            android:label="@string/title_activity_work_spaces" >
         </activity>
         <activity
             android:name=".Activities.LoginActivity"

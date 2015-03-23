@@ -16,12 +16,8 @@ public class Application {
 
     private static User owner = null;
     private List<Workspace> myWorkspaces;
-   // private static ArrayList<Workspace> myWorkspaces; -> this will come from the database
-    // private static ArrayList<Workspace> foreignWorkspaces;
 
     private static UsersDataSource userData = null;
-
-    private static SessionManager session;
 
     public static void createUser(String username, String email)
         throws NoDatabaseException, UserAlreadyExistsException {
@@ -43,17 +39,9 @@ public class Application {
     public static User getOwner() { return Application.owner; }
 
     public Application (User u) {
-        Application.owner = u;//find user     //this.owner = Application.getUser(username)
-        this.myWorkspaces = new ArrayList<Workspace>();
+        Application.owner = u;
+        this.myWorkspaces = new ArrayList<>();
     }
-/*  User does this - delete stuff later
-    public void createWorkSpace(String name, int quota, boolean isPrivate, List<String> tags) throws ApplicationHasNoUserException{
-        //if (owner == null)    -> this is stup
-          //  throw new ApplicationHasNoUserException();
-
-        //this.workspace.add(name, quota, isPrivate, tags);
-
-    }*/
 
     private static boolean checkUser(User u){
 
@@ -64,15 +52,10 @@ public class Application {
 
     public static void login(String email) throws NotRegisteredException, WrongPasswordException {
 
-        List<User> allUsers = userData.getAll();
+        User user = userData.get(email);
+        if (user == null) throw new NotRegisteredException();
+        Application.owner = user;
 
-        for(User user : allUsers) {
-            if (user.getEmail().equals(email)) {
-                Application.owner = user;
-                return;
-            }
-        }
-        throw new NotRegisteredException();
     }
 
     public static List<Workspace> getMyWorkspaces(){

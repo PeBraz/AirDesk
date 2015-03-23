@@ -10,14 +10,20 @@ import android.widget.Button;
 import android.widget.Toast;
 
 import pt.ulisboa.tecnico.cmov.airdesk_cmov.R;
+import pt.ulisboa.tecnico.cmov.airdesk_cmov.Sessions.SessionManager;
 
 
 public class MainActivity extends ActionBarActivity {
+
+    SessionManager session;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        session = new SessionManager(getApplicationContext());
+        session.checkLogin();
 
         Button button = (Button) findViewById(R.id.button6);
         Button button2 = (Button) findViewById(R.id.button5);

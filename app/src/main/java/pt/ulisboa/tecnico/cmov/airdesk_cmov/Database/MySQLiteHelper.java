@@ -12,7 +12,6 @@ public class MySQLiteHelper extends SQLiteOpenHelper{
    // public static final String USER_ID = "id";
     public static final String USER_USERNAME = "USER";
     public static final String USER_EMAIL = "EMAIL";
-    public static final String USER_PASSWORD = "PASSWORD";
 
     private static final String DATABASE_NAME = "airdeskdb";
     private static final int DATABASE_VERSION = 1;
