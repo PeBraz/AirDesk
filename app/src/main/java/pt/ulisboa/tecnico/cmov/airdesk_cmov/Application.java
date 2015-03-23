@@ -15,13 +15,16 @@ import pt.ulisboa.tecnico.cmov.airdesk_cmov.Sessions.SessionManager;
 public class Application {
 
     private static User owner = null;
-    private List<Workspace> myWorkspaces;
-   // private static ArrayList<Workspace> myWorkspaces; -> this will come from the database
-    // private static ArrayList<Workspace> foreignWorkspaces;
+    public static SessionManager session = null;
 
+
+    private List<Workspace> myWorkspaces;
     private static UsersDataSource userData = null;
 
-    private static SessionManager session;
+    public static void init(android.content.Context AppContext) {
+        Application.setUsersDataSource(new UsersDataSource(AppContext));
+        Application.session = new SessionManager(AppContext);
+    }
 
     public static void createUser(String username, String email)
         throws NoDatabaseException, UserAlreadyExistsException {
@@ -64,15 +67,12 @@ public class Application {
 
     public static void login(String email) throws NotRegisteredException, WrongPasswordException {
 
-        List<User> allUsers = userData.getAll();
+        if (userData == null) throw new NoDatabaseException();
 
-        for(User user : allUsers) {
-            if (user.getEmail().equals(email)) {
-                Application.owner = user;
-                return;
-            }
-        }
-        throw new NotRegisteredException();
+        User u = userData.get(email);
+        if (u == null)throw new NotRegisteredException();
+
+        Application.owner = userData.get(email);
     }
 
     public static List<Workspace> getMyWorkspaces(){

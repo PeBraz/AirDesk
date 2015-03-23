@@ -23,9 +23,6 @@ public class WorkSpacesActivity extends ActionBarActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_work_spaces);
 
-        session = new SessionManager(getApplicationContext());
-        session.checkLogin();
-
         Button button = (Button)findViewById(R.id.new_workspace_button);
         button.setOnClickListener(new View.OnClickListener() {
             @Override

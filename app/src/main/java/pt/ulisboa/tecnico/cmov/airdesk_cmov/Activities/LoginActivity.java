@@ -24,7 +24,6 @@ public class LoginActivity extends ActionBarActivity {
     private EditText email = null;
     private EditText username = null;
 
-    private SessionManager session;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -35,8 +34,6 @@ public class LoginActivity extends ActionBarActivity {
         username = (EditText)findViewById(R.id.editText4);
         Button button = (Button) findViewById(R.id.button4);
 
-        Application.setUsersDataSource(new UsersDataSource(this));
-
         button.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -44,8 +41,8 @@ public class LoginActivity extends ActionBarActivity {
                 try {
 
                     Application.login(email.getText().toString());
-                    session = new SessionManager(getApplicationContext());
-                    session.createLoginSession(email.getText().toString(),username.getText().toString());
+                    Application.session = new SessionManager(getApplicationContext());
+                    Application.session.createLoginSession(email.getText().toString(),username.getText().toString());
                     Toast.makeText(LoginActivity.this, "Welcome to AirDesk.", Toast.LENGTH_SHORT).show();
                     Intent intent = new Intent(LoginActivity.this, WorkSpacesActivity.class);
                     startActivity(intent);

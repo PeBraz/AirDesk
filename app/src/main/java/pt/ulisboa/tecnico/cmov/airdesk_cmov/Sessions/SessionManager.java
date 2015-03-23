@@ -48,7 +48,7 @@ public class SessionManager {
         return user;
     }
 
-    public void checkLogin(){
+    /*public void checkLogin(){
 
         if(!this.isLoggedIn()){
 
@@ -57,7 +57,7 @@ public class SessionManager {
             i.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
             context.startActivity(i);
         }
-    }
+    }*/
 
     public void logoutUser(){
 
