@@ -3,19 +3,23 @@ package pt.ulisboa.tecnico.cmov.airdesk_cmov.Activities;
 import android.content.Intent;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
 import java.util.HashMap;
+
+import pt.ulisboa.tecnico.cmov.airdesk_cmov.Application;
+import pt.ulisboa.tecnico.cmov.airdesk_cmov.Database.UsersDataSource;
+import pt.ulisboa.tecnico.cmov.airdesk_cmov.Exceptions.NotRegisteredException;
+import pt.ulisboa.tecnico.cmov.airdesk_cmov.Exceptions.WrongPasswordException;
 import pt.ulisboa.tecnico.cmov.airdesk_cmov.R;
 import pt.ulisboa.tecnico.cmov.airdesk_cmov.Sessions.SessionManager;
 
 
 public class WorkSpacesActivity extends ActionBarActivity {
-
-    SessionManager session;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

@@ -9,6 +9,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
 import pt.ulisboa.tecnico.cmov.airdesk_cmov.Activities.MainActivity;
+import pt.ulisboa.tecnico.cmov.airdesk_cmov.Activities.WorkSpacesActivity;
 
 public class SessionManager {
 
@@ -50,9 +51,9 @@ public class SessionManager {
 
     /*public void checkLogin(){
 
-        if(!this.isLoggedIn()){
+        if(this.isLoggedIn()){
 
-            Intent i = new Intent(context, MainActivity.class);
+            Intent i = new Intent(context, WorkSpacesActivity.class);
             i.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
             i.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
             context.startActivity(i);

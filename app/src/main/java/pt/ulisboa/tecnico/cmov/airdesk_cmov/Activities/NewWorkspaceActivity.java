@@ -3,6 +3,7 @@ package pt.ulisboa.tecnico.cmov.airdesk_cmov.Activities;
 import android.content.Intent;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -11,8 +12,11 @@ import android.widget.EditText;
 import android.widget.TextView;
 
 
+import java.util.HashMap;
+
 import pt.ulisboa.tecnico.cmov.airdesk_cmov.Exceptions.InvalidQuotaException;
 import pt.ulisboa.tecnico.cmov.airdesk_cmov.Exceptions.WorkspaceAlreadyExistsException;
+import pt.ulisboa.tecnico.cmov.airdesk_cmov.Sessions.SessionManager;
 import pt.ulisboa.tecnico.cmov.airdesk_cmov.User;
 import pt.ulisboa.tecnico.cmov.airdesk_cmov.Application;
 import pt.ulisboa.tecnico.cmov.airdesk_cmov.R;

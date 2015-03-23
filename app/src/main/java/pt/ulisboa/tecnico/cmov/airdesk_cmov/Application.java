@@ -15,17 +15,24 @@ import pt.ulisboa.tecnico.cmov.airdesk_cmov.Sessions.SessionManager;
 public class Application {
 
     private static User owner = null;
+<<<<<<< HEAD
     public static SessionManager session = null;
 
+=======
+    private List<Workspace> myWorkspaces;
+>>>>>>> ce1b796f344112926352a2345cfcc4821e1bf965
 
     private List<Workspace> myWorkspaces;
     private static UsersDataSource userData = null;
 
+<<<<<<< HEAD
     public static void init(android.content.Context AppContext) {
         Application.setUsersDataSource(new UsersDataSource(AppContext));
         Application.session = new SessionManager(AppContext);
     }
 
+=======
+>>>>>>> ce1b796f344112926352a2345cfcc4821e1bf965
     public static void createUser(String username, String email)
         throws NoDatabaseException, UserAlreadyExistsException {
 
@@ -46,17 +53,9 @@ public class Application {
     public static User getOwner() { return Application.owner; }
 
     public Application (User u) {
-        Application.owner = u;//find user     //this.owner = Application.getUser(username)
-        this.myWorkspaces = new ArrayList<Workspace>();
+        Application.owner = u;
+        this.myWorkspaces = new ArrayList<>();
     }
-/*  User does this - delete stuff later
-    public void createWorkSpace(String name, int quota, boolean isPrivate, List<String> tags) throws ApplicationHasNoUserException{
-        //if (owner == null)    -> this is stup
-          //  throw new ApplicationHasNoUserException();
-
-        //this.workspace.add(name, quota, isPrivate, tags);
-
-    }*/
 
     private static boolean checkUser(User u){
 
@@ -67,12 +66,19 @@ public class Application {
 
     public static void login(String email) throws NotRegisteredException, WrongPasswordException {
 
+<<<<<<< HEAD
         if (userData == null) throw new NoDatabaseException();
 
         User u = userData.get(email);
         if (u == null)throw new NotRegisteredException();
 
         Application.owner = userData.get(email);
+=======
+        User user = userData.get(email);
+        if (user == null) throw new NotRegisteredException();
+        Application.owner = user;
+
+>>>>>>> ce1b796f344112926352a2345cfcc4821e1bf965
     }
 
     public static List<Workspace> getMyWorkspaces(){
