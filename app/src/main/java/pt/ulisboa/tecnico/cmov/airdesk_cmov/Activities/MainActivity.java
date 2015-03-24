@@ -28,9 +28,7 @@ public class MainActivity extends ActionBarActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        //App init
         Application.init(getApplicationContext());
-
 
         if (Application.session.isLoggedIn()) {
             String email = Application.session.getUserInfo().get(SessionManager.KEY_EMAIL);

@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import pt.ulisboa.tecnico.cmov.airdesk_cmov.Database.UsersDataSource;
+import pt.ulisboa.tecnico.cmov.airdesk_cmov.Database.WorkspacesDataSource;
 import pt.ulisboa.tecnico.cmov.airdesk_cmov.Exceptions.ApplicationHasNoUserException;
 import pt.ulisboa.tecnico.cmov.airdesk_cmov.Exceptions.NoDatabaseException;
 import pt.ulisboa.tecnico.cmov.airdesk_cmov.Exceptions.NotRegisteredException;
@@ -15,24 +16,21 @@ import pt.ulisboa.tecnico.cmov.airdesk_cmov.Sessions.SessionManager;
 public class Application {
 
     private static User owner = null;
-<<<<<<< HEAD
-    public static SessionManager session = null;
 
-=======
-    private List<Workspace> myWorkspaces;
->>>>>>> ce1b796f344112926352a2345cfcc4821e1bf965
+    public static SessionManager session = null;
 
     private List<Workspace> myWorkspaces;
     private static UsersDataSource userData = null;
+    private static WorkspacesDataSource workspaceData = null;
 
-<<<<<<< HEAD
+
     public static void init(android.content.Context AppContext) {
         Application.setUsersDataSource(new UsersDataSource(AppContext));
+        Application.setWorkspacesDataSource(new WorkspacesDataSource(AppContext));
         Application.session = new SessionManager(AppContext);
     }
 
-=======
->>>>>>> ce1b796f344112926352a2345cfcc4821e1bf965
+
     public static void createUser(String username, String email)
         throws NoDatabaseException, UserAlreadyExistsException {
 
@@ -48,6 +46,9 @@ public class Application {
 
     public static void setUsersDataSource(UsersDataSource userdb) {
         Application.userData = userdb;
+    }
+    public static void setWorkspacesDataSource(WorkspacesDataSource workspacedb) {
+        Application.workspaceData = workspacedb;
     }
 
     public static User getOwner() { return Application.owner; }
@@ -66,24 +67,27 @@ public class Application {
 
     public static void login(String email) throws NotRegisteredException, WrongPasswordException {
 
-<<<<<<< HEAD
         if (userData == null) throw new NoDatabaseException();
 
         User u = userData.get(email);
         if (u == null)throw new NotRegisteredException();
 
         Application.owner = userData.get(email);
-=======
-        User user = userData.get(email);
-        if (user == null) throw new NotRegisteredException();
-        Application.owner = user;
 
->>>>>>> ce1b796f344112926352a2345cfcc4821e1bf965
     }
 
     public static List<Workspace> getMyWorkspaces(){
-        List<Workspace> workspaces = new ArrayList<>();
-        return workspaces;
 
+        List<Workspace> myWorkspaces = new ArrayList<>();
+        List<Workspace> allWorkspaces = workspaceData.getAll();
+
+        System.out.println(allWorkspaces.toString());
+
+        for(Workspace work : allWorkspaces){
+            if (work.getOwner().getEmail().equals(Application.getOwner().getEmail()))
+                myWorkspaces.add(work);
+        }
+
+        return myWorkspaces;
     }
 }

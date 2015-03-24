@@ -37,17 +37,12 @@ public class NewWorkspaceActivity extends ActionBarActivity {
                 final EditText quota = (EditText) findViewById(R.id.editText5);
                 User user = Application.getOwner();
                 try {
-                    //the application needs to load the user at some stage
                     user.createWorkspace(workspaceName.getText().toString(), Integer.parseInt(quota.getText().toString()));
                     startActivity(new Intent(getApplicationContext(), WorkSpacesActivity.class));
                 }catch(InvalidQuotaException | WorkspaceAlreadyExistsException e) {
                     final TextView error = (TextView) findViewById(R.id.error_message);
                     error.setText(e.getMessage());
-                }/*catch(WorkspaceAlreadyExistsException e) {
-                    final TextView error = (TextView) findViewById(R.id.error_message);
-                    error.setText(e.getMessage());
-                }*/
-
+                }
             }
         });
     }

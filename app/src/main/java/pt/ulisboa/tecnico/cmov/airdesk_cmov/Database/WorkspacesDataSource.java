@@ -81,7 +81,7 @@ public class WorkspacesDataSource extends DataSource<Workspace>{
         Workspace ws = new Workspace();
         ws.setName(cursor.getString(0));
         ws.setQuota(cursor.getInt(1));
-        //  LOAD user to get name??
+       //  LOAD user to get name??
         return ws;
     }
 }
