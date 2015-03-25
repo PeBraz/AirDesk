@@ -16,13 +16,12 @@ import pt.ulisboa.tecnico.cmov.airdesk_cmov.Sessions.SessionManager;
 public class Application {
 
     private static User owner = null;
-
     public static SessionManager session = null;
 
     private List<Workspace> myWorkspaces;
+
     private static UsersDataSource userData = null;
     private static WorkspacesDataSource workspaceData = null;
-
 
     public static void init(android.content.Context AppContext) {
         Application.setUsersDataSource(new UsersDataSource(AppContext));
@@ -90,4 +89,5 @@ public class Application {
 
         return myWorkspaces;
     }
+
 }

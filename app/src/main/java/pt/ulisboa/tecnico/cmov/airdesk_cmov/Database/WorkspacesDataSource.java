@@ -8,6 +8,7 @@ import android.database.sqlite.SQLiteDatabase;
 import java.util.ArrayList;
 import java.util.List;
 
+import pt.ulisboa.tecnico.cmov.airdesk_cmov.Application;
 import pt.ulisboa.tecnico.cmov.airdesk_cmov.Exceptions.NoDatabaseException;
 import pt.ulisboa.tecnico.cmov.airdesk_cmov.Workspace;
 
@@ -81,7 +82,7 @@ public class WorkspacesDataSource extends DataSource<Workspace>{
         Workspace ws = new Workspace();
         ws.setName(cursor.getString(0));
         ws.setQuota(cursor.getInt(1));
-       //  LOAD user to get name??
+        ws.setOwner(Application.getOwner());
         return ws;
     }
 }
