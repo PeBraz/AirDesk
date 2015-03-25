@@ -21,6 +21,7 @@ public class Application {
 
     private static UsersDataSource userData = null;
 
+    public static final int MAX_APPLICATION_QUOTA = 20; //do something with this
 
     public static void init(android.content.Context AppContext) {
         Application.setUsersDataSource(new UsersDataSource(AppContext));
@@ -75,4 +76,5 @@ public class Application {
         return workspaces;
 
     }
+
 }

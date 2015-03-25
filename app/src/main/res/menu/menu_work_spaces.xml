@@ -3,4 +3,9 @@
     xmlns:tools="http://schemas.android.com/tools" tools:context=".WorkSpacesActivity">
     <item android:id="@+id/action_settings" android:title="@string/action_settings"
         android:orderInCategory="100" app:showAsAction="never" />
+    <item android:id="@+id/new_workspace" android:title="@string/menu_new_workspace"
+        android:orderInCategory="100" app:showAsAction="never" />
+    <item android:id="@+id/subscribe" android:title="@string/menu_subscribe"
+        android:orderInCategory="100" app:showAsAction="never" />
+
 </menu>

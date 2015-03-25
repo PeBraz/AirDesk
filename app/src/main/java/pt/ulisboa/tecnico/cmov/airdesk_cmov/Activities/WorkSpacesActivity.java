@@ -1,23 +1,21 @@
 package pt.ulisboa.tecnico.cmov.airdesk_cmov.Activities;
 
+import android.app.Dialog;
 import android.content.Intent;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
-import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
+import android.widget.SeekBar;
 import android.widget.TextView;
-import java.util.HashMap;
 
 import pt.ulisboa.tecnico.cmov.airdesk_cmov.Application;
-import pt.ulisboa.tecnico.cmov.airdesk_cmov.Database.UsersDataSource;
-import pt.ulisboa.tecnico.cmov.airdesk_cmov.Exceptions.NotRegisteredException;
-import pt.ulisboa.tecnico.cmov.airdesk_cmov.Exceptions.WrongPasswordException;
+import pt.ulisboa.tecnico.cmov.airdesk_cmov.Exceptions.InvalidQuotaException;
+import pt.ulisboa.tecnico.cmov.airdesk_cmov.Exceptions.WorkspaceAlreadyExistsException;
 import pt.ulisboa.tecnico.cmov.airdesk_cmov.R;
-import pt.ulisboa.tecnico.cmov.airdesk_cmov.Sessions.SessionManager;
-
 
 public class WorkSpacesActivity extends ActionBarActivity {
 
@@ -26,14 +24,6 @@ public class WorkSpacesActivity extends ActionBarActivity {
 
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_work_spaces);
-
-        Button button = (Button)findViewById(R.id.new_workspace_button);
-        button.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-               startActivity(new Intent(getApplicationContext(), NewWorkspaceActivity.class));
-            }
-        });
 
         Button button2 = (Button)findViewById(R.id.my_workspaces);
         button2.setOnClickListener(new View.OnClickListener() {
@@ -50,6 +40,8 @@ public class WorkSpacesActivity extends ActionBarActivity {
                 startActivity(new Intent(getApplicationContext(), ForeignWorkspacesActivity.class));
             }
         });
+
+
     }
 
     @Override
@@ -67,8 +59,85 @@ public class WorkSpacesActivity extends ActionBarActivity {
         if (id == R.id.action_settings) {
             Intent intent = new Intent(WorkSpacesActivity.this, UserSettingsActivity.class);
             startActivity(intent);
+        } else if (id == R.id.new_workspace) {
+            this.newWorkspaceDialog(Application.MAX_APPLICATION_QUOTA);
+         //   Intent intent = new Intent(getApplicationContext(), NewWorkspaceActivity.class);
+         //   startActivity(intent);
+        }else if (id == R.id.subscribe) {
+            //TODO
         }
 
         return super.onOptionsItemSelected(item);
+    }
+
+    /**
+     * Creates a dialog on top of the workspaces activity view that allows the user to create a new
+     * workspace.
+     *
+     * The dialog accepts a workspace name and the quota number (given through a seek bar)
+     *
+     * Error messages will be displayed on the dialog.
+     *
+     * @param maxquota max value for the seek bar (will probably be Application.MAX_APPLICATION_QUOTA)
+     *
+     */
+
+    private void newWorkspaceDialog(int maxquota) {
+
+
+        final Dialog dialog = new Dialog(this);
+        dialog.setTitle("New Workspace");
+
+        LayoutInflater inflater = this.getLayoutInflater();
+        View dialogView = inflater.inflate(R.layout.dialog_new_workspace, null);
+        dialog.setContentView(dialogView);
+
+        final SeekBar bar = (SeekBar) dialogView.findViewById(R.id.new_workspace_seekbar);
+        bar.setMax(maxquota);
+        bar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+            @Override
+            public void onStartTrackingTouch(SeekBar seekBar) { }
+            @Override
+            public void onStopTrackingTouch(SeekBar seekBar) { }
+            @Override
+            public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
+                TextView view = (TextView) findViewById(R.id.new_workspace_quota_tag);
+                view.setText(R.string.new_workspace_quota +": "+progress);
+            }
+        });
+
+        dialog.show();
+
+        Button ok = (Button) dialogView.findViewById(R.id.new_workspace_confirm_button);
+        Button cancel = (Button) dialogView.findViewById(R.id.new_workspace_cancel_button);
+
+        ok.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                TextView text = (TextView) dialog.findViewById(R.id.new_workspace_username);
+                SeekBar bar = (SeekBar) dialog.findViewById(R.id.new_workspace_seekbar);
+
+                TextView error = (TextView) dialog.findViewById(R.id.new_workspace_error);
+                if (text.getText().toString().isEmpty())
+                    error.setText("No workspace name chosen.");
+
+                try {
+                    Application.getOwner().createWorkspace(text.getText().toString().trim(), bar.getProgress());
+                    dialog.dismiss();
+                }catch (InvalidQuotaException e) {
+                    //should not happen because the seek bar is limited
+                }catch (WorkspaceAlreadyExistsException e) {
+                    error.setText(e.getMessage());
+                }
+
+            }
+        });
+        cancel.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                dialog.dismiss();
+            }
+        });
     }
 }
