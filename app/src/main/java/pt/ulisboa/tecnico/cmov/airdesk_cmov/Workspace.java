@@ -55,6 +55,10 @@ public class Workspace {
         return clients;
     }
 
+    public void setOwner(User owner) {
+        this.owner = owner;
+    }
+
 
 
 

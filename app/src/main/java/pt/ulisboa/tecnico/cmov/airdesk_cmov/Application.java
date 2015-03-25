@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import pt.ulisboa.tecnico.cmov.airdesk_cmov.Database.UsersDataSource;
+import pt.ulisboa.tecnico.cmov.airdesk_cmov.Database.WorkspacesDataSource;
 import pt.ulisboa.tecnico.cmov.airdesk_cmov.Exceptions.ApplicationHasNoUserException;
 import pt.ulisboa.tecnico.cmov.airdesk_cmov.Exceptions.NoDatabaseException;
 import pt.ulisboa.tecnico.cmov.airdesk_cmov.Exceptions.NotRegisteredException;
@@ -22,9 +23,12 @@ public class Application {
     private static UsersDataSource userData = null;
 
     public static final int MAX_APPLICATION_QUOTA = 20; //do something with this
+    private static WorkspacesDataSource workspaceData = null;
+
 
     public static void init(android.content.Context AppContext) {
         Application.setUsersDataSource(new UsersDataSource(AppContext));
+        Application.setWorkspacesDataSource(new WorkspacesDataSource(AppContext));
         Application.session = new SessionManager(AppContext);
     }
 
@@ -44,6 +48,9 @@ public class Application {
 
     public static void setUsersDataSource(UsersDataSource userdb) {
         Application.userData = userdb;
+    }
+    public static void setWorkspacesDataSource(WorkspacesDataSource workspacedb) {
+        Application.workspaceData = workspacedb;
     }
 
     public static User getOwner() { return Application.owner; }
@@ -67,14 +74,23 @@ public class Application {
         User u = userData.get(email);
         if (u == null)throw new NotRegisteredException();
 
-        Application.owner = u;
+        Application.owner = userData.get(email);
 
     }
 
     public static List<Workspace> getMyWorkspaces(){
-        List<Workspace> workspaces = new ArrayList<>();
-        return workspaces;
 
+        List<Workspace> myWorkspaces = new ArrayList<>();
+        List<Workspace> allWorkspaces = workspaceData.getAll();
+
+        System.out.println(allWorkspaces.toString());
+
+        for(Workspace work : allWorkspaces){
+            if (work.getOwner().getEmail().equals(Application.getOwner().getEmail()))
+                myWorkspaces.add(work);
+        }
+
+        return myWorkspaces;
     }
 
 }
