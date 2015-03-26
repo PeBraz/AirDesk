@@ -28,7 +28,7 @@ public class MyWorkSpacesActivity extends ActionBarActivity {
         ArrayAdapter<String> adapter = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, android.R.id.text1, ws);
         listview.setAdapter(adapter);
 
-
+        
     }
 
 }

@@ -59,9 +59,6 @@ public class Workspace {
         this.owner = owner;
     }
 
-
-
-
     public final void setName(final String name) {
         this.name = name;
     }

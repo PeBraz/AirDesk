@@ -101,8 +101,8 @@ public class WorkSpacesActivity extends ActionBarActivity {
             public void onStopTrackingTouch(SeekBar seekBar) { }
             @Override
             public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
-                TextView view = (TextView) findViewById(R.id.new_workspace_quota_tag);
-                view.setText(R.string.new_workspace_quota +": "+progress);
+                //TextView view = (TextView) findViewById(R.id.new_workspace_quota_tag);
+                //view.setText(R.string.new_workspace_quota +": "+progress);
             }
         });
 
