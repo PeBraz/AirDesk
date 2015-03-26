@@ -19,7 +19,7 @@
         android:layout_marginLeft="4dp"
         android:layout_marginRight="4dp"
         android:layout_marginBottom="4dp"
-        android:hint="@string/input_workspace" />
+        android:hint="@string/workspace_name_input" />
 
     <SeekBar
         android:layout_width="match_parent"

@@ -20,7 +20,7 @@ public class MyWorkSpacesActivity extends ActionBarActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_my_work_spaces);
 
-        List<Workspace> myWorkspaces = Application.getMyWorkspaces();
+        List<Workspace> myWorkspaces = Application.getOwner().getMyWorkspaces();
         ListView listview = (ListView) findViewById(R.id.listView);
 
         for(Workspace w : myWorkspaces) ws.add(w.getName());

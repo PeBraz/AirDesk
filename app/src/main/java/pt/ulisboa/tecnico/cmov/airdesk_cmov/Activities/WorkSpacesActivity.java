@@ -86,14 +86,20 @@ public class WorkSpacesActivity extends ActionBarActivity {
 
 
         final Dialog dialog = new Dialog(this);
-        dialog.setTitle("New Workspace");
+        dialog.setTitle(R.string.new_workspace_title);
 
-        LayoutInflater inflater = this.getLayoutInflater();
-        View dialogView = inflater.inflate(R.layout.dialog_new_workspace, null);
+        final LayoutInflater inflater = this.getLayoutInflater();
+        final View dialogView = inflater.inflate(R.layout.dialog_new_workspace, null);
         dialog.setContentView(dialogView);
 
         final SeekBar bar = (SeekBar) dialogView.findViewById(R.id.new_workspace_seekbar);
+        final TextView quotaView = (TextView) dialogView.findViewById(R.id.new_workspace_quota_tag);
+
+        //Set quota initial value at half the size of the slider
+        bar.setProgress(maxquota/2);
+        quotaView.setText("Quota: "+ (maxquota/2));
         bar.setMax(maxquota);
+
         bar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             @Override
             public void onStartTrackingTouch(SeekBar seekBar) { }
@@ -101,8 +107,9 @@ public class WorkSpacesActivity extends ActionBarActivity {
             public void onStopTrackingTouch(SeekBar seekBar) { }
             @Override
             public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
-                //TextView view = (TextView) findViewById(R.id.new_workspace_quota_tag);
-                //view.setText(R.string.new_workspace_quota +": "+progress);
+                TextView view = (TextView) dialogView.findViewById(R.id.new_workspace_quota_tag);
+                view.setText("Quota: "+progress);
+
             }
         });
 
@@ -119,9 +126,10 @@ public class WorkSpacesActivity extends ActionBarActivity {
                 SeekBar bar = (SeekBar) dialog.findViewById(R.id.new_workspace_seekbar);
 
                 TextView error = (TextView) dialog.findViewById(R.id.new_workspace_error);
-                if (text.getText().toString().isEmpty())
+                if (text.getText().toString().isEmpty()) {
                     error.setText("No workspace name chosen.");
-
+                    return;
+                }
                 try {
                     Application.getOwner().createWorkspace(text.getText().toString().trim(), bar.getProgress());
                     dialog.dismiss();

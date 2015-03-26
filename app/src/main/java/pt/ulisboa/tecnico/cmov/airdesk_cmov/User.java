@@ -4,7 +4,7 @@ import pt.ulisboa.tecnico.cmov.airdesk_cmov.Database.WorkspacesDataSource;
 import pt.ulisboa.tecnico.cmov.airdesk_cmov.Exceptions.InvalidQuotaException;
 import pt.ulisboa.tecnico.cmov.airdesk_cmov.Exceptions.WorkspaceAlreadyExistsException;
 
-public final class User {
+public class User {
 
     private final WorkspacesDataSource workspacedb;
     private String username;
@@ -21,6 +21,9 @@ public final class User {
         this.workspacedb = new WorkspacesDataSource();
     }
 
+    protected final WorkspacesDataSource getWorkspaceDataSource() {
+        return this.workspacedb;
+    }
 
     public final String getUsername() {
         return username;
@@ -36,20 +39,9 @@ public final class User {
         return username;
     }
 
-
-
-    public final void createWorkspace(final String name, final int quota)
-            throws WorkspaceAlreadyExistsException, InvalidQuotaException {
-        if (quota > 10) throw new InvalidQuotaException(quota);  // needs to be changed to mirror the device's real space
-        if (this.workspacedb.get(name) != null) throw new WorkspaceAlreadyExistsException(name);
-        this.workspacedb.create(new Workspace(name, quota, this));
-    }
     public final Workspace getWorkspace(final String name) {
         return this.workspacedb.get(name);
     }
 
-    public final void subscribe(Workspace workspace) {
-        //TODO -> after foreign workspaces
-    }
 
 }

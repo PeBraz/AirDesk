@@ -10,10 +10,12 @@
     <string name="title_activity_new_workspace">NewWorkspaceActivity</string>
 
     <!-- new workspace activity -->
-    <string name="workspace_name">Workspace Name...</string>
+    <string name="new_workspace_title">Create New Workspace</string>
+    <string name="workspace_name_input">Workspace Name...</string>
     <string name="title_activity_my_work_spaces">MyWorkSpacesActivity</string>
     <string name="title_activity_foreign_workspaces">ForeignWorkspacesActivity</string>
     <string name="new_workspace_quota">Quota</string>
+    <string name="input_workspace">Workspace Name</string>
 
     <!-- menu options -->
     <string name="action_settings">My account</string>
@@ -21,7 +23,6 @@
     <string name="menu_subscribe">Subscribe</string>
 
 
-    <string name="input_workspace">Workspace Name</string>
 
     <string name="Confirm">Confirm</string>
     <string name="Cancel">Cancel</string>
