@@ -82,7 +82,7 @@ public class WorkspacesDataSource extends DataSource<Workspace>{
         Workspace ws = new Workspace();
         ws.setName(cursor.getString(0));
         ws.setQuota(cursor.getInt(1));
-        ws.setOwner(Application.getOwner());
+        ws.setOwner(Application.getUser(cursor.getString(4)));
         return ws;
     }
 }

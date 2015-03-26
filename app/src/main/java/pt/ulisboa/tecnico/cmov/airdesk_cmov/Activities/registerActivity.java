@@ -15,6 +15,7 @@ import pt.ulisboa.tecnico.cmov.airdesk_cmov.Application;
 import pt.ulisboa.tecnico.cmov.airdesk_cmov.Database.UsersDataSource;
 import pt.ulisboa.tecnico.cmov.airdesk_cmov.Exceptions.UserAlreadyExistsException;
 import pt.ulisboa.tecnico.cmov.airdesk_cmov.R;
+import pt.ulisboa.tecnico.cmov.airdesk_cmov.Sessions.SessionManager;
 import pt.ulisboa.tecnico.cmov.airdesk_cmov.User;
 
 
@@ -48,8 +49,10 @@ public class registerActivity extends ActionBarActivity {
 
                 try {
                     Application.createUser(username.getText().toString(),email.getText().toString());
-                    Toast.makeText(registerActivity.this, "User created. Please sign in.", Toast.LENGTH_SHORT).show();
-                    Intent intent = new Intent(registerActivity.this, MainActivity.class);
+                    Application.session = new SessionManager(getApplicationContext());
+                    Application.session.createLoginSession(email.getText().toString(),username.getText().toString());
+                    Toast.makeText(registerActivity.this, "Welcome to AirDesk.", Toast.LENGTH_SHORT).show();
+                    Intent intent = new Intent(registerActivity.this, WorkSpacesActivity.class);
                     startActivity(intent);
                 } catch (UserAlreadyExistsException e) {
                     Toast.makeText(registerActivity.this, e.getMessage(), Toast.LENGTH_SHORT).show();
