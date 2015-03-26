@@ -3,27 +3,22 @@ package pt.ulisboa.tecnico.cmov.airdesk_cmov.Activities;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.ActionBarActivity;
-import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
-
-import java.util.List;
 
 import pt.ulisboa.tecnico.cmov.airdesk_cmov.Application;
 import pt.ulisboa.tecnico.cmov.airdesk_cmov.Database.UsersDataSource;
 import pt.ulisboa.tecnico.cmov.airdesk_cmov.Exceptions.UserAlreadyExistsException;
 import pt.ulisboa.tecnico.cmov.airdesk_cmov.R;
 import pt.ulisboa.tecnico.cmov.airdesk_cmov.Sessions.SessionManager;
-import pt.ulisboa.tecnico.cmov.airdesk_cmov.User;
 
 
-public class registerActivity extends ActionBarActivity {
+public class RegisterActivity extends ActionBarActivity {
 
     private EditText username = null;
     private EditText email = null;
-    private EditText password = null;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -43,7 +38,7 @@ public class registerActivity extends ActionBarActivity {
             public void onClick(View v) {
 
                 if (("".equals(username.getText().toString().trim()) || "".equals(email.getText().toString().trim()))){
-                    Toast.makeText(registerActivity.this, "A value is missing!", Toast.LENGTH_LONG).show();
+                    Toast.makeText(RegisterActivity.this, "A value is missing!", Toast.LENGTH_LONG).show();
                     return;
                 }
 
@@ -51,11 +46,11 @@ public class registerActivity extends ActionBarActivity {
                     Application.createUser(username.getText().toString(),email.getText().toString());
                     Application.session = new SessionManager(getApplicationContext());
                     Application.session.createLoginSession(email.getText().toString(),username.getText().toString());
-                    Toast.makeText(registerActivity.this, "Welcome to AirDesk.", Toast.LENGTH_SHORT).show();
-                    Intent intent = new Intent(registerActivity.this, WorkSpacesActivity.class);
+                    Toast.makeText(RegisterActivity.this, "Welcome to AirDesk.", Toast.LENGTH_SHORT).show();
+                    Intent intent = new Intent(RegisterActivity.this, WorkSpacesActivity.class);
                     startActivity(intent);
                 } catch (UserAlreadyExistsException e) {
-                    Toast.makeText(registerActivity.this, e.getMessage(), Toast.LENGTH_SHORT).show();
+                    Toast.makeText(RegisterActivity.this, e.getMessage(), Toast.LENGTH_SHORT).show();
                 }
 
 

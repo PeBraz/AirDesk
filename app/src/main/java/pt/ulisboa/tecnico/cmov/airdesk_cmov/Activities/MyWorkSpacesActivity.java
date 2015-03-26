@@ -1,10 +1,14 @@
 package pt.ulisboa.tecnico.cmov.airdesk_cmov.Activities;
 
 
+import android.content.Intent;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
+import android.view.View;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
+
 import java.util.ArrayList;
 import java.util.List;
 import pt.ulisboa.tecnico.cmov.airdesk_cmov.Application;
@@ -21,14 +25,28 @@ public class MyWorkSpacesActivity extends ActionBarActivity {
         setContentView(R.layout.activity_my_work_spaces);
 
         List<Workspace> myWorkspaces = Application.getOwner().getMyWorkspaces();
-        ListView listview = (ListView) findViewById(R.id.listView);
+        final ListView listview = (ListView) findViewById(R.id.listView);
 
         for(Workspace w : myWorkspaces) ws.add(w.getName());
 
-        ArrayAdapter<String> adapter = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, android.R.id.text1, ws);
+        final ArrayAdapter<String> adapter = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, android.R.id.text1, ws);
         listview.setAdapter(adapter);
 
-        
+        listview.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+
+                String itemValue = (String) listview.getItemAtPosition(position);
+
+                System.out.println(itemValue);
+
+                startActivity(new Intent(MyWorkSpacesActivity.this, ListFilesActivity.class));
+
+            }
+
+        });
+
     }
 
 }
