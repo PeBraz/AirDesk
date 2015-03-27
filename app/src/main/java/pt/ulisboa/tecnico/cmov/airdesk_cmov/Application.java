@@ -5,6 +5,7 @@ import android.test.ApplicationTestCase;
 import java.util.ArrayList;
 import java.util.List;
 
+import pt.ulisboa.tecnico.cmov.airdesk_cmov.Database.FilesDataSource;
 import pt.ulisboa.tecnico.cmov.airdesk_cmov.Database.UsersDataSource;
 import pt.ulisboa.tecnico.cmov.airdesk_cmov.Database.WorkspacesDataSource;
 import pt.ulisboa.tecnico.cmov.airdesk_cmov.Exceptions.ApplicationHasNoUserException;
@@ -24,6 +25,8 @@ public class Application {
 
     private static UsersDataSource userData = null;
 
+    private static FilesDataSource fileData = null;
+
     //The Data source should not be called from here, should instead be called from the owner
     private static WorkspacesDataSource workspaceData = null;
     public static final int MAX_APPLICATION_QUOTA = 20; //do something with this
@@ -35,6 +38,7 @@ public class Application {
     public static void init(android.content.Context AppContext) {
         Application.setUsersDataSource(new UsersDataSource(AppContext));
         Application.setWorkspacesDataSource(new WorkspacesDataSource(AppContext));
+        Application.setFileDataSource(new FilesDataSource(AppContext));
         Application.session = new SessionManager(AppContext);
     }
 
@@ -52,6 +56,7 @@ public class Application {
         else throw new UserAlreadyExistsException();
     }
 
+    public static void setFileDataSource(FilesDataSource filedb) {Application.fileData = filedb;}
     public static void setUsersDataSource(UsersDataSource userdb) {
         Application.userData = userdb;
     }

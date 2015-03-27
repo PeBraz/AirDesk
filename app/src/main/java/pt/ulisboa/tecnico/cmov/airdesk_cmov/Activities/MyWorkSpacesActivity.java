@@ -38,10 +38,9 @@ public class MyWorkSpacesActivity extends ActionBarActivity {
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
 
                 String itemValue = (String) listview.getItemAtPosition(position);
-
-                System.out.println(itemValue);
-
-                startActivity(new Intent(MyWorkSpacesActivity.this, ListFilesActivity.class));
+                Intent intent = new Intent(MyWorkSpacesActivity.this, ListFilesActivity.class);
+                intent.putExtra("WSNAME", itemValue);
+                startActivity(intent);
 
             }
 

@@ -11,6 +11,7 @@
 
     <!-- new workspace activity -->
     <string name="new_workspace_title">Create New Workspace</string>
+    <string name="new_file_title">Create New File</string>
     <string name="workspace_name_input">Workspace Name...</string>
     <string name="title_activity_my_work_spaces">MyWorkSpacesActivity</string>
     <string name="title_activity_foreign_workspaces">ForeignWorkspacesActivity</string>
@@ -21,10 +22,12 @@
     <string name="action_settings">My account</string>
     <string name="menu_new_workspace">New Workspace</string>
     <string name="menu_subscribe">Subscribe</string>
+    <string name="menu_new_file">New file</string>
 
 
 
     <string name="Confirm">Confirm</string>
     <string name="Cancel">Cancel</string>
     <string name="title_activity_list_files">ListFilesActivity</string>
+    <string name="title_activity_main_activity2">MainActivity2Activity</string>
 </resources>

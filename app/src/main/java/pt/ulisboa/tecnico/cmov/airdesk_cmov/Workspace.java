@@ -1,6 +1,9 @@
 package pt.ulisboa.tecnico.cmov.airdesk_cmov;
 
 import java.util.ArrayList;
+import java.util.List;
+
+import pt.ulisboa.tecnico.cmov.airdesk_cmov.Database.FilesDataSource;
 
 public class Workspace {
 
@@ -11,6 +14,7 @@ public class Workspace {
     private int minQuota;
     private boolean isPrivate;
     private String tags;
+    private FilesDataSource filedb;
 
     public Workspace(final String name,final int quota, final User owner) {
         this.name = name;
@@ -25,7 +29,7 @@ public class Workspace {
         this.tags = tags;
     }
 
-    public Workspace () {}
+    public Workspace () {this.filedb = new FilesDataSource();}
 
     public final int getQuota() {
         return quota;
@@ -74,7 +78,25 @@ public class Workspace {
     public final void invite(final User u) {
         //TODO
     }
-    public void createFile(final String name,final String content){
-        //updateQuota
+
+    public void createFile(String name, String workspace){
+        File file = new File(name,workspace);
+        filedb.create(file);
     }
+
+    public List<String> getAllFiles(String workspace){
+
+        ArrayList<String> allFiles = new ArrayList<>();
+
+        List<File> listFiles =  filedb.getAll();
+        for(File f : listFiles){
+            System.out.println(workspace);
+            System.out.println(f.getWorkspace());
+            if (f.getWorkspace().equals(workspace))
+                allFiles.add(f.getName() + ".txt");
+        }
+
+        return allFiles;
+    }
+
 }

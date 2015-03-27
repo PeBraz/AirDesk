@@ -32,8 +32,7 @@ public class FilesDataSource extends DataSource<File>{
 
         ContentValues values = new ContentValues();
         values.put(MySQLiteHelper.FILE_NAME, file.getName());
-        values.put(MySQLiteHelper.FILE_PATH, file.getPath());
-        values.put(MySQLiteHelper.FILE_WORKSPACE, file.getWorkspace().getName());
+        values.put(MySQLiteHelper.FILE_WORKSPACE, file.getWorkspace());
         database.insert(MySQLiteHelper.TABLE_FILES, null, values);
 
     }
@@ -42,7 +41,7 @@ public class FilesDataSource extends DataSource<File>{
         final String query = String.format("UPDATE %1$s SET %2$s= ?, %3$s= ? WHERE %4$s= ?",
                 MySQLiteHelper.TABLE_FILES, MySQLiteHelper.FILE_PATH, MySQLiteHelper.FILE_WORKSPACE,
                 MySQLiteHelper.FILE_NAME);
-        database.rawQuery(query, new String[]{ file.getPath(), file.getWorkspace().getName(),
+        database.rawQuery(query, new String[]{ file.getPath(), file.getWorkspace(),
                                     file.getName()});
     }
     @Override
@@ -78,6 +77,7 @@ public class FilesDataSource extends DataSource<File>{
         File file = new File();
         file.setName(cursor.getString(0));
         file.setPath(cursor.getString(1));
+        file.setWorkspace(cursor.getString(2));
         // get workspace from db? ()
         //file.setWorkspace(cursor.getString(2));
         return file;

@@ -10,7 +10,9 @@ import android.widget.Toast;
 
 import pt.ulisboa.tecnico.cmov.airdesk_cmov.Application;
 import pt.ulisboa.tecnico.cmov.airdesk_cmov.Database.UsersDataSource;
+import pt.ulisboa.tecnico.cmov.airdesk_cmov.Exceptions.NotRegisteredException;
 import pt.ulisboa.tecnico.cmov.airdesk_cmov.Exceptions.UserAlreadyExistsException;
+import pt.ulisboa.tecnico.cmov.airdesk_cmov.Exceptions.WrongPasswordException;
 import pt.ulisboa.tecnico.cmov.airdesk_cmov.R;
 import pt.ulisboa.tecnico.cmov.airdesk_cmov.Sessions.SessionManager;
 
@@ -44,6 +46,7 @@ public class RegisterActivity extends ActionBarActivity {
 
                 try {
                     Application.createUser(username.getText().toString(),email.getText().toString());
+                    Application.login(email.getText().toString());
                     Application.session = new SessionManager(getApplicationContext());
                     Application.session.createLoginSession(email.getText().toString(),username.getText().toString());
                     Toast.makeText(RegisterActivity.this, "Welcome to AirDesk.", Toast.LENGTH_SHORT).show();
@@ -51,6 +54,10 @@ public class RegisterActivity extends ActionBarActivity {
                     startActivity(intent);
                 } catch (UserAlreadyExistsException e) {
                     Toast.makeText(RegisterActivity.this, e.getMessage(), Toast.LENGTH_SHORT).show();
+                } catch (WrongPasswordException e) {
+                    e.printStackTrace();
+                } catch (NotRegisteredException e) {
+                    e.printStackTrace();
                 }
 
 
