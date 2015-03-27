@@ -49,6 +49,12 @@ public class RegisterActivity extends ActionBarActivity {
                     Application.login(email.getText().toString());
                     Application.session = new SessionManager(getApplicationContext());
                     Application.session.createLoginSession(email.getText().toString(),username.getText().toString());
+                    try {
+                        Application.login(email.getText().toString());
+                    }catch (NotRegisteredException  | WrongPasswordException e){
+                        System.out.println(e.getMessage());
+                        return;
+                    }
                     Toast.makeText(RegisterActivity.this, "Welcome to AirDesk.", Toast.LENGTH_SHORT).show();
                     Intent intent = new Intent(RegisterActivity.this, WorkSpacesActivity.class);
                     startActivity(intent);

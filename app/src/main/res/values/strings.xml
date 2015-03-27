@@ -28,6 +28,7 @@
 
     <string name="Confirm">Confirm</string>
     <string name="Cancel">Cancel</string>
+    <string name="title_activity_workspace_settings">WorkspaceSettings</string>
     <string name="title_activity_list_files">ListFilesActivity</string>
     <string name="title_activity_main_activity2">MainActivity2Activity</string>
 </resources>

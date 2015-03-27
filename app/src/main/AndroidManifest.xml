@@ -47,6 +47,10 @@
             android:label="@string/title_activity_foreign_workspaces" >
         </activity>
         <activity
+            android:name=".Activities.WorkspaceSettings"
+            android:label="@string/title_activity_workspace_settings" >
+        </activity>
+        <activity
             android:name=".Activities.ListFilesActivity"
             android:label="@string/title_activity_list_files" >
         </activity>
