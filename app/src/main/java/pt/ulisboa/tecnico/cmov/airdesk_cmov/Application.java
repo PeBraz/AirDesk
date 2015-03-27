@@ -83,5 +83,9 @@ public class Application {
 
     }
 
+    public static User getUser(String email){
+        return userData.get(email);
+    }
+
 
 }

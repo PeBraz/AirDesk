@@ -25,7 +25,7 @@
             android:label="@string/title_activity_login" >
         </activity>
         <activity
-            android:name=".Activities.registerActivity"
+            android:name=".Activities.RegisterActivity"
             android:label="@string/title_activity_register" >
         </activity>
         <activity
@@ -49,6 +49,10 @@
         <activity
             android:name=".Activities.WorkspaceSettings"
             android:label="@string/title_activity_workspace_settings" >
+        </activity>
+        <activity
+            android:name=".Activities.ListFilesActivity"
+            android:label="@string/title_activity_list_files" >
         </activity>
     </application>
 

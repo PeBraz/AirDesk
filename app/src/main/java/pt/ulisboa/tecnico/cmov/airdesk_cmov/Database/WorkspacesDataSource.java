@@ -19,6 +19,7 @@ public class WorkspacesDataSource extends DataSource<Workspace>{
                                     MySQLiteHelper.WS_QUOTA,
                                     MySQLiteHelper.WS_PRIVACY,
                                     MySQLiteHelper.WS_TAGS,
+                                    MySQLiteHelper.WS_ACCESS,
                                     MySQLiteHelper.WS_USER};
 
     public WorkspacesDataSource(Context context) {
@@ -51,7 +52,7 @@ public class WorkspacesDataSource extends DataSource<Workspace>{
         values.put(MySQLiteHelper.WS_PRIVACY, ws.getPrivacy()?1:0);
         values.put(MySQLiteHelper.WS_TAGS, ws.getTags());
         values.put(MySQLiteHelper.WS_ACCESS, ws.getAccessListSerialized());
-        values.put(MySQLiteHelper.WS_USER, ws.getOwner().getUsername());
+        values.put(MySQLiteHelper.WS_USER, ws.getOwner().getEmail());
         database.update(MySQLiteHelper.TABLE_WORKSPACES, values,
                 String.format(" %1$s=? ", MySQLiteHelper.WS_NAME), new String[] {ws.getName()});
 
@@ -92,7 +93,7 @@ public class WorkspacesDataSource extends DataSource<Workspace>{
         ws.setPrivacy(cursor.getInt(2)==1);
         ws.setTags(cursor.getString(3));
         ws.setAccessList(cursor.getBlob(4));
-        ws.setOwner(Application.getOwner());
+        ws.setOwner(Application.getUser(cursor.getString(5)));
         return ws;
     }
 }

@@ -103,8 +103,14 @@ public class Workspace {
         try {
             in = new ObjectInputStream(bais);
             this.accessList = (List<User>) in.readObject();
-        }catch(IOException | ClassNotFoundException e) {
-            System.out.println(e.getMessage());
+            System.out.println("FInish");
+        }catch (StreamCorruptedException e){
+            System.out.println("Caught Stream Corrupted Exception:::"+e.getMessage());
+            this.accessList = null;
+        }catch(IOException | ClassNotFoundException  e) {
+            System.out.println(e);
+                System.out.println("WTF:::"+e.getMessage());
+            this.accessList = null;
         }finally {
             try{
                 if (in != null) in.close();

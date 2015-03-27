@@ -109,6 +109,7 @@ public class WorkSpacesActivity extends ActionBarActivity {
             public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
                 TextView view = (TextView) dialogView.findViewById(R.id.new_workspace_quota_tag);
                 view.setText("Quota: "+progress);
+
             }
         });
 

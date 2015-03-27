@@ -14,7 +14,7 @@ public class MySQLiteHelper extends SQLiteOpenHelper{
     public static final String USER_EMAIL = "EMAIL";
 
     private static final String DATABASE_NAME = "airdeskdb";
-    private static final int DATABASE_VERSION = 2;
+    private static final int DATABASE_VERSION = 3;
 
     public static final String TABLE_WORKSPACES = "workspaces";
     public static final String WS_NAME = "name";
