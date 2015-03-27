@@ -35,19 +35,26 @@ public class WorkspacesDataSource extends DataSource<Workspace>{
         ContentValues values = new ContentValues();
         values.put(MySQLiteHelper.WS_NAME, ws.getName());
         values.put(MySQLiteHelper.WS_QUOTA, ws.getQuota());
-        values.put(MySQLiteHelper.WS_PRIVACY, ws.getPrivacy()?"1":"0");
+        values.put(MySQLiteHelper.WS_PRIVACY, ws.getPrivacy()?1:0);
         values.put(MySQLiteHelper.WS_TAGS, ws.getTags());
+        values.put(MySQLiteHelper.WS_ACCESS, ws.getAccessListSerialized());
         values.put(MySQLiteHelper.WS_USER, ws.getOwner().getUsername());
         database.insert(MySQLiteHelper.TABLE_WORKSPACES, null, values);
 
     }
     @Override
     public void save(Workspace ws) {
-        final String query = String.format("UPDATE %1$s SET %2$s= ?,%3$s= ? , %4$s= ? WHERE %5$s= ?",
-                MySQLiteHelper.TABLE_WORKSPACES, MySQLiteHelper.WS_QUOTA, MySQLiteHelper.WS_PRIVACY,
-                MySQLiteHelper.WS_USER, MySQLiteHelper.WS_NAME);
-        database.rawQuery(query, new String[]{Integer.toString(ws.getQuota()),ws.getPrivacy()?"1":"0",
-                                    ws.getOwner().getUsername(), ws.getName()});
+
+        ContentValues values = new ContentValues();
+        values.put(MySQLiteHelper.WS_NAME, ws.getName());
+        values.put(MySQLiteHelper.WS_QUOTA, ws.getQuota());
+        values.put(MySQLiteHelper.WS_PRIVACY, ws.getPrivacy()?1:0);
+        values.put(MySQLiteHelper.WS_TAGS, ws.getTags());
+        values.put(MySQLiteHelper.WS_ACCESS, ws.getAccessListSerialized());
+        values.put(MySQLiteHelper.WS_USER, ws.getOwner().getUsername());
+        database.update(MySQLiteHelper.TABLE_WORKSPACES, values,
+                String.format(" %1$s=? ", MySQLiteHelper.WS_NAME), new String[] {ws.getName()});
+
     }
     @Override
     public Workspace get(final String wsKey) {
@@ -82,6 +89,9 @@ public class WorkspacesDataSource extends DataSource<Workspace>{
         Workspace ws = new Workspace();
         ws.setName(cursor.getString(0));
         ws.setQuota(cursor.getInt(1));
+        ws.setPrivacy(cursor.getInt(2)==1);
+        ws.setTags(cursor.getString(3));
+        ws.setAccessList(cursor.getBlob(4));
         ws.setOwner(Application.getOwner());
         return ws;
     }

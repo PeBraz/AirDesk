@@ -10,7 +10,6 @@
         <activity
             android:name=".Activities.MainActivity"
             android:label="@string/title_activity_main" >
-
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -33,10 +32,12 @@
             android:name=".Activities.UserSettingsActivity"
             android:label="@string/title_activity_user_settings" >
         </activity>
-       <!-- <activity
+        <!--
+        <activity
             android:name=".Activities.NewWorkspaceActivity"
             android:label="@string/title_activity_new_workspace" >
-        </activity>-->
+        </activity>
+        -->
         <activity
             android:name=".Activities.MyWorkSpacesActivity"
             android:label="@string/title_activity_my_work_spaces" >
@@ -44,6 +45,10 @@
         <activity
             android:name=".Activities.ForeignWorkspacesActivity"
             android:label="@string/title_activity_foreign_workspaces" >
+        </activity>
+        <activity
+            android:name=".Activities.WorkspaceSettings"
+            android:label="@string/title_activity_workspace_settings" >
         </activity>
     </application>
 
