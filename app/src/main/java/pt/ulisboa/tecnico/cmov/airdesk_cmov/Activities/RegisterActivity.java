@@ -61,9 +61,9 @@ public class RegisterActivity extends ActionBarActivity {
                 } catch (UserAlreadyExistsException e) {
                     Toast.makeText(RegisterActivity.this, e.getMessage(), Toast.LENGTH_SHORT).show();
                 } catch (WrongPasswordException e) {
-                    e.printStackTrace();
+                    e.getMessage();
                 } catch (NotRegisteredException e) {
-                    e.printStackTrace();
+                    e.getMessage();
                 }
 
 

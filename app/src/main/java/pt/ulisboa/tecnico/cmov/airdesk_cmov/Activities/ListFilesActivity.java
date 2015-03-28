@@ -8,8 +8,10 @@ import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -35,6 +37,19 @@ public class ListFilesActivity extends ActionBarActivity {
 
         final ArrayAdapter<String> adapter = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, android.R.id.text1, new Workspace().getAllFiles(wsName));
         listview.setAdapter(adapter);
+
+        listview.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+
+            String itemValue = (String) listview.getItemAtPosition(position);
+            String text = read(itemValue);
+            fileOptionsDialog(itemValue, text);
+
+            }
+
+        });
 
     }
 
@@ -69,9 +84,9 @@ public class ListFilesActivity extends ActionBarActivity {
 
         dialog.show();
 
-        Button save = (Button) dialogView.findViewById(R.id.button);
+        Button createFile = (Button) dialogView.findViewById(R.id.button);
 
-        save.setOnClickListener(new View.OnClickListener() {
+        createFile.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
 
@@ -83,24 +98,75 @@ public class ListFilesActivity extends ActionBarActivity {
                     return;
                 }
 
-                write(fileTitle.getText().toString(),fileText.getText().toString());
-                new Workspace().createFile(fileTitle.getText().toString(),wsName);
+                String title = fileTitle.getText().toString() + ".txt";
+
+                write(title, fileText.getText().toString());
+                new Workspace().createFile(title, wsName);
                 dialog.dismiss();
 
             }
         });
+    }
 
+    private void fileOptionsDialog(final String fileName, String textfile){
+
+        final Dialog dialog = new Dialog(this);
+        dialog.setTitle(fileName);
+
+        final LayoutInflater inflater = this.getLayoutInflater();
+        final View dialogView = inflater.inflate(R.layout.dialog_options_files, null);
+        dialog.setContentView(dialogView);
+
+        dialog.show();
+
+        final EditText text = (EditText) dialog.findViewById(R.id.editText5);
+        text.setText(textfile,TextView.BufferType.EDITABLE);
+
+        Button cancel = (Button) dialog.findViewById(R.id.button9);
+        Button saveFile = (Button) dialog.findViewById(R.id.button);
+        Button deleteFile = (Button) dialog.findViewById(R.id.button8);
+
+        cancel.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                dialog.dismiss();
+            }
+        });
+
+        saveFile.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                write(fileName,text.getText().toString());
+                dialog.dismiss();
+            }
+        });
     }
 
     private void write(String title, String text) {
+
         if (FileUtil.isExternalStorageWritable()) {
             File dir = FileUtil.getExternalFilesDirAllApiLevels(this.getPackageName());
-            File file = new File(dir, title + ".txt");
+            File file = new File(dir, title);
             FileUtil.writeStringAsFile(text, file);
             Toast.makeText(this, "File written", Toast.LENGTH_SHORT).show();
-        } else {
-            Toast.makeText(this, "External storage not writable", Toast.LENGTH_SHORT).show();
         }
+        else Toast.makeText(this, "External storage not writable", Toast.LENGTH_SHORT).show();
+    }
+
+    private String read(String fileName) {
+
+        if (FileUtil.isExternalStorageReadable()) {
+            File dir = FileUtil.getExternalFilesDirAllApiLevels(this.getPackageName());
+            File file = new File(dir, fileName);
+
+            if (file.exists() && file.canRead())
+                return FileUtil.readFileAsString(file);
+
+            else Toast.makeText(this, "Unable to read file: " + file.getAbsolutePath(), Toast.LENGTH_SHORT).show();
+        }
+        else Toast.makeText(this, "External storage not readable", Toast.LENGTH_SHORT).show();
+
+        return null;
     }
 
 

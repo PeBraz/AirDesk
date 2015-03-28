@@ -101,10 +101,8 @@ public class Workspace {
 
         List<File> listFiles =  filedb.getAll();
         for(File f : listFiles){
-            System.out.println(workspace);
-            System.out.println(f.getWorkspace());
             if (f.getWorkspace().equals(workspace))
-                allFiles.add(f.getName() + ".txt");
+                allFiles.add(f.getName());
         }
 
         return allFiles;
