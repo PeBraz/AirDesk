@@ -4,6 +4,7 @@ package pt.ulisboa.tecnico.cmov.airdesk_cmov.Activities;
 import android.app.Dialog;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -43,9 +44,8 @@ public class ListFilesActivity extends ActionBarActivity {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
 
-            String itemValue = (String) listview.getItemAtPosition(position);
-            String text = read(itemValue);
-            fileOptionsDialog(itemValue, text);
+            String fileTitle = (String) listview.getItemAtPosition(position);
+            fileOptionsDialog(fileTitle);
 
             }
 
@@ -84,23 +84,20 @@ public class ListFilesActivity extends ActionBarActivity {
 
         dialog.show();
 
-        Button createFile = (Button) dialogView.findViewById(R.id.button);
+        final Button createFile = (Button) dialogView.findViewById(R.id.button);
 
         createFile.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
 
                 TextView fileTitle = (TextView) dialog.findViewById(R.id.editText6);
-                TextView fileText = (TextView) dialog.findViewById(R.id.editText5);
 
-                if (fileText.getText().toString().isEmpty() || fileTitle.getText().toString().isEmpty()) {
+                if (fileTitle.getText().toString().isEmpty()) {
                     Toast.makeText(ListFilesActivity.this, "A value is missing.", Toast.LENGTH_SHORT).show();
                     return;
                 }
 
                 String title = fileTitle.getText().toString() + ".txt";
-
-                write(title, fileText.getText().toString());
                 new Workspace().createFile(title, wsName);
                 dialog.dismiss();
 
@@ -108,7 +105,7 @@ public class ListFilesActivity extends ActionBarActivity {
         });
     }
 
-    private void fileOptionsDialog(final String fileName, String textfile){
+    private void fileOptionsDialog(final String fileName){
 
         final Dialog dialog = new Dialog(this);
         dialog.setTitle(fileName);
@@ -119,12 +116,9 @@ public class ListFilesActivity extends ActionBarActivity {
 
         dialog.show();
 
-        final EditText text = (EditText) dialog.findViewById(R.id.editText5);
-        text.setText(textfile,TextView.BufferType.EDITABLE);
-
         Button cancel = (Button) dialog.findViewById(R.id.button9);
-        Button saveFile = (Button) dialog.findViewById(R.id.button);
-        Button deleteFile = (Button) dialog.findViewById(R.id.button8);
+        Button readFile = (Button) dialog.findViewById(R.id.button10);
+        Button writeFile = (Button) dialog.findViewById(R.id.button);
 
         cancel.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -133,10 +127,86 @@ public class ListFilesActivity extends ActionBarActivity {
             }
         });
 
-        saveFile.setOnClickListener(new View.OnClickListener() {
+        readFile.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                write(fileName,text.getText().toString());
+                readFileDialog(fileName);
+                dialog.dismiss();
+            }
+        });
+
+        writeFile.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                writeFileDialog(fileName);
+                dialog.dismiss();
+            }
+        });
+
+    }
+
+    private void readFileDialog(String filename){
+
+        final Dialog dialog = new Dialog(this);
+        dialog.setTitle(filename);
+
+        final LayoutInflater inflater = this.getLayoutInflater();
+        final View dialogView = inflater.inflate(R.layout.dialog_read_file, null);
+        dialog.setContentView(dialogView);
+
+        dialog.show();
+
+        TextView text = (TextView) dialog.findViewById(R.id.textView16);
+        String fileText = read(filename);
+
+        if (fileText == null)
+            Toast.makeText(this, "File is still empty.", Toast.LENGTH_SHORT).show();
+
+        else text.setText(fileText);
+
+        Button cancel = (Button) dialog.findViewById(R.id.button11);
+
+        cancel.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                dialog.dismiss();
+            }
+        });
+
+    }
+
+    private void writeFileDialog(final String filename){
+
+        final Dialog dialog = new Dialog(this);
+        dialog.setTitle(filename);
+
+        final LayoutInflater inflater = this.getLayoutInflater();
+        final View dialogView = inflater.inflate(R.layout.dialog_write_file, null);
+        dialog.setContentView(dialogView);
+
+        dialog.show();
+
+        Button save = (Button) dialog.findViewById(R.id.button12);
+        final EditText text = (EditText) dialog.findViewById(R.id.editText7);
+
+        String actualText = read(filename);
+
+        if (actualText!=null) text.setText(actualText);
+
+        save.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                write(filename, text.getText().toString());
+                dialog.dismiss();
+            }
+        });
+
+
+        Button cancel = (Button) dialog.findViewById(R.id.button13);
+
+        cancel.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
                 dialog.dismiss();
             }
         });
@@ -149,8 +219,9 @@ public class ListFilesActivity extends ActionBarActivity {
             File file = new File(dir, title);
             FileUtil.writeStringAsFile(text, file);
             Toast.makeText(this, "File written", Toast.LENGTH_SHORT).show();
+        } else {
+            Toast.makeText(this, "External storage not writable", Toast.LENGTH_SHORT).show();
         }
-        else Toast.makeText(this, "External storage not writable", Toast.LENGTH_SHORT).show();
     }
 
     private String read(String fileName) {
@@ -161,13 +232,9 @@ public class ListFilesActivity extends ActionBarActivity {
 
             if (file.exists() && file.canRead())
                 return FileUtil.readFileAsString(file);
-
-            else Toast.makeText(this, "Unable to read file: " + file.getAbsolutePath(), Toast.LENGTH_SHORT).show();
         }
         else Toast.makeText(this, "External storage not readable", Toast.LENGTH_SHORT).show();
 
         return null;
     }
-
-
 }

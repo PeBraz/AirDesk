@@ -1,36 +1,35 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:orientation="vertical" android:layout_width="match_parent"
-    android:layout_height="match_parent">
-
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:textAppearance="?android:attr/textAppearanceMedium"
-        android:text="Text"
-        android:id="@+id/textView12" />
-
-    <EditText
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:id="@+id/editText5" />
+    android:layout_height="match_parent"
+    android:gravity="center_horizontal">
 
     <Button
-        android:layout_width="103dp"
+        android:layout_width="110dp"
         android:layout_height="wrap_content"
-        android:text="Save file"
-        android:id="@+id/button" />
+        android:text="read file"
+        android:id="@+id/button10"
+        android:gravity="center_horizontal" />
 
     <Button
-        android:layout_width="wrap_content"
+        android:layout_width="110dp"
+        android:layout_height="wrap_content"
+        android:text="write file"
+        android:id="@+id/button"
+        android:gravity="center_horizontal" />
+
+    <Button
+        android:layout_width="110dp"
         android:layout_height="wrap_content"
         android:text="Delete File"
-        android:id="@+id/button8" />
+        android:id="@+id/button8"
+        android:gravity="center_horizontal" />
 
     <Button
-        android:layout_width="105dp"
+        android:layout_width="110dp"
         android:layout_height="wrap_content"
         android:text="Cancel"
-        android:id="@+id/button9" />
+        android:id="@+id/button9"
+        android:gravity="center_horizontal" />
 
 </LinearLayout>

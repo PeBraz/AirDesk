@@ -108,7 +108,6 @@ public class Workspace {
         return allFiles;
     }
 
-
     public final void setAccessList(List<User> users) {
         this.accessList = users;
     }
