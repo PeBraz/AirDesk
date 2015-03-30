@@ -20,9 +20,6 @@ public final class ApplicationOwner extends User {
         Workspace ws = new Workspace(name, quota, this);
         getWorkspaceDataSource().create(ws);
 
-
-        //mirror the new workspace to the foreign workspaces
-        //remove for other part of project
         Application.workspacesInNetwork.add(ws);
 
     }
@@ -53,8 +50,6 @@ public final class ApplicationOwner extends User {
 
         List<Workspace> myWorkspaces = new ArrayList<>();
         List<Workspace> allWorkspaces = super.getWorkspaceDataSource().getAll();
-
-        System.out.println(allWorkspaces.toString());
 
         for(Workspace work : allWorkspaces){
             if (work.populateUser().getOwner().getEmail().equals(Application.getOwner().getEmail()))
