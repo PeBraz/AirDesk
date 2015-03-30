@@ -118,6 +118,7 @@ public class ListFilesActivity extends ActionBarActivity {
         Button cancel = (Button) dialog.findViewById(R.id.button9);
         Button readFile = (Button) dialog.findViewById(R.id.button10);
         Button writeFile = (Button) dialog.findViewById(R.id.button);
+        Button deleteFile = (Button) dialog.findViewById(R.id.button8);
 
         cancel.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -138,6 +139,15 @@ public class ListFilesActivity extends ActionBarActivity {
             @Override
             public void onClick(View v) {
                 writeFileDialog(fileName);
+                dialog.dismiss();
+            }
+        });
+
+
+        deleteFile.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                deleteFileDialog(fileName);
                 dialog.dismiss();
             }
         });
@@ -202,6 +212,27 @@ public class ListFilesActivity extends ActionBarActivity {
 
 
         Button cancel = (Button) dialog.findViewById(R.id.button13);
+
+        cancel.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                dialog.dismiss();
+            }
+        });
+    }
+
+    private void deleteFileDialog(String filename){
+
+        final Dialog dialog = new Dialog(this);
+        dialog.setTitle(filename);
+
+        final LayoutInflater inflater = this.getLayoutInflater();
+        final View dialogView = inflater.inflate(R.layout.dialog_delete_file, null);
+        dialog.setContentView(dialogView);
+
+        dialog.show();
+
+        Button cancel = (Button) dialog.findViewById(R.id.button15);
 
         cancel.setOnClickListener(new View.OnClickListener() {
             @Override
