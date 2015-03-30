@@ -36,12 +36,13 @@ public abstract class DataSource <T>{
      *  Only the attribute that serves as key will be used to find the existing entry.
      *
      * @param object the type of object that needs to be saved in the database
-     *
      */
     public abstract void save(T object);
 
-    public abstract T get(final String key);
+  //  public abstract T get(final String key);
 
     public abstract List<T> getAll();
+
+
 
 }

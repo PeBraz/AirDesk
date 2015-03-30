@@ -9,13 +9,18 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.SeekBar;
 import android.widget.TextView;
+
+import java.util.HashSet;
+import java.util.Set;
 
 import pt.ulisboa.tecnico.cmov.airdesk_cmov.Application;
 import pt.ulisboa.tecnico.cmov.airdesk_cmov.Exceptions.InvalidQuotaException;
 import pt.ulisboa.tecnico.cmov.airdesk_cmov.Exceptions.WorkspaceAlreadyExistsException;
 import pt.ulisboa.tecnico.cmov.airdesk_cmov.R;
+import pt.ulisboa.tecnico.cmov.airdesk_cmov.Workspace;
 
 public class WorkSpacesActivity extends ActionBarActivity {
 
@@ -64,7 +69,7 @@ public class WorkSpacesActivity extends ActionBarActivity {
          //   Intent intent = new Intent(getApplicationContext(), NewWorkspaceActivity.class);
          //   startActivity(intent);
         }else if (id == R.id.subscribe) {
-            //TODO
+            this.subscribeDialog();
         }
 
         return super.onOptionsItemSelected(item);
@@ -141,6 +146,62 @@ public class WorkSpacesActivity extends ActionBarActivity {
 
             }
         });
+        cancel.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                dialog.dismiss();
+            }
+        });
+    }
+    private void subscribeDialog() {
+
+
+        final Dialog dialog = new Dialog(this);
+        dialog.setTitle(R.string.subscribe_title);
+
+        final LayoutInflater inflater = this.getLayoutInflater();
+        final View dialogView = inflater.inflate(R.layout.dialog_subscribe, null);
+        dialog.setContentView(dialogView);
+
+
+        dialog.show();
+
+        Button ok = (Button) dialogView.findViewById(R.id.subscribe_confirm_button);
+        Button search = (Button) dialogView.findViewById(R.id.subscribe_search_button);
+        Button cancel = (Button) dialogView.findViewById(R.id.subscribe_cancel_button);
+
+        //Store the contents searched, for when finalizing the action
+        final Set<Workspace> availableWS = new HashSet<>();
+
+        ok.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Application.subscribe(availableWS);
+                dialog.dismiss();
+
+            }
+        });
+        search.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                EditText text = (EditText) dialog.findViewById(R.id.subscribe_query);
+
+                availableWS.clear();
+                availableWS.addAll(Application.networkSearch(text.getText().toString()));
+
+                TextView list = (TextView) dialog.findViewById(R.id.subscribe_list);
+                if (availableWS.isEmpty()) {
+                    list.setText("No Workspaces found.");
+                } else {
+                    list.setText("");
+                    for (Workspace ws : availableWS) {
+                        list.setText(list.getText() + "\n" + ws.getName());
+                    }
+                }
+            }
+        });
+
         cancel.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {

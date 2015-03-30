@@ -44,6 +44,7 @@ public class FilesDataSource extends DataSource<File>{
         database.rawQuery(query, new String[]{ file.getPath(), file.getWorkspace(),
                                     file.getName()});
     }
+    /*
     @Override
     public File get(final String fileKey) {
         final File file;
@@ -56,7 +57,23 @@ public class FilesDataSource extends DataSource<File>{
         cursor.close();
         return file;
 
+    }*/
+
+    public File get(final String filename, final String wsname, final String userEmail) {
+        final File file;
+        final String whereQuery =   MySQLiteHelper.FILE_NAME+"=? AND "+
+                MySQLiteHelper.FILE_WORKSPACE+"=? AND "+
+                MySQLiteHelper.FILE_USER+"=? ";
+        Cursor cursor = database.query(MySQLiteHelper.TABLE_FILES, null, whereQuery,
+                new String[] {filename, wsname, userEmail}, null, null, null);
+        cursor.moveToFirst();
+        if(cursor.isAfterLast())
+            return null;
+        file = cursorToFile(cursor);
+        cursor.close();
+        return file;
     }
+
     @Override
     public List<File> getAll() {
 
@@ -71,6 +88,14 @@ public class FilesDataSource extends DataSource<File>{
         }
         cursor.close();
         return files;
+    }
+
+    public final void delete(final String filename, final String wsname, final String userEmail) {
+        final String whereQuery =   MySQLiteHelper.FILE_NAME+"=? AND "+
+                MySQLiteHelper.FILE_WORKSPACE+"=? AND "+
+                MySQLiteHelper.FILE_USER+"=? ";
+        database.delete(MySQLiteHelper.TABLE_FILES , whereQuery,
+                new String[] {filename, wsname, userEmail});
     }
 
     private File cursorToFile(Cursor cursor) {

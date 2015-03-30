@@ -24,7 +24,9 @@
     <string name="menu_subscribe">Subscribe</string>
     <string name="menu_new_file">New file</string>
 
-
+    <!-- subscribe dialog-->
+    <string name="subscribe_title">Subscribe</string>
+    <string name="subscribe_query">Search...</string>
 
     <string name="Confirm">Confirm</string>
     <string name="Cancel">Cancel</string>

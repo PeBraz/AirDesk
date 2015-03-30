@@ -4,8 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 import pt.ulisboa.tecnico.cmov.airdesk_cmov.Exceptions.InvalidQuotaException;
 import pt.ulisboa.tecnico.cmov.airdesk_cmov.Exceptions.WorkspaceAlreadyExistsException;
-import pt.ulisboa.tecnico.cmov.airdesk_cmov.Files.FileUtil;
-import java.io.File;
+
 
 public final class ApplicationOwner extends User {
 
@@ -17,13 +16,19 @@ public final class ApplicationOwner extends User {
             throws WorkspaceAlreadyExistsException, InvalidQuotaException {
 
         if (quota > Application.MAX_APPLICATION_QUOTA) throw new InvalidQuotaException(quota);  // needs to be changed to mirror the device's real space
-        if (getWorkspaceDataSource().get(name) != null) throw new WorkspaceAlreadyExistsException(name);
-        getWorkspaceDataSource().create(new Workspace(name, quota, this));
+        if (getWorkspaceDataSource().get(name, this.getEmail()) != null) throw new WorkspaceAlreadyExistsException(name);
+        Workspace ws = new Workspace(name, quota, this);
+        getWorkspaceDataSource().create(ws);
+
+
+        //mirror the new workspace to the foreign workspaces
+        //remove for other part of project
+        Application.workspacesInNetwork.add(ws);
+
     }
 
     public final void subscribe(Workspace workspace) {
-
-        Application.foreignWorkspaces.add(workspace);
+        Application.workspacesInNetwork.add(workspace);
 
     }
 
@@ -52,7 +57,7 @@ public final class ApplicationOwner extends User {
         System.out.println(allWorkspaces.toString());
 
         for(Workspace work : allWorkspaces){
-            if (work.getOwner().getEmail().equals(Application.getOwner().getEmail()))
+            if (work.populateUser().getOwner().getEmail().equals(Application.getOwner().getEmail()))
                 myWorkspaces.add(work);
         }
         return myWorkspaces;

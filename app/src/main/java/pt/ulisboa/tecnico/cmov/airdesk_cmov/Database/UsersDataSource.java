@@ -38,7 +38,7 @@ public class UsersDataSource extends DataSource<User>{
                MySQLiteHelper.TABLE_USERS, MySQLiteHelper.USER_USERNAME, MySQLiteHelper.USER_EMAIL);
         database.rawQuery(query, new String[]{ user.getUsername(), user.getEmail()});
     }
-    @Override
+  //  @Override
     public User get(final String userKey) {
         final User user;
         Cursor cursor = database.rawQuery("select * from "+MySQLiteHelper.TABLE_USERS+" where "+ MySQLiteHelper.USER_EMAIL+" = ? ",
@@ -72,5 +72,4 @@ public class UsersDataSource extends DataSource<User>{
         user.setEmail(cursor.getString(0));
         return user;
     }
-
 }

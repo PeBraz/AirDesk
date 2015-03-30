@@ -40,7 +40,7 @@ public class User {
     }
 
     public final Workspace getWorkspace(final String name) {
-        return this.workspacedb.get(name);
+        return this.workspacedb.get(name, this.getEmail());
     }
 
 
