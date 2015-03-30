@@ -36,27 +36,13 @@ public abstract class DataSource <T>{
      *  Only the attribute that serves as key will be used to find the existing entry.
      *
      * @param object the type of object that needs to be saved in the database
-     *
      */
     public abstract void save(T object);
 
-    public abstract T get(final String key);
+  //  public abstract T get(final String key);
 
     public abstract List<T> getAll();
 
-    /**
-     * A different version of get, should be used on foreign keys to get an object inside another
-     * object.
-     */
-//    protected abstract T unpopulatedGet(final String key);
 
-    /**
-     *  The same as get but allows multiple keys
-     */
-  //  protected abstract T get(final String... keys);
 
-    /**
-     * The same as unpopulatedGet but allows multiple keys
-     */
-  //  protected abstract T unpopulatedGet(final String... keys);
 }

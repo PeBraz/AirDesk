@@ -8,7 +8,6 @@ import android.database.sqlite.SQLiteDatabase;
 import java.util.ArrayList;
 import java.util.List;
 
-import pt.ulisboa.tecnico.cmov.airdesk_cmov.Application;
 import pt.ulisboa.tecnico.cmov.airdesk_cmov.Exceptions.NoDatabaseException;
 import pt.ulisboa.tecnico.cmov.airdesk_cmov.Workspace;
 
@@ -57,7 +56,8 @@ public class WorkspacesDataSource extends DataSource<Workspace>{
                 String.format(" %1$s=? ", MySQLiteHelper.WS_NAME), new String[] {ws.getName()});
 
     }
-    @Override
+   // @Override
+    /*
     public Workspace get(final String wsKey) {
         final Workspace ws;
         Cursor cursor = database.rawQuery("select * from "+MySQLiteHelper.TABLE_WORKSPACES+" where "+MySQLiteHelper.WS_NAME+" = ? ",
@@ -70,6 +70,21 @@ public class WorkspacesDataSource extends DataSource<Workspace>{
         return ws;
 
     }
+*/
+   public Workspace get(final String wsname, final String userEmail) {
+        final Workspace ws;
+        final String whereQuery =   MySQLiteHelper.WS_NAME+"=? AND "+
+                MySQLiteHelper.WS_USER+"=? ";
+        Cursor cursor = database.query(MySQLiteHelper.TABLE_WORKSPACES, null, whereQuery,
+                new String[] {wsname, userEmail}, null, null, null);
+        cursor.moveToFirst();
+        if(cursor.isAfterLast())
+            return null;
+        ws = cursorToWorkspace(cursor);
+        cursor.close();
+        return ws;
+    }
+
     @Override
     public List<Workspace> getAll() {
 
@@ -84,6 +99,13 @@ public class WorkspacesDataSource extends DataSource<Workspace>{
         }
         cursor.close();
         return wss;
+    }
+
+    public final void delete(final String wsname, final String userEmail) {
+        final String whereQuery =   MySQLiteHelper.WS_NAME+"=? AND "+
+                MySQLiteHelper.WS_USER+"=? ";
+        database.delete(MySQLiteHelper.TABLE_WORKSPACES, whereQuery,
+                                new String[] {wsname, userEmail});
     }
 
     private Workspace cursorToWorkspace(Cursor cursor) {

@@ -4,8 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 import pt.ulisboa.tecnico.cmov.airdesk_cmov.Exceptions.InvalidQuotaException;
 import pt.ulisboa.tecnico.cmov.airdesk_cmov.Exceptions.WorkspaceAlreadyExistsException;
-import pt.ulisboa.tecnico.cmov.airdesk_cmov.Files.FileUtil;
-import java.io.File;
+
 
 public final class ApplicationOwner extends User {
 
@@ -17,7 +16,7 @@ public final class ApplicationOwner extends User {
             throws WorkspaceAlreadyExistsException, InvalidQuotaException {
 
         if (quota > Application.MAX_APPLICATION_QUOTA) throw new InvalidQuotaException(quota);  // needs to be changed to mirror the device's real space
-        if (getWorkspaceDataSource().get(name) != null) throw new WorkspaceAlreadyExistsException(name);
+        if (getWorkspaceDataSource().get(name, this.getEmail()) != null) throw new WorkspaceAlreadyExistsException(name);
         Workspace ws = new Workspace(name, quota, this);
         getWorkspaceDataSource().create(ws);
 
