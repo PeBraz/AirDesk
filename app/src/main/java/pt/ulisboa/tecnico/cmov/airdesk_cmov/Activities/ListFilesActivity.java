@@ -35,9 +35,7 @@ public class ListFilesActivity extends ActionBarActivity {
         if (info != null) wsName = info.getString("WSNAME");
 
         final ListView listview = (ListView) findViewById(R.id.listView2);
-
-        final ArrayAdapter<String> adapter = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, android.R.id.text1, new Workspace().getAllFiles(wsName));
-        listview.setAdapter(adapter);
+        showList();
 
         listview.setOnItemClickListener(new AdapterView.OnItemClickListener() {
 
@@ -100,6 +98,7 @@ public class ListFilesActivity extends ActionBarActivity {
                 String title = fileTitle.getText().toString() + ".txt";
                 new Workspace().createFile(title, wsName);
                 dialog.dismiss();
+                showList();
 
             }
         });
@@ -236,5 +235,12 @@ public class ListFilesActivity extends ActionBarActivity {
         else Toast.makeText(this, "External storage not readable", Toast.LENGTH_SHORT).show();
 
         return null;
+    }
+
+    private void showList(){
+
+        final ListView listview = (ListView) findViewById(R.id.listView2);
+        final ArrayAdapter<String> adapter = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, android.R.id.text1, new Workspace().getAllFiles(wsName));
+        listview.setAdapter(adapter);
     }
 }
