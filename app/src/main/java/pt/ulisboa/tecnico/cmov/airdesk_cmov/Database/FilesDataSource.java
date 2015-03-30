@@ -103,8 +103,6 @@ public class FilesDataSource extends DataSource<File>{
         file.setName(cursor.getString(0));
         file.setPath(cursor.getString(1));
         file.setWorkspace(cursor.getString(2));
-        // get workspace from db? ()
-        //file.setWorkspace(cursor.getString(2));
         return file;
     }
 }

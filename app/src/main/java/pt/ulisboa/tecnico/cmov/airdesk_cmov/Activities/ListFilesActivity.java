@@ -4,7 +4,6 @@ package pt.ulisboa.tecnico.cmov.airdesk_cmov.Activities;
 import android.app.Dialog;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -17,6 +16,8 @@ import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 import java.io.File;
+
+import pt.ulisboa.tecnico.cmov.airdesk_cmov.Application;
 import pt.ulisboa.tecnico.cmov.airdesk_cmov.Files.FileUtil;
 import pt.ulisboa.tecnico.cmov.airdesk_cmov.R;
 import pt.ulisboa.tecnico.cmov.airdesk_cmov.Workspace;
@@ -46,9 +47,7 @@ public class ListFilesActivity extends ActionBarActivity {
             fileOptionsDialog(fileTitle);
 
             }
-
         });
-
     }
 
     @Override
@@ -96,7 +95,7 @@ public class ListFilesActivity extends ActionBarActivity {
                 }
 
                 String title = fileTitle.getText().toString() + ".txt";
-                new Workspace().createFile(title, wsName);
+                Workspace.createFile(title, wsName);
                 dialog.dismiss();
                 showList();
 
@@ -221,7 +220,7 @@ public class ListFilesActivity extends ActionBarActivity {
         });
     }
 
-    private void deleteFileDialog(String filename){
+    private void deleteFileDialog(final String filename){
 
         final Dialog dialog = new Dialog(this);
         dialog.setTitle(filename);
@@ -233,11 +232,22 @@ public class ListFilesActivity extends ActionBarActivity {
         dialog.show();
 
         Button cancel = (Button) dialog.findViewById(R.id.button15);
+        Button delete = (Button) dialog.findViewById(R.id.button14);
 
         cancel.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 dialog.dismiss();
+            }
+        });
+
+        delete.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Workspace.deleteFile(filename, wsName, Application.getOwner().getEmail());
+                deleteFileStorage(filename);
+                dialog.dismiss();
+                showList();
             }
         });
     }
@@ -268,10 +278,22 @@ public class ListFilesActivity extends ActionBarActivity {
         return null;
     }
 
+    private void deleteFileStorage(String name){
+
+        if (FileUtil.isExternalStorageReadable()) {
+            File dir = FileUtil.getExternalFilesDirAllApiLevels(this.getPackageName());
+            File file = new File(dir, name);
+
+            if (file.exists()) file.delete();
+
+            else Toast.makeText(this, "File does not exist.", Toast.LENGTH_SHORT).show();
+        }
+    }
+
     private void showList(){
 
         final ListView listview = (ListView) findViewById(R.id.listView2);
-        final ArrayAdapter<String> adapter = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, android.R.id.text1, new Workspace().getAllFiles(wsName));
+        final ArrayAdapter<String> adapter = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, android.R.id.text1, Workspace.getAllFiles(wsName));
         listview.setAdapter(adapter);
     }
 }

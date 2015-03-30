@@ -29,7 +29,7 @@ public class Workspace {
     private int minQuota;
     private boolean isPrivate;
     private String tags;
-    private FilesDataSource filedb;
+    private static FilesDataSource filedb;
     private List<User> accessList = new ArrayList<User>();
 
 
@@ -100,12 +100,12 @@ public class Workspace {
         this.ownerEmail = email;
     }
 
-    public void createFile(String name, String workspace){
+    public static void createFile(String name, String workspace){
         File file = new File(name,workspace);
         filedb.create(file);
     }
 
-    public List<String> getAllFiles(String workspace){
+    public static List<String> getAllFiles(String workspace){
 
         ArrayList<String> allFiles = new ArrayList<>();
 
@@ -116,6 +116,11 @@ public class Workspace {
         }
 
         return allFiles;
+    }
+
+    public static void deleteFile(String fileName, String wsName, String ownerMail){
+
+        filedb.delete(fileName,wsName,ownerMail);
     }
 
     public final void setAccessList(List<User> users) {
