@@ -11,12 +11,19 @@ import java.io.StreamCorruptedException;
 import java.util.ArrayList;
 import java.util.List;
 import pt.ulisboa.tecnico.cmov.airdesk_cmov.Database.FilesDataSource;
+import pt.ulisboa.tecnico.cmov.airdesk_cmov.Database.UsersDataSource;
 
 
 public class Workspace {
 
     private String name;
     private ArrayList<User> clients = new ArrayList<>();
+
+    /**
+     *  Retrieved by the database when initializing this workspace, can be used to populate the user
+     */
+    private String ownerEmail;
+
     private User owner;
     private int quota;
     private int minQuota;
@@ -88,6 +95,9 @@ public class Workspace {
 
     public final void invite(final User u) {
         //TODO
+    }
+    public void setOwnerEmail(String email) {
+        this.ownerEmail = email;
     }
 
     public void createFile(String name, String workspace){
@@ -166,6 +176,18 @@ public class Workspace {
             }
         }
         return bytes;
+    }
+
+    /**
+     * Given this workspace, initialize the user by looking for it in the database,
+     * populate user will load the user in the database by searching for the name.
+     *
+     * return the object itself to allow chaining of methods
+     */
+    public final Workspace populateUser() {
+        if (owner == null)
+            this.owner = Application.getUser(this.ownerEmail);
+        return this;
     }
 
 }

@@ -3,7 +3,9 @@ package pt.ulisboa.tecnico.cmov.airdesk_cmov;
 import android.test.ApplicationTestCase;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import pt.ulisboa.tecnico.cmov.airdesk_cmov.Database.FilesDataSource;
 import pt.ulisboa.tecnico.cmov.airdesk_cmov.Database.UsersDataSource;
@@ -33,7 +35,7 @@ public class Application {
 
     //maybe move this inside the user, right now this is temporary because the foreign
     // workspaces will work as dummy data
-    public static final List<Workspace> foreignWorkspaces = new ArrayList<Workspace>();
+    public static final Set<Workspace> foreignWorkspaces = new HashSet<Workspace>();
 
     public static void init(android.content.Context AppContext) {
         Application.setUsersDataSource(new UsersDataSource(AppContext));
@@ -92,5 +94,40 @@ public class Application {
         return userData.get(email);
     }
 
+
+    public static Set<Workspace> workspacesInNetwork = new HashSet<>();
+
+
+    /**
+     * Will search for workspaces available in the network
+     *  (dont confuse workspacesInNetwork with foreigWworkspace)
+     *
+     */
+    public static Set<Workspace> networkSearch(String query) {
+        String[] queryArr = query.split("\\s+");
+        Set<Workspace> availableWS = new HashSet<>();
+
+        System.out.println("DEBUG:");
+        System.out.println( "is empty:" + (query.trim().isEmpty()?"YES":"NO"));
+        for (Workspace w : workspacesInNetwork)
+            System.out.println(w.getName());
+        if (query.trim().isEmpty())
+            return new HashSet<Workspace>(workspacesInNetwork);
+
+        for (Workspace ws : Application.workspacesInNetwork) {
+            for (String tag : ws.getTagsAsArray()) {
+                for (String q: queryArr) {
+                    if (q.equals(tag)) {
+                        availableWS.add(ws);
+                    }
+                }
+            }
+        }
+        return availableWS;
+    }
+
+    public static void subscribe(Set<Workspace> targetWs) {
+            Application.foreignWorkspaces.addAll(targetWs);
+    }
 
 }

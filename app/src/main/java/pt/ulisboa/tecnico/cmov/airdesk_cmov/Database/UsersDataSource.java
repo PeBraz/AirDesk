@@ -72,5 +72,4 @@ public class UsersDataSource extends DataSource<User>{
         user.setEmail(cursor.getString(0));
         return user;
     }
-
 }

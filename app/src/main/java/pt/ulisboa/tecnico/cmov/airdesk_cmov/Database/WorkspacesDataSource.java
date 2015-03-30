@@ -93,7 +93,7 @@ public class WorkspacesDataSource extends DataSource<Workspace>{
         ws.setPrivacy(cursor.getInt(2)==1);
         ws.setTags(cursor.getString(3));
         ws.setAccessList(cursor.getBlob(4));
-        ws.setOwner(Application.getUser(cursor.getString(5)));
+        ws.setOwnerEmail(cursor.getString(5));
         return ws;
     }
 }
