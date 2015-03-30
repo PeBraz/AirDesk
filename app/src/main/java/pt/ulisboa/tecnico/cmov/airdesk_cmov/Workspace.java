@@ -182,12 +182,20 @@ public class Workspace {
      * Given this workspace, initialize the user by looking for it in the database,
      * populate user will load the user in the database by searching for the name.
      *
-     * return the object itself to allow chaining of methods
+     * @return the object itself to allow chaining of methods
      */
     public final Workspace populateUser() {
         if (owner == null)
             this.owner = Application.getUser(this.ownerEmail);
         return this;
     }
+
+    /**
+     * Utility method for saving the workspace itself
+     */
+    public final void save() {
+        this.populateUser().getOwner().saveWorkspace(this);
+    }
+
 
 }

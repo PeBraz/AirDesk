@@ -1,5 +1,7 @@
 package pt.ulisboa.tecnico.cmov.airdesk_cmov;
 
+import android.os.Environment;
+import android.os.StatFs;
 import android.test.ApplicationTestCase;
 
 import java.util.ArrayList;
@@ -69,7 +71,7 @@ public class Application {
     public static ApplicationOwner getOwner() { return Application.owner; }
 
     public Application (User u) {
-        Application.owner = (ApplicationOwner) u;
+        Application.owner = ApplicationOwner.fromUser(u);
     }
 
     private static boolean checkUser(User u){
@@ -128,6 +130,18 @@ public class Application {
 
     public static void subscribe(Set<Workspace> targetWs) {
             Application.foreignWorkspaces.addAll(targetWs);
+    }
+    /**
+    * Returns the device storage available in the internal storage of the device (as bytes)
+    * gives no information on how the space limited by the quota values
+    *
+    *  (add better functionality change this)
+    */
+    public static int getDeviceStorageSpace() {
+        //int OneMB = 1024 * 1024;
+        return  Application.MAX_APPLICATION_QUOTA;
+       // StatFs stat = new StatFs(Environment.getDataDirectory().getPath());
+        //return (int) ((long)stat.getBlockSize() * (long)stat.getBlockCount() /(long) oneMB);
     }
 
 }

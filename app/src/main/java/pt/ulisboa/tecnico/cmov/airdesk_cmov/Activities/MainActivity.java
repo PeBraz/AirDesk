@@ -28,12 +28,10 @@ public class MainActivity extends ActionBarActivity {
             String email = Application.session.getUserInfo().get(SessionManager.KEY_EMAIL);
             try {
                 Application.login(email);
+                startActivity(new Intent(this, WorkSpacesActivity.class));
             }catch (NotRegisteredException | WrongPasswordException e) {
-                System.out.println("O MANGAS É CHATO");
+               System.out.println(e.getMessage());
             }
-
-            startActivity(new Intent(this, WorkSpacesActivity.class));
-            return;
         }
 
         Button button = (Button) findViewById(R.id.button6);

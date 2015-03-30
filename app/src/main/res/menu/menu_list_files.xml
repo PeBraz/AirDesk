@@ -4,5 +4,6 @@
     tools:context="pt.ulisboa.tecnico.cmov.airdesk_cmov.Activities.ListFilesActivity">
     <item android:id="@+id/create_file" android:title="@string/menu_new_file"
         android:orderInCategory="100" app:showAsAction="never" />
-
+    <item android:id="@+id/ws_settings" android:title="@string/settings"
+        android:orderInCategory="100" app:showAsAction="never" />
 </menu>

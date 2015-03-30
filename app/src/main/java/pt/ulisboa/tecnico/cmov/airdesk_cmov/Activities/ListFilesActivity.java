@@ -12,11 +12,16 @@ import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.ListView;
+import android.widget.SeekBar;
 import android.widget.TextView;
 import android.widget.Toast;
 import java.io.File;
+
+import pt.ulisboa.tecnico.cmov.airdesk_cmov.Application;
+import pt.ulisboa.tecnico.cmov.airdesk_cmov.Exceptions.ApplicationHasNoUserException;
 import pt.ulisboa.tecnico.cmov.airdesk_cmov.Files.FileUtil;
 import pt.ulisboa.tecnico.cmov.airdesk_cmov.R;
 import pt.ulisboa.tecnico.cmov.airdesk_cmov.Workspace;
@@ -64,8 +69,10 @@ public class ListFilesActivity extends ActionBarActivity {
         int id = item.getItemId();
 
         if (id == R.id.create_file) {
-            newFileDialog();
+            this.newFileDialog();
             return true;
+        }else if (id == R.id.ws_settings) {
+            this.changeSettings();
         }
 
         return super.onOptionsItemSelected(item);
@@ -242,5 +249,67 @@ public class ListFilesActivity extends ActionBarActivity {
         final ListView listview = (ListView) findViewById(R.id.listView2);
         final ArrayAdapter<String> adapter = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, android.R.id.text1, new Workspace().getAllFiles(wsName));
         listview.setAdapter(adapter);
+    }
+
+    private void changeSettings() {
+
+        final Dialog dialog = new Dialog(this);
+        dialog.setTitle(R.string.settings);
+
+        final LayoutInflater inflater = this.getLayoutInflater();
+        final View dialogView = inflater.inflate(R.layout.dialog_ws_settings, null);
+        dialog.setContentView(dialogView);
+
+        dialog.show();
+        final Workspace ws = Application.getOwner().getWorkspace(wsName);
+
+        final int currentQuota = ws.getQuota();
+        int deviceSpace = Application.getDeviceStorageSpace();
+
+
+        final SeekBar quota = (SeekBar) dialog.findViewById(R.id.ws_settings_quota);
+        quota.setMax(deviceSpace - currentQuota);
+
+        final CheckBox isPrivate = (CheckBox) dialog.findViewById(R.id.private_checkbox);
+        isPrivate.setChecked(ws.getPrivacy());
+
+        final EditText tags = (EditText) dialog.findViewById(R.id.ws_settings_tags);
+        tags.setText(ws.getTags());
+
+        final TextView quotaTag = (TextView) dialog.findViewById(R.id.ws_settings_quota_tag);
+        quotaTag.setText(Integer.toString(currentQuota));
+
+        Button confirm = (Button) dialogView.findViewById(R.id.ws_settings_confirm);
+        Button cancel = (Button) dialogView.findViewById(R.id.ws_settings_cancel);
+
+        quota.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+            @Override
+            public void onStartTrackingTouch(SeekBar seekBar) { }
+            @Override
+            public void onStopTrackingTouch(SeekBar seekBar) { }
+            @Override
+            public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
+                quotaTag.setText(Integer.toString(currentQuota + progress));
+            }
+        });
+
+        confirm.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+            ws.setPrivacy(isPrivate.isChecked());
+            ws.setQuota(quota.getProgress() + currentQuota);
+            ws.setTags(tags.getText().toString());
+            ws.save();
+            dialog.dismiss();
+            }
+        });
+
+        cancel.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                dialog.dismiss();
+            }
+        });
     }
 }
