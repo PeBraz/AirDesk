@@ -1,23 +1,22 @@
 package pt.ulisboa.tecnico.cmov.airdesk_cmov;
 
-
-import pt.ulisboa.tecnico.cmov.airdesk_cmov.Database.FilesDataSource;
-
-
 public class File {
 
     private String name;
     private String path;
+
+
+    private String user;
     private String workspace;
 
     public File () {
 
-
     }
 
-    public File(String name, String workspace) {
+    public File(String name, String workspace, String user) {
         this.name = name;
         this.workspace = workspace;
+        this.user = user;
     }
 
     public final String getName() {
@@ -38,7 +37,11 @@ public class File {
     public final void setWorkspace(final String workspace) {
         this.workspace = workspace;
     }
+    public String getUser() {
+        return user;
+    }
 
-
-
+    public void setUser(String user) {
+        this.user = user;
+    }
 }

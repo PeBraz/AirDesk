@@ -16,6 +16,7 @@ public class FilesDataSource extends DataSource<File>{
     private String[] allColumns = {
             MySQLiteHelper.FILE_NAME,
             MySQLiteHelper.FILE_PATH,
+            MySQLiteHelper.FILE_USER,
             MySQLiteHelper.FILE_WORKSPACE};
 
     public FilesDataSource(Context context) {
@@ -33,6 +34,7 @@ public class FilesDataSource extends DataSource<File>{
         ContentValues values = new ContentValues();
         values.put(MySQLiteHelper.FILE_NAME, file.getName());
         values.put(MySQLiteHelper.FILE_WORKSPACE, file.getWorkspace());
+        values.put(MySQLiteHelper.FILE_USER, file.getUser());
         database.insert(MySQLiteHelper.TABLE_FILES, null, values);
 
     }
@@ -40,9 +42,9 @@ public class FilesDataSource extends DataSource<File>{
     public void save(File file) {
         final String query = String.format("UPDATE %1$s SET %2$s= ?, %3$s= ? WHERE %4$s= ?",
                 MySQLiteHelper.TABLE_FILES, MySQLiteHelper.FILE_PATH, MySQLiteHelper.FILE_WORKSPACE,
-                MySQLiteHelper.FILE_NAME);
+                MySQLiteHelper.FILE_NAME, MySQLiteHelper.FILE_USER);
         database.rawQuery(query, new String[]{ file.getPath(), file.getWorkspace(),
-                                    file.getName()});
+                                    file.getName(), file.getUser()});
     }
     /*
     @Override
@@ -77,7 +79,7 @@ public class FilesDataSource extends DataSource<File>{
     @Override
     public List<File> getAll() {
 
-        List<File> files = new ArrayList<File>();
+        List<File> files = new ArrayList<>();
         Cursor cursor = database.query(MySQLiteHelper.TABLE_FILES, allColumns, null, null, null, null, null);
 
         cursor.moveToFirst();
@@ -102,7 +104,8 @@ public class FilesDataSource extends DataSource<File>{
         File file = new File();
         file.setName(cursor.getString(0));
         file.setPath(cursor.getString(1));
-        file.setWorkspace(cursor.getString(2));
+        file.setWorkspace(cursor.getString(3));
+        file.setUser(cursor.getString(2));
         return file;
     }
 }
