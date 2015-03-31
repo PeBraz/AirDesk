@@ -4,4 +4,8 @@
     tools:context="pt.ulisboa.tecnico.cmov.airdesk_cmov.Activities.MyWorkSpacesActivity">
     <item android:id="@+id/action_settings" android:title="@string/action_settings"
         android:orderInCategory="100" app:showAsAction="never" />
+    <item android:id="@+id/new_workspace" android:title="@string/menu_new_workspace"
+        android:orderInCategory="100" app:showAsAction="never" />
+    <item android:id="@+id/foreign" android:title="@string/title_activity_foreign_workspaces"
+        android:orderInCategory="100" app:showAsAction="never" />
 </menu>

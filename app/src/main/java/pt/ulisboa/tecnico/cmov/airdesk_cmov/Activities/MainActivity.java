@@ -28,7 +28,7 @@ public class MainActivity extends ActionBarActivity {
             String email = Application.session.getUserInfo().get(SessionManager.KEY_EMAIL);
             try {
                 Application.login(email);
-                startActivity(new Intent(this, WorkSpacesActivity.class));
+                startActivity(new Intent(this, MyWorkSpacesActivity.class));
             }catch (NotRegisteredException | WrongPasswordException e) {
                System.out.println(e.getMessage());
             }
@@ -45,16 +45,16 @@ public class MainActivity extends ActionBarActivity {
                     startActivity(intent);
 
                 }
-            });
+        });
 
-            button2.setOnClickListener(new View.OnClickListener() {
+        button2.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
 
                     Intent intent = new Intent(MainActivity.this, RegisterActivity.class);
                     startActivity(intent);
 
-                }
+            }
             });
 
     }

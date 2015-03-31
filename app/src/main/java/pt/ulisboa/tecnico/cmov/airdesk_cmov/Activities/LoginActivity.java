@@ -44,7 +44,7 @@ public class LoginActivity extends ActionBarActivity {
                     Application.session = new SessionManager(getApplicationContext());
                     Application.session.createLoginSession(email.getText().toString(),username.getText().toString());
                     Toast.makeText(LoginActivity.this, "Welcome to AirDesk.", Toast.LENGTH_SHORT).show();
-                    Intent intent = new Intent(LoginActivity.this, WorkSpacesActivity.class);
+                    Intent intent = new Intent(LoginActivity.this, MyWorkSpacesActivity.class);
                     startActivity(intent);
 
                 } catch (NotRegisteredException e) {

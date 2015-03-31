@@ -35,8 +35,6 @@ public class Application {
     private static WorkspacesDataSource workspaceData = null;
     public static final int MAX_APPLICATION_QUOTA = 20; //do something with this
 
-    //maybe move this inside the user, right now this is temporary because the foreign
-    // workspaces will work as dummy data
     public static final Set<Workspace> foreignWorkspaces = new HashSet<Workspace>();
 
     public static void init(android.content.Context AppContext) {

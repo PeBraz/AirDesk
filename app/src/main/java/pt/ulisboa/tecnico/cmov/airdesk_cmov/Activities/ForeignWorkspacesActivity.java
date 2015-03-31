@@ -1,11 +1,28 @@
 package pt.ulisboa.tecnico.cmov.airdesk_cmov.Activities;
 
+import android.app.Dialog;
+import android.content.Intent;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
+import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
+import android.widget.Button;
+import android.widget.EditText;
+import android.widget.ListView;
+import android.widget.TextView;
 
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+
+import pt.ulisboa.tecnico.cmov.airdesk_cmov.Application;
 import pt.ulisboa.tecnico.cmov.airdesk_cmov.R;
+import pt.ulisboa.tecnico.cmov.airdesk_cmov.Workspace;
 
 public class ForeignWorkspacesActivity extends ActionBarActivity {
 
@@ -13,7 +30,10 @@ public class ForeignWorkspacesActivity extends ActionBarActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_foreign_workspaces);
+        listWorkspaces();
     }
+
+
 
 
     @Override
@@ -32,9 +52,102 @@ public class ForeignWorkspacesActivity extends ActionBarActivity {
 
         //noinspection SimplifiableIfStatement
         if (id == R.id.action_settings) {
-            return true;
-        }
+            Intent intent = new Intent(ForeignWorkspacesActivity.this, UserSettingsActivity.class);
+            startActivity(intent);
 
+        }else if (id == R.id.subscribe) {
+            this.subscribeDialog();
+        }else if(id == R.id.my) {
+
+            startActivity(new Intent(getApplicationContext(), MyWorkSpacesActivity.class));
+        }
         return super.onOptionsItemSelected(item);
+    }
+
+    private void listWorkspaces() {
+
+        Set<Workspace> myWorkspaces = Application.foreignWorkspaces;
+        List<String> foreignws = new ArrayList<>();
+
+        final ListView listview = (ListView) findViewById(R.id.foreign_list);
+
+        foreignws.clear();
+        for(Workspace w : myWorkspaces) foreignws.add(w.getName());
+
+        final ArrayAdapter<String> adapter = new ArrayAdapter<>(this,
+                                android.R.layout.simple_list_item_1, android.R.id.text1, foreignws);
+
+        listview.setAdapter(adapter);
+
+        listview.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+
+                String itemValue = (String) listview.getItemAtPosition(position);
+                Intent intent = new Intent(ForeignWorkspacesActivity.this, ListFilesActivity.class);
+                intent.putExtra("WSNAME", itemValue);
+                startActivity(intent);
+
+            }
+
+        });
+    }
+    private void subscribeDialog() {
+
+
+        final Dialog dialog = new Dialog(this);
+        dialog.setTitle(R.string.subscribe_title);
+
+        final LayoutInflater inflater = this.getLayoutInflater();
+        final View dialogView = inflater.inflate(R.layout.dialog_subscribe, null);
+        dialog.setContentView(dialogView);
+
+
+        dialog.show();
+
+        Button ok = (Button) dialogView.findViewById(R.id.subscribe_confirm_button);
+        Button search = (Button) dialogView.findViewById(R.id.subscribe_search_button);
+        Button cancel = (Button) dialogView.findViewById(R.id.subscribe_cancel_button);
+
+        //Store the contents searched, for when finalizing the action
+        final Set<Workspace> availableWS = new HashSet<>();
+
+        ok.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Application.subscribe(availableWS);
+                listWorkspaces();
+                dialog.dismiss();
+
+            }
+        });
+        search.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                EditText text = (EditText) dialog.findViewById(R.id.subscribe_query);
+
+                availableWS.clear();
+                availableWS.addAll(Application.networkSearch(text.getText().toString()));
+
+                TextView list = (TextView) dialog.findViewById(R.id.subscribe_list);
+                if (availableWS.isEmpty()) {
+                    list.setText("No Workspaces found.");
+                } else {
+                    list.setText("");
+                    for (Workspace ws : availableWS) {
+                        list.setText(list.getText() + "\n" + ws.getName());
+                    }
+                }
+            }
+        });
+
+        cancel.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                dialog.dismiss();
+            }
+        });
     }
 }
