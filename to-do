@@ -1,5 +1,5 @@
-implement databse: http://www.vogella.com/tutorials/AndroidSQLite/article.html
-mudar onclick listeners para o xml e fazer metodos. tirar as merdas do oncreate()
+implement databse: http://www.vogella.com/tutorials/AndroidSQLite/article.html -> DONE
+mudar onclick listeners para o xml e fazer metodos. tirar as merdas do oncreate() -> DONE
 
 
 multi-threading for intensive tasks
@@ -7,7 +7,7 @@ multi-threading for intensive tasks
 subscription (access list) preferences)
 
 Workspace Functionality
-    add workspace
+    add workspace -> DONE
     change privacy settings (Private/Public)
     change maxquota
     add user to workspace (invite)
@@ -15,9 +15,9 @@ Workspace Functionality
     remove workspace
 
 File Functionality 
-    add file 
-    edit file
-    save file
+    add file -> DONE
+    edit file -> DONE
+    save file -> DONE
     remove file
 
 Foreign Workspace Functionality
