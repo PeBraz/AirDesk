@@ -21,6 +21,7 @@ import java.io.File;
 
 import pt.ulisboa.tecnico.cmov.airdesk_cmov.Application;
 
+import pt.ulisboa.tecnico.cmov.airdesk_cmov.Exceptions.UserNotFoundException;
 import pt.ulisboa.tecnico.cmov.airdesk_cmov.Files.FileUtil;
 import pt.ulisboa.tecnico.cmov.airdesk_cmov.R;
 import pt.ulisboa.tecnico.cmov.airdesk_cmov.Workspace;
@@ -70,6 +71,8 @@ public class ListFilesActivity extends ActionBarActivity {
             return true;
         }else if (id == R.id.ws_settings) {
             this.changeSettings();
+        }else if (id == R.id.invite_user) {
+            this.inviteDialog();
         }
 
         return super.onOptionsItemSelected(item);
@@ -363,5 +366,56 @@ public class ListFilesActivity extends ActionBarActivity {
                 dialog.dismiss();
             }
         });
+    }
+    /**
+     * Displays a Dialog that allows the workspace owner to invite a different user into the
+     * workspace
+     *
+     */
+    public void inviteDialog () {
+        final Dialog dialog = new Dialog(this);
+        dialog.setTitle(R.string.title_invite_dialog);
+
+        final LayoutInflater inflater = this.getLayoutInflater();
+        final View dialogView = inflater.inflate(R.layout.dialog_invite , null);
+        dialog.setContentView(dialogView);
+
+        dialog.show();
+        final Workspace ws = Application.getOwner().getWorkspace(wsName);
+
+        final TextView error = (TextView)dialog.findViewById(R.id.invite_error);
+
+        Button confirm = (Button) dialog.findViewById(R.id.dialog_invite_confirm);
+        Button cancel = (Button) dialog.findViewById(R.id.dialog_invite_cancel);
+
+
+        confirm.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                EditText text = (EditText) dialog.findViewById(R.id.invite_user_email);
+                String email = text.getText().toString();
+                if (email.isEmpty()) {
+                    error.setText("No email given");
+                    return;
+                }
+
+                try {
+                    ws.addAccessListUser(Application.getNetworkUser(email));
+                    ws.save();
+                    dialog.dismiss();
+                }catch(UserNotFoundException e) {
+                    error.setText(e.getMessage());
+                }
+            }
+        });
+
+        cancel.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                dialog.dismiss();
+            }
+        });
+
+
     }
 }

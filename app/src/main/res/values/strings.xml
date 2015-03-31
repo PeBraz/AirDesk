@@ -30,6 +30,9 @@
 
     <string name="Confirm">Confirm</string>
     <string name="Cancel">Cancel</string>
+    <string name="title_invite_dialog">Invite User</string>
+    <string name="invite_dialog_email">user email</string>
+
     <string name="title_activity_workspace_settings">WorkspaceSettings</string>
     <string name="title_activity_list_files">ListFilesActivity</string>
     <string name="title_activity_main_activity2">MainActivity2Activity</string>

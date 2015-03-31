@@ -57,6 +57,7 @@ public class ForeignWorkspacesActivity extends ActionBarActivity {
 
         }else if (id == R.id.subscribe) {
             this.subscribeDialog();
+
         }else if(id == R.id.my) {
 
             startActivity(new Intent(getApplicationContext(), MyWorkSpacesActivity.class));

@@ -1,5 +1,7 @@
 package pt.ulisboa.tecnico.cmov.airdesk_cmov;
 
+import java.io.Serializable;
+
 import pt.ulisboa.tecnico.cmov.airdesk_cmov.Database.WorkspacesDataSource;
 import pt.ulisboa.tecnico.cmov.airdesk_cmov.Exceptions.InvalidQuotaException;
 import pt.ulisboa.tecnico.cmov.airdesk_cmov.Exceptions.WorkspaceAlreadyExistsException;

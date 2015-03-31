@@ -3,6 +3,8 @@ package pt.ulisboa.tecnico.cmov.airdesk_cmov;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.io.InvalidClassException;
+import java.io.NotSerializableException;
 import java.io.ObjectInput;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutput;
@@ -30,7 +32,7 @@ public class Workspace {
     private boolean isPrivate;
     private String tags;
     private static FilesDataSource filedb;
-    private List<User> accessList = new ArrayList<User>();
+    private List<String> accessList = new ArrayList<>();
 
 
 
@@ -93,9 +95,6 @@ public class Workspace {
 
     public final void setTags(final String tags) { this.tags = tags; }
 
-    public final void invite(final User u) {
-        //TODO
-    }
     public void setOwnerEmail(String email) {
         this.ownerEmail = email;
     }
@@ -123,27 +122,43 @@ public class Workspace {
         filedb.delete(fileName,wsName,ownerMail);
     }
 
-    public final void setAccessList(List<User> users) {
-        this.accessList = users;
+    public final void addAccessListUser(User u) {
+        this.accessList.add(u.getEmail());
+    }
+    public final void remAccessListUser(User u) {
+        for (String email: this.accessList)
+            if (email.equals(u.getEmail()))
+                this.accessList.remove(email);
     }
 
+    /**
+     * Returns the list of users stored in the access list by going to the database and getting all
+     * This can't be used to perform changes on the access list.
+     * @return list of users
+     */
     public final List<User> getAccessList() {
-        return this.accessList;
+        List<User> users = new ArrayList<>();
+        for (String email: this.accessList)
+            users.add(Application.getUser(email));
+        return users;
     }
+
+    /**
+     * Deserializes the access list taken as bytes array
+     *
+     * @param accessBytes
+     */
     public final void setAccessList(byte[] accessBytes) {
         ByteArrayInputStream bais = new ByteArrayInputStream(accessBytes);
         ObjectInput in = null;
         try {
             in = new ObjectInputStream(bais);
-            this.accessList = (List<User>) in.readObject();
-            System.out.println("FInish");
+            this.accessList = (List<String>) in.readObject();
         }catch (StreamCorruptedException e){
-            System.out.println("Caught Stream Corrupted Exception:::"+e.getMessage());
-            this.accessList = null;
+            this.accessList = new ArrayList<>();
         }catch(IOException | ClassNotFoundException  e) {
-            System.out.println(e);
-                System.out.println("WTF:::"+e.getMessage());
-            this.accessList = null;
+            System.out.println(e.getMessage());
+            this.accessList = new ArrayList<>();
         }finally {
             try{
                 if (in != null) in.close();
@@ -158,13 +173,18 @@ public class Workspace {
         }
     }
 
+    /**
+     * Serializes the Access User list so that it can be serialized
+     *
+     * @return byte array of the list of users
+     */
     public final byte[] getAccessListSerialized() {
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         ObjectOutput oo = null;
         byte[] bytes = null;
         try {
             oo = new ObjectOutputStream(baos);
-            oo.writeObject(this.getAccessList());
+            oo.writeObject(this.accessList);
             bytes = baos.toByteArray();
         }catch(IOException e) {
             System.out.println(e.getMessage());
@@ -179,6 +199,7 @@ public class Workspace {
             }catch(IOException e){
                 System.out.println(e.getMessage());
             }
+
         }
         return bytes;
     }

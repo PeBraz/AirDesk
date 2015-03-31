@@ -16,6 +16,7 @@ import pt.ulisboa.tecnico.cmov.airdesk_cmov.Exceptions.ApplicationHasNoUserExcep
 import pt.ulisboa.tecnico.cmov.airdesk_cmov.Exceptions.NoDatabaseException;
 import pt.ulisboa.tecnico.cmov.airdesk_cmov.Exceptions.NotRegisteredException;
 import pt.ulisboa.tecnico.cmov.airdesk_cmov.Exceptions.UserAlreadyExistsException;
+import pt.ulisboa.tecnico.cmov.airdesk_cmov.Exceptions.UserNotFoundException;
 import pt.ulisboa.tecnico.cmov.airdesk_cmov.Exceptions.WrongPasswordException;
 import pt.ulisboa.tecnico.cmov.airdesk_cmov.Sessions.SessionManager;
 
@@ -96,14 +97,26 @@ public class Application {
 
 
     /**
+     * Tries to find a user in the network with a specific email
+     *
+     * @param email unique identifier for the user in the local network
+     */
+    public static User getNetworkUser(String email) throws UserNotFoundException{
+        for (User u : Application.userData.getAll())
+            if (u.getEmail().equals(email))
+                return u;
+        throw new UserNotFoundException(email);
+    }
+
+    /**
      * Local method to simulate the workspaces that are visible (public) in the network
      *
      * @return all public workspaces
      */
 
-    public final static Set<Workspace> getNetworkWS() {
+    public static Set<Workspace> getNetworkWS() {
         final Set publicWS = new HashSet<>();
-        for (Workspace ws: Application.workspaceData.getAll()) {
+        for (Workspace ws : Application.workspaceData.getAll()) {
             if (!ws.getPrivacy())
                 publicWS.add(ws);
         }

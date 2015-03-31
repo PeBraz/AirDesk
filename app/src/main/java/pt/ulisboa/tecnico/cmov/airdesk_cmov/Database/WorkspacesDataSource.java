@@ -9,6 +9,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import pt.ulisboa.tecnico.cmov.airdesk_cmov.Exceptions.NoDatabaseException;
+import pt.ulisboa.tecnico.cmov.airdesk_cmov.User;
 import pt.ulisboa.tecnico.cmov.airdesk_cmov.Workspace;
 
 public class WorkspacesDataSource extends DataSource<Workspace>{
@@ -112,7 +113,7 @@ public class WorkspacesDataSource extends DataSource<Workspace>{
         Workspace ws = new Workspace();
         ws.setName(cursor.getString(0));
         ws.setQuota(cursor.getInt(1));
-        ws.setPrivacy(cursor.getInt(2)==1);
+        ws.setPrivacy(cursor.getInt(2) == 1);
         ws.setTags(cursor.getString(3));
         ws.setAccessList(cursor.getBlob(4));
         ws.setOwnerEmail(cursor.getString(5));

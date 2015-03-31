@@ -6,4 +6,6 @@
         android:orderInCategory="100" app:showAsAction="never" />
     <item android:id="@+id/ws_settings" android:title="@string/settings"
         android:orderInCategory="100" app:showAsAction="never" />
+    <item android:id="@+id/invite_user" android:title="@string/title_invite_dialog"
+        android:orderInCategory="100" app:showAsAction="never" />
 </menu>
