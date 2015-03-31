@@ -19,13 +19,10 @@ public final class ApplicationOwner extends User {
         if (getWorkspaceDataSource().get(name, this.getEmail()) != null) throw new WorkspaceAlreadyExistsException(name);
         Workspace ws = new Workspace(name, quota, this);
         getWorkspaceDataSource().create(ws);
-
-        Application.workspacesInNetwork.add(ws);
-
     }
 
     public final void subscribe(Workspace workspace) {
-        Application.workspacesInNetwork.add(workspace);
+        Application.foreignWorkspaces.add(workspace);
 
     }
 
@@ -57,6 +54,7 @@ public final class ApplicationOwner extends User {
         }
         return myWorkspaces;
     }
+
 
 }
 

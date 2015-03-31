@@ -350,6 +350,7 @@ public class ListFilesActivity extends ActionBarActivity {
 
             ws.setPrivacy(isPrivate.isChecked());
             ws.setQuota(quota.getProgress() + currentQuota);
+            System.out.println("TAGS: "+ tags.getText().toString());
             ws.setTags(tags.getText().toString());
             ws.save();
             dialog.dismiss();

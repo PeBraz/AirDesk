@@ -70,7 +70,7 @@ public class Workspace {
     public final String getTags() { return tags; }
 
     public final String[] getTagsAsArray() {
-        return this.tags.split("\\s+");
+        return  (tags != null)? this.tags.split("\\s+"): new String[]{};
     }
 
     public final ArrayList<User> getClients() {

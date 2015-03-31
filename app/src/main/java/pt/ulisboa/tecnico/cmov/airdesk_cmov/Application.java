@@ -97,8 +97,20 @@ public class Application {
     }
 
 
-    public static Set<Workspace> workspacesInNetwork = new HashSet<>();
+    /**
+     * Local method to simulate the workspaces that are visible (public) in the network
+     *
+     * @return all public workspaces
+     */
 
+    public final static Set<Workspace> getNetworkWS() {
+        final Set publicWS = new HashSet<>();
+        for (Workspace ws: Application.workspaceData.getAll()) {
+            if (!ws.getPrivacy())
+                publicWS.add(ws);
+        }
+        return publicWS;
+    }
 
     /**
      * Will search for workspaces available in the network
@@ -109,14 +121,10 @@ public class Application {
         String[] queryArr = query.split("\\s+");
         Set<Workspace> availableWS = new HashSet<>();
 
-        System.out.println("DEBUG:");
-        System.out.println( "is empty:" + (query.trim().isEmpty()?"YES":"NO"));
-        for (Workspace w : workspacesInNetwork)
-            System.out.println(w.getName());
         if (query.trim().isEmpty())
-            return new HashSet<Workspace>(workspacesInNetwork);
+            return new HashSet<Workspace>(Application.getNetworkWS());
 
-        for (Workspace ws : Application.workspacesInNetwork) {
+        for (Workspace ws : Application.getNetworkWS()) {
             for (String tag : ws.getTagsAsArray()) {
                 for (String q: queryArr) {
                     if (q.equals(tag)) {
