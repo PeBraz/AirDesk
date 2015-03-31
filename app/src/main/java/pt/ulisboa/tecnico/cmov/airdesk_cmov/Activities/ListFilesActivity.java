@@ -48,7 +48,6 @@ public class ListFilesActivity extends ActionBarActivity {
 
             String fileTitle = (String) listview.getItemAtPosition(position);
             fileOptionsDialog(fileTitle);
-
             }
         });
     }
@@ -226,7 +225,7 @@ public class ListFilesActivity extends ActionBarActivity {
         });
     }
 
-    private void deleteFileDialog(final String filename){
+    private void deleteFileDialog(final String filename){ //.txt
 
         final Dialog dialog = new Dialog(this);
         dialog.setTitle(filename);
@@ -288,7 +287,7 @@ public class ListFilesActivity extends ActionBarActivity {
 
         if (FileUtil.isExternalStorageReadable()) {
             File dir = FileUtil.getExternalFilesDirAllApiLevels(this.getPackageName());
-            File file = new File(dir, name);
+            File file = new File(dir, name + "|" + Application.getOwner().getEmail());
 
             if (file.exists()) file.delete();
 
