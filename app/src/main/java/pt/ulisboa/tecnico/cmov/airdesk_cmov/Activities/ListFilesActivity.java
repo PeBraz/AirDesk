@@ -49,7 +49,6 @@ public class ListFilesActivity extends ActionBarActivity {
 
             String fileTitle = (String) listview.getItemAtPosition(position);
             fileOptionsDialog(fileTitle);
-
             }
         });
     }
@@ -103,7 +102,8 @@ public class ListFilesActivity extends ActionBarActivity {
                 }
 
                 String title = fileTitle.getText().toString() + ".txt";
-                Workspace.createFile(title, wsName);
+                Workspace.createFile(title, wsName, Application.getOwner().getEmail());
+
                 dialog.dismiss();
                 showList();
 
@@ -228,7 +228,7 @@ public class ListFilesActivity extends ActionBarActivity {
         });
     }
 
-    private void deleteFileDialog(final String filename){
+    private void deleteFileDialog(final String filename){ //.txt
 
         final Dialog dialog = new Dialog(this);
         dialog.setTitle(filename);
@@ -264,7 +264,7 @@ public class ListFilesActivity extends ActionBarActivity {
 
         if (FileUtil.isExternalStorageWritable()) {
             File dir = FileUtil.getExternalFilesDirAllApiLevels(this.getPackageName());
-            File file = new File(dir, title);
+            File file = new File(dir, title + "|" + Application.getOwner().getEmail());
             FileUtil.writeStringAsFile(text, file);
             Toast.makeText(this, "File written", Toast.LENGTH_SHORT).show();
         } else {
@@ -276,7 +276,7 @@ public class ListFilesActivity extends ActionBarActivity {
 
         if (FileUtil.isExternalStorageReadable()) {
             File dir = FileUtil.getExternalFilesDirAllApiLevels(this.getPackageName());
-            File file = new File(dir, fileName);
+            File file = new File(dir, fileName + "|" + Application.getOwner().getEmail());
 
             if (file.exists() && file.canRead())
                 return FileUtil.readFileAsString(file);
@@ -290,7 +290,7 @@ public class ListFilesActivity extends ActionBarActivity {
 
         if (FileUtil.isExternalStorageReadable()) {
             File dir = FileUtil.getExternalFilesDirAllApiLevels(this.getPackageName());
-            File file = new File(dir, name);
+            File file = new File(dir, name + "|" + Application.getOwner().getEmail());
 
             if (file.exists()) file.delete();
 

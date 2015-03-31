@@ -99,8 +99,8 @@ public class Workspace {
         this.ownerEmail = email;
     }
 
-    public static void createFile(String name, String workspace){
-        File file = new File(name,workspace);
+    public static void createFile(String name, String workspace, String user){
+        File file = new File(name,workspace, user);
         filedb.create(file);
     }
 
@@ -110,7 +110,7 @@ public class Workspace {
 
         List<File> listFiles =  filedb.getAll();
         for(File f : listFiles){
-            if (f.getWorkspace().equals(workspace))
+            if (f.getWorkspace().equals(workspace) && f.getUser().equals(Application.getOwner().getEmail()))
                 allFiles.add(f.getName());
         }
 
