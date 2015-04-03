@@ -85,7 +85,7 @@ public class ForeignWorkspacesActivity extends ActionBarActivity {
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
 
                 String itemValue = (String) listview.getItemAtPosition(position);
-                Intent intent = new Intent(ForeignWorkspacesActivity.this, ListFilesActivity.class);
+                Intent intent = new Intent(ForeignWorkspacesActivity.this, FilesActivity.class);
                 intent.putExtra("WSNAME", itemValue);
                 startActivity(intent);
 
@@ -115,6 +115,7 @@ public class ForeignWorkspacesActivity extends ActionBarActivity {
         ok.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+
                 Application.subscribe(availableWS);
                 listWorkspaces();
                 dialog.dismiss();

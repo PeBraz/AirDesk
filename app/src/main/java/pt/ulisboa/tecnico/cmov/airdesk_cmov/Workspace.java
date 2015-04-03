@@ -1,5 +1,7 @@
 package pt.ulisboa.tecnico.cmov.airdesk_cmov;
 
+import android.test.ApplicationTestCase;
+
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -11,6 +13,7 @@ import java.io.StreamCorruptedException;
 import java.util.ArrayList;
 import java.util.List;
 import pt.ulisboa.tecnico.cmov.airdesk_cmov.Database.FilesDataSource;
+import pt.ulisboa.tecnico.cmov.airdesk_cmov.Exceptions.NotOwnerException;
 import pt.ulisboa.tecnico.cmov.airdesk_cmov.Exceptions.UserAlreadyAddedException;
 import pt.ulisboa.tecnico.cmov.airdesk_cmov.Exceptions.UserIsMyselfException;
 
@@ -231,6 +234,17 @@ public class Workspace {
      */
     public final void save() {
         this.populateUser().getOwner().saveWorkspace(this);
+    }
+    /**
+     * Utility method for removing the workspace
+     */
+    public final void remove() {
+        final User u = this.populateUser().getOwner();
+        boolean notOwner = ! Application.getOwner().getEmail().equals(u.getEmail());
+
+        if (notOwner)
+               throw new NotOwnerException();
+        Application.remove(this);
     }
 
     /**

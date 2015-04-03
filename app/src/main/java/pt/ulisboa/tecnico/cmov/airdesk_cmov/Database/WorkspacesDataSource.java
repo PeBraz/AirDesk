@@ -102,7 +102,7 @@ public class WorkspacesDataSource extends DataSource<Workspace>{
         return wss;
     }
 
-    public final void delete(final String wsname, final String userEmail) {
+    public final void remove(final String wsname, final String userEmail) {
         final String whereQuery =   MySQLiteHelper.WS_NAME+"=? AND "+
                 MySQLiteHelper.WS_USER+"=? ";
         database.delete(MySQLiteHelper.TABLE_WORKSPACES, whereQuery,

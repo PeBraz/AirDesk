@@ -71,7 +71,8 @@ public class Application {
         if (Application.owner == null)
             throw new ApplicationHasNoUserException();
 
-        return Application.owner; }
+        return Application.owner;
+    }
 
     public Application (User u) {
         Application.owner = ApplicationOwner.fromUser(u);
@@ -154,7 +155,7 @@ public class Application {
         for (Workspace ws : Application.getPublicNetworkWS()) {
 
             //Dont' allow owned workspaces to appear
-            if (ws.getOwner().getEmail().equals(Application.getOwner().getEmail()))
+            if (ws.populateUser().getOwner().getEmail().equals(Application.getOwner().getEmail()))
                 continue;
 
             for (String tag : ws.getTagsAsArray()) {
@@ -169,7 +170,9 @@ public class Application {
     }
 
     public static void subscribe(Set<Workspace> targetWs) {
-            Application.foreignWorkspaces.addAll(targetWs);
+           // Application.foreignWorkspaces.addAll(targetWs);
+        for (Workspace ws: targetWs)
+            Application.getOwner().addForeign(ws);
     }
     /**
     * Returns the device storage available in the internal storage of the device (as bytes)
@@ -190,6 +193,10 @@ public class Application {
      */
     public static void saveUser(User u) {
         Application.userData.save(u);
+    }
+
+    public static void remove(Workspace ws){
+        Application.workspaceData.remove(ws.getName(), ws.populateUser().getOwner().getEmail());
     }
 
 }

@@ -2,6 +2,7 @@ package pt.ulisboa.tecnico.cmov.airdesk_cmov.Activities;
 
 
 import android.app.Dialog;
+import android.content.Intent;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -22,7 +23,6 @@ import java.io.File;
 import pt.ulisboa.tecnico.cmov.airdesk_cmov.Application;
 
 import pt.ulisboa.tecnico.cmov.airdesk_cmov.Exceptions.UserAlreadyAddedException;
-import pt.ulisboa.tecnico.cmov.airdesk_cmov.Exceptions.UserAlreadyExistsException;
 import pt.ulisboa.tecnico.cmov.airdesk_cmov.Exceptions.UserIsMyselfException;
 import pt.ulisboa.tecnico.cmov.airdesk_cmov.Exceptions.UserNotFoundException;
 import pt.ulisboa.tecnico.cmov.airdesk_cmov.Files.FileUtil;
@@ -30,17 +30,21 @@ import pt.ulisboa.tecnico.cmov.airdesk_cmov.R;
 import pt.ulisboa.tecnico.cmov.airdesk_cmov.Workspace;
 
 
-public class ListFilesActivity extends ActionBarActivity {
+public class FilesActivity extends ActionBarActivity {
 
     private String wsName;
-
+    private boolean isMyWs;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_list_files);
+        setContentView(R.layout.activity_files);
 
         Bundle info = getIntent().getExtras();
         if (info != null) wsName = info.getString("WSNAME");
+
+        setTitle("Workspace - " + wsName);
+        isMyWs = Application.getOwner().getWorkspace(wsName) != null;
+
 
         final ListView listview = (ListView) findViewById(R.id.listView2);
         showList();
@@ -58,8 +62,14 @@ public class ListFilesActivity extends ActionBarActivity {
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-
-        getMenuInflater().inflate(R.menu.menu_list_files, menu);
+        if (isMyWs) {
+            getMenuInflater().inflate(R.menu.menu_files_owned, menu);
+            MenuItem delete = menu.findItem(R.id.ws_remove);
+            delete.setTitle("Remove - " + wsName);
+        }
+        else {
+            getMenuInflater().inflate(R.menu.menu_files_foreign, menu);
+        }
         return true;
     }
 
@@ -75,6 +85,8 @@ public class ListFilesActivity extends ActionBarActivity {
             this.changeSettings();
         }else if (id == R.id.invite_user) {
             this.inviteDialog();
+        }else if (id == R.id.ws_remove){
+            this.removeWorkspaceDialog();
         }
 
         return super.onOptionsItemSelected(item);
@@ -100,7 +112,7 @@ public class ListFilesActivity extends ActionBarActivity {
                 TextView fileTitle = (TextView) dialog.findViewById(R.id.editText6);
 
                 if (fileTitle.getText().toString().isEmpty()) {
-                    Toast.makeText(ListFilesActivity.this, "A value is missing.", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(FilesActivity.this, "A value is missing.", Toast.LENGTH_SHORT).show();
                     return;
                 }
 
@@ -416,7 +428,48 @@ public class ListFilesActivity extends ActionBarActivity {
                 dialog.dismiss();
             }
         });
+    }
 
+    /**
+     * Removes the current workspace.
+     * Can be used in the foreign or owned context, but the deletion is done in different ways.
+     * Removing a owned workspace will affect all users that are subscribed to the workspace.
+     * Removing a foreign workspace will only affect the real owner of the workspace.
+     */
+    public void removeWorkspaceDialog() {
+
+        final Dialog dialog = new Dialog(this);
+        dialog.setTitle(R.string.last_warning);
+
+        final LayoutInflater inflater = this.getLayoutInflater();
+        final View dialogView = inflater.inflate(R.layout.dialog_ws_remove , null);
+        dialog.setContentView(dialogView);
+
+        dialog.show();
+        final Workspace ws = Application.getOwner().getWorkspace(wsName);
+
+
+        Button confirm = (Button) dialog.findViewById(R.id.dialog_ws_confirm);
+        Button cancel = (Button) dialog.findViewById(R.id.dialog_ws_cancel);
+
+
+        confirm.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                boolean isMyWs  = Application.getOwner().getEmail()
+                                    .equals(ws.populateUser().getOwner().getEmail());
+                Application.getOwner().remove(ws);
+                startActivity(new Intent(getApplicationContext(),
+                        (isMyWs)? MyWorkSpacesActivity.class : ForeignWorkspacesActivity.class));
+            }
+        });
+
+        cancel.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                dialog.dismiss();
+            }
+        });
 
     }
 }

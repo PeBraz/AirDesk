@@ -73,6 +73,12 @@ public class User {
 
     public final void addForeign(Workspace ws) {
         this.foreignWs.add(ws.getName());
+        this.save();
+    }
+
+    public final void remForeign(Workspace ws) {
+        this.foreignWs.remove(ws.getName());
+        this.save();
     }
 
     /**

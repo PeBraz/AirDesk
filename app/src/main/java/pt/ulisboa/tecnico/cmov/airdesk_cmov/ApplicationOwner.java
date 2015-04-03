@@ -81,6 +81,32 @@ public final class ApplicationOwner extends User {
         return foreign;
     }
 
+    /**
+     *  Removes the workspace from this user
+     *  If the workspace belongs to this user, users in the access list need to be informed.
+     *  If the workspace belongs to someone else, the owner needs to be informed.
+     *
+     * @param ws workspace to be removed
+     */
+
+    public final void remove(Workspace ws) {
+    /*
+        Removing the workspaces is performed locally, the real users are not informed,
+        only their database information is updated
+    */
+        boolean isMyWs = Application.getOwner().getEmail().equals(ws.getOwner().getEmail());
+        if (isMyWs) {
+            for (User u : ws.getAccessList()) {
+                u.remForeign(ws);
+            }
+            ws.remove();
+        }
+        else {
+            ws.remAccessListUser(this);
+            this.remForeign(ws);
+        }
+    }
+
 }
 
 
