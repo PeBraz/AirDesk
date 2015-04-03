@@ -67,7 +67,11 @@ public class Application {
         Application.workspaceData = workspacedb;
     }
 
-    public static ApplicationOwner getOwner() { return Application.owner; }
+    public static ApplicationOwner getOwner() {
+        if (Application.owner == null)
+            throw new ApplicationHasNoUserException();
+
+        return Application.owner; }
 
     public Application (User u) {
         Application.owner = ApplicationOwner.fromUser(u);
@@ -80,7 +84,8 @@ public class Application {
         return user != null;
     }
 
-    public static void login(String email) throws NotRegisteredException, WrongPasswordException {
+    public static void login(String email)
+          throws NotRegisteredException, NoDatabaseException, WrongPasswordException{
 
         if (userData == null) throw new NoDatabaseException();
 
@@ -114,8 +119,8 @@ public class Application {
      * @return all public workspaces
      */
 
-    public static Set<Workspace> getNetworkWS() {
-        final Set publicWS = new HashSet<>();
+    public static Set<Workspace> getPublicNetworkWS() {
+        final Set<Workspace> publicWS = new HashSet<>();
         for (Workspace ws : Application.workspaceData.getAll()) {
             if (!ws.getPrivacy())
                 publicWS.add(ws);
@@ -124,18 +129,34 @@ public class Application {
     }
 
     /**
+     * Method used to simulate all workspaces in the network, users have access to private workspaces
+     * if they were invited or subscribed while public
+     *
+     * @return all workspaces in the current network
+     */
+    public static Set<Workspace> getAllNetworkWS() {
+        return  new HashSet<>(Application.workspaceData.getAll());
+    }
+
+    /**
      * Will search for workspaces available in the network
-     *  (dont confuse workspacesInNetwork with foreigWworkspace)
+     *  (don't confuse workspacesInNetwork with foreignWorkspace)
      *
      */
     public static Set<Workspace> networkSearch(String query) {
         String[] queryArr = query.split("\\s+");
         Set<Workspace> availableWS = new HashSet<>();
 
+        //By default providing no arguments to the query will show all available workspaces
         if (query.trim().isEmpty())
-            return new HashSet<Workspace>(Application.getNetworkWS());
+            return new HashSet<Workspace>(Application.getPublicNetworkWS());
 
-        for (Workspace ws : Application.getNetworkWS()) {
+        for (Workspace ws : Application.getPublicNetworkWS()) {
+
+            //Dont' allow owned workspaces to appear
+            if (ws.getOwner().getEmail().equals(Application.getOwner().getEmail()))
+                continue;
+
             for (String tag : ws.getTagsAsArray()) {
                 for (String q: queryArr) {
                     if (q.equals(tag)) {
@@ -161,6 +182,14 @@ public class Application {
         return  Application.MAX_APPLICATION_QUOTA;
        // StatFs stat = new StatFs(Environment.getDataDirectory().getPath());
         //return (int) ((long)stat.getBlockSize() * (long)stat.getBlockCount() /(long) oneMB);
+    }
+
+    /**
+     * Saves a modified user in the application
+     * @param u user to be changed
+     */
+    public static void saveUser(User u) {
+        Application.userData.save(u);
     }
 
 }

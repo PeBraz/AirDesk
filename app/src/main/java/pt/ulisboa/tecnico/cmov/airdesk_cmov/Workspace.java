@@ -3,8 +3,6 @@ package pt.ulisboa.tecnico.cmov.airdesk_cmov;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.io.InvalidClassException;
-import java.io.NotSerializableException;
 import java.io.ObjectInput;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutput;
@@ -13,7 +11,8 @@ import java.io.StreamCorruptedException;
 import java.util.ArrayList;
 import java.util.List;
 import pt.ulisboa.tecnico.cmov.airdesk_cmov.Database.FilesDataSource;
-import pt.ulisboa.tecnico.cmov.airdesk_cmov.Database.UsersDataSource;
+import pt.ulisboa.tecnico.cmov.airdesk_cmov.Exceptions.UserAlreadyAddedException;
+import pt.ulisboa.tecnico.cmov.airdesk_cmov.Exceptions.UserIsMyselfException;
 
 
 public class Workspace {
@@ -205,6 +204,17 @@ public class Workspace {
     }
 
     /**
+     * Checks if this workspace is the same as another
+     *
+     * @param w workspace to be compared with
+     * @return if workspaces are the same or not
+     */
+    public boolean equals(Workspace w) {
+        return this.getName().equals(w.getName())
+               && this.getOwner().getEmail().equals(w.getOwner().getEmail());
+    }
+
+    /**
      * Given this workspace, initialize the user by looking for it in the database,
      * populate user will load the user in the database by searching for the name.
      *
@@ -223,5 +233,31 @@ public class Workspace {
         this.populateUser().getOwner().saveWorkspace(this);
     }
 
+    /**
+     * Adds the user to the the application owner access list.
+     *
+     * Invites a foreign user to the workspace, attempting to connect to that foreign client
+     * and requesting the invite.
+     *
+     * The provided user is confirmed to be available in the network.
+     *
+     * @param user that is invited
+     */
+    public final void invite(User user)
+            throws UserIsMyselfException, UserAlreadyAddedException {
 
+        if (user.getEmail().equals(Application.getOwner().getEmail()))
+            throw new UserIsMyselfException();
+        if (this.accessList.indexOf(user.getEmail()) != -1)
+            throw new UserAlreadyAddedException(user.getEmail());
+
+        this.addAccessListUser(user);
+        this.save();
+        /*
+        *  The invite just stores it automatically into the target user foreign workspace list
+        *
+        */
+        user.addForeign(this);
+        user.save();
+    }
 }

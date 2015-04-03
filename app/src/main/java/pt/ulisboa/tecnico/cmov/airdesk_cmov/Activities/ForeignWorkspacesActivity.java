@@ -67,13 +67,12 @@ public class ForeignWorkspacesActivity extends ActionBarActivity {
 
     private void listWorkspaces() {
 
-        Set<Workspace> myWorkspaces = Application.foreignWorkspaces;
+        Set<Workspace> foreignWorkspaces = Application.getOwner().getForeignWorkspaces();
         List<String> foreignws = new ArrayList<>();
 
         final ListView listview = (ListView) findViewById(R.id.foreign_list);
 
-        foreignws.clear();
-        for(Workspace w : myWorkspaces) foreignws.add(w.getName());
+        for(Workspace w : foreignWorkspaces) foreignws.add(w.getName());
 
         final ArrayAdapter<String> adapter = new ArrayAdapter<>(this,
                                 android.R.layout.simple_list_item_1, android.R.id.text1, foreignws);
@@ -104,7 +103,6 @@ public class ForeignWorkspacesActivity extends ActionBarActivity {
         final View dialogView = inflater.inflate(R.layout.dialog_subscribe, null);
         dialog.setContentView(dialogView);
 
-
         dialog.show();
 
         Button ok = (Button) dialogView.findViewById(R.id.subscribe_confirm_button);
@@ -131,6 +129,7 @@ public class ForeignWorkspacesActivity extends ActionBarActivity {
 
                 availableWS.clear();
                 availableWS.addAll(Application.networkSearch(text.getText().toString()));
+
 
                 TextView list = (TextView) dialog.findViewById(R.id.subscribe_list);
                 if (availableWS.isEmpty()) {

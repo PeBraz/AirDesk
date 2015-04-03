@@ -21,6 +21,9 @@ import java.io.File;
 
 import pt.ulisboa.tecnico.cmov.airdesk_cmov.Application;
 
+import pt.ulisboa.tecnico.cmov.airdesk_cmov.Exceptions.UserAlreadyAddedException;
+import pt.ulisboa.tecnico.cmov.airdesk_cmov.Exceptions.UserAlreadyExistsException;
+import pt.ulisboa.tecnico.cmov.airdesk_cmov.Exceptions.UserIsMyselfException;
 import pt.ulisboa.tecnico.cmov.airdesk_cmov.Exceptions.UserNotFoundException;
 import pt.ulisboa.tecnico.cmov.airdesk_cmov.Files.FileUtil;
 import pt.ulisboa.tecnico.cmov.airdesk_cmov.R;
@@ -398,12 +401,10 @@ public class ListFilesActivity extends ActionBarActivity {
                     error.setText("No email given");
                     return;
                 }
-
                 try {
-                    ws.addAccessListUser(Application.getNetworkUser(email));
-                    ws.save();
+                    ws.invite(Application.getNetworkUser(email));
                     dialog.dismiss();
-                }catch(UserNotFoundException e) {
+                }catch(UserIsMyselfException | UserNotFoundException | UserAlreadyAddedException e) {
                     error.setText(e.getMessage());
                 }
             }

@@ -15,7 +15,8 @@ public class UsersDataSource extends DataSource<User>{
     private SQLiteDatabase database;
 
     private String[] allColumns = { MySQLiteHelper.USER_EMAIL,
-                                    MySQLiteHelper.USER_USERNAME};
+                                    MySQLiteHelper.USER_USERNAME,
+                                    MySQLiteHelper.USER_FOREIGN};
 
     public UsersDataSource(Context context) {
         super(context);
@@ -29,14 +30,23 @@ public class UsersDataSource extends DataSource<User>{
 
         values.put(MySQLiteHelper.USER_USERNAME, user.getUsername());
         values.put(MySQLiteHelper.USER_EMAIL, user.getEmail());
-
+        values.put(MySQLiteHelper.USER_FOREIGN, user.getForeignSerialized());
         database.insert(MySQLiteHelper.TABLE_USERS, null, values);
     }
     @Override
     public void save(User user) {
-        final String query = String.format("UPDATE %1$s SET %2$s= ? WHERE %3$s= ?",
-               MySQLiteHelper.TABLE_USERS, MySQLiteHelper.USER_USERNAME, MySQLiteHelper.USER_EMAIL);
-        database.rawQuery(query, new String[]{ user.getUsername(), user.getEmail()});
+        final String query = String.format("UPDATE %1$s SET %2$s= ?, %3$s=? WHERE %4$s= ?",
+               MySQLiteHelper.TABLE_USERS, MySQLiteHelper.USER_USERNAME,
+                                           MySQLiteHelper.USER_EMAIL,
+                                           MySQLiteHelper.USER_FOREIGN);
+        database.rawQuery(query, new String[]{ user.getUsername(), user.getEmail(),});
+
+        ContentValues values = new ContentValues();
+        values.put(MySQLiteHelper.USER_USERNAME, user.getUsername());
+        values.put(MySQLiteHelper.USER_EMAIL, user.getEmail());
+        values.put(MySQLiteHelper.USER_FOREIGN, user.getForeignSerialized());
+        database.update(MySQLiteHelper.TABLE_USERS, values,
+                String.format(" %1$s=? ", MySQLiteHelper.USER_EMAIL), new String[] {user.getEmail()});
     }
   //  @Override
     public User get(final String userKey) {
@@ -70,6 +80,7 @@ public class UsersDataSource extends DataSource<User>{
         User user = new User();
         user.setUsername(cursor.getString(1));
         user.setEmail(cursor.getString(0));
+        user.setForeign(cursor.getBlob(2));
         return user;
     }
 }
