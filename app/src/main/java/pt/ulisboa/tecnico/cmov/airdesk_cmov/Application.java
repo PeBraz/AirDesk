@@ -34,7 +34,9 @@ public class Application {
 
     //The Data source should not be called from here, should instead be called from the owner
     private static WorkspacesDataSource workspaceData = null;
-    public static final int MAX_APPLICATION_QUOTA = 20; //do something with this
+
+    //Application quota int bytes
+    public static final int MAX_APPLICATION_QUOTA = 20;
 
     public static final Set<Workspace> foreignWorkspaces = new HashSet<Workspace>();
 
@@ -178,13 +180,12 @@ public class Application {
     * Returns the device storage available in the internal storage of the device (as bytes)
     * gives no information on how the space limited by the quota values
     *
-    *  (add better functionality change this)
+    *  @return space available in the device as bytes
     */
     public static int getDeviceStorageSpace() {
-        //int OneMB = 1024 * 1024;
         return  Application.MAX_APPLICATION_QUOTA;
        // StatFs stat = new StatFs(Environment.getDataDirectory().getPath());
-        //return (int) ((long)stat.getBlockSize() * (long)stat.getBlockCount() /(long) oneMB);
+        //return (int) ((long)stat.getBlockSize() * (long)stat.getBlockCount());
     }
 
     /**

@@ -18,10 +18,15 @@ import android.widget.ListView;
 import android.widget.SeekBar;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import junit.framework.Assert;
+
 import java.io.File;
 
 import pt.ulisboa.tecnico.cmov.airdesk_cmov.Application;
 
+import pt.ulisboa.tecnico.cmov.airdesk_cmov.BuildConfig;
+import pt.ulisboa.tecnico.cmov.airdesk_cmov.Exceptions.StorageOverLimitException;
 import pt.ulisboa.tecnico.cmov.airdesk_cmov.Exceptions.UserAlreadyAddedException;
 import pt.ulisboa.tecnico.cmov.airdesk_cmov.Exceptions.UserIsMyselfException;
 import pt.ulisboa.tecnico.cmov.airdesk_cmov.Exceptions.UserNotFoundException;
@@ -220,15 +225,34 @@ public class FilesActivity extends ActionBarActivity {
         Button save = (Button) dialog.findViewById(R.id.button12);
         final EditText text = (EditText) dialog.findViewById(R.id.editText7);
 
-        String actualText = read(filename);
+        final String actualText = read(filename);
+        //checks space being used, so that id doesn't get counted again
+        final int oldSize = (actualText!=null)? actualText.getBytes().length: 0;
 
-        if (actualText!=null) text.setText(actualText);
+        if (actualText!=null)
+            text.setText(actualText);
+
 
         save.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                write(filename, text.getText().toString());
-                dialog.dismiss();
+                String newText = text.getText().toString();
+                int newSize = newText.getBytes().length;
+
+                try {
+                    Application.getOwner().getWorkspace(wsName).changeStorageUsed(newSize - oldSize);
+                    boolean success = write(filename, newText);
+                    if (!success)
+                        Application.getOwner().getWorkspace(wsName).changeStorageUsed(-(newSize-oldSize));
+                    dialog.dismiss();
+                }catch(StorageOverLimitException e) {
+                     // not possible in exception
+                    if (BuildConfig.DEBUG && (newSize - oldSize) < 0)
+                        throw new AssertionError("size had negative value, not possible");
+
+                    Toast.makeText(getApplicationContext(),
+                            "Can't save file, quota over limit.", Toast.LENGTH_SHORT).show();
+                }
             }
         });
 
@@ -268,22 +292,29 @@ public class FilesActivity extends ActionBarActivity {
             @Override
             public void onClick(View v) {
                 Workspace.deleteFile(filename, wsName, Application.getOwner().getEmail());
-                deleteFileStorage(filename);
+                int weightLost = deleteFileStorage(filename);
+                try {
+                    Application.getOwner().getWorkspace(wsName).changeStorageUsed(-weightLost);
+                }catch(StorageOverLimitException e){
+                    System.out.println(e.getMessage());
+                }
                 dialog.dismiss();
                 showList();
             }
         });
     }
 
-    private void write(String title, String text) {
+    private boolean write(String title, String text) {
 
         if (FileUtil.isExternalStorageWritable()) {
             File dir = FileUtil.getExternalFilesDirAllApiLevels(this.getPackageName());
             File file = new File(dir, title + "|" + Application.getOwner().getEmail());
             FileUtil.writeStringAsFile(text, file);
             Toast.makeText(this, "File written", Toast.LENGTH_SHORT).show();
+            return true;
         } else {
             Toast.makeText(this, "External storage not writable", Toast.LENGTH_SHORT).show();
+            return false;
         }
     }
 
@@ -301,16 +332,33 @@ public class FilesActivity extends ActionBarActivity {
         return null;
     }
 
-    private void deleteFileStorage(String name){
+    /**
+     *  Deletes a file from the application storage.
+     *
+     * @param name of the file to be deleted
+     * @return number of bytes released
+     */
+    private int deleteFileStorage(String name){
 
         if (FileUtil.isExternalStorageReadable()) {
             File dir = FileUtil.getExternalFilesDirAllApiLevels(this.getPackageName());
             File file = new File(dir, name + "|" + Application.getOwner().getEmail());
 
-            if (file.exists()) file.delete();
+            if (file.exists()) {
 
-            else Toast.makeText(this, "File does not exist.", Toast.LENGTH_SHORT).show();
+                String filetext = read(name);
+                if (file.delete()) {
+                    return filetext.getBytes().length;
+                }
+                else {
+                    Toast.makeText(this, "Unable to delete file.", Toast.LENGTH_SHORT).show();
+                }
+            }
+            else {
+                Toast.makeText(this, "File does not exist.", Toast.LENGTH_SHORT).show();
+            }
         }
+        return 0;
     }
 
     private void showList(){
@@ -459,6 +507,8 @@ public class FilesActivity extends ActionBarActivity {
                 boolean isMyWs  = Application.getOwner().getEmail()
                                     .equals(ws.populateUser().getOwner().getEmail());
                 Application.getOwner().remove(ws);
+
+                dialog.dismiss();
                 startActivity(new Intent(getApplicationContext(),
                         (isMyWs)? MyWorkSpacesActivity.class : ForeignWorkspacesActivity.class));
             }

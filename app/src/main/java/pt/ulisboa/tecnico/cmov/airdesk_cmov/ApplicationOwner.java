@@ -31,10 +31,6 @@ public final class ApplicationOwner extends User {
         getWorkspaceDataSource().create(ws);
     }
 
-    public final void subscribe(Workspace workspace) {
-        Application.foreignWorkspaces.add(workspace);
-
-    }
 
     /**
      *  This method is used to create the application owner from an existing user that can be found
@@ -64,6 +60,7 @@ public final class ApplicationOwner extends User {
         }
         return myWorkspaces;
     }
+
     /**
      *  Finds all workspaces in the network that the user has added
      *
@@ -77,7 +74,6 @@ public final class ApplicationOwner extends User {
                     foreign.add(ws);
             }
         }
-
         return foreign;
     }
 

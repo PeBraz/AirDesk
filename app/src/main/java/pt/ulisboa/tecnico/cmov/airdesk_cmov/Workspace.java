@@ -14,6 +14,7 @@ import java.util.ArrayList;
 import java.util.List;
 import pt.ulisboa.tecnico.cmov.airdesk_cmov.Database.FilesDataSource;
 import pt.ulisboa.tecnico.cmov.airdesk_cmov.Exceptions.NotOwnerException;
+import pt.ulisboa.tecnico.cmov.airdesk_cmov.Exceptions.StorageOverLimitException;
 import pt.ulisboa.tecnico.cmov.airdesk_cmov.Exceptions.UserAlreadyAddedException;
 import pt.ulisboa.tecnico.cmov.airdesk_cmov.Exceptions.UserIsMyselfException;
 
@@ -30,7 +31,7 @@ public class Workspace {
 
     private User owner;
     private int quota;
-    private int minQuota;
+    private int usedStorage;
     private boolean isPrivate;
     private String tags;
     private static FilesDataSource filedb;
@@ -43,6 +44,7 @@ public class Workspace {
         this.quota = quota;
         this.owner = owner;
         this.isPrivate = true;
+        this.usedStorage = 0;
     }
     public Workspace(final String name, final int quota, final User owner,
                      final boolean privacy, final String tags) {
@@ -57,10 +59,6 @@ public class Workspace {
         return quota;
     }
 
-    public final int getMinQuota() {
-        return minQuota;
-    }
-
     public final User getOwner() {
         return owner;
     }
@@ -72,6 +70,10 @@ public class Workspace {
     public final boolean getPrivacy() { return isPrivate; }
 
     public final String getTags() { return tags; }
+
+    public final int getStorage() {
+        return this.usedStorage;
+    }
 
     public final String[] getTagsAsArray() {
         return  (tags != null)? this.tags.split("\\s+"): new String[]{};
@@ -97,8 +99,12 @@ public class Workspace {
 
     public final void setTags(final String tags) { this.tags = tags; }
 
-    public void setOwnerEmail(String email) {
+    public final void setOwnerEmail(String email) {
         this.ownerEmail = email;
+    }
+
+    public final void setStorage(int storage) {
+        this.usedStorage = storage;
     }
 
     public static void createFile(String name, String workspace, String user){
@@ -118,6 +124,29 @@ public class Workspace {
 
         return allFiles;
     }
+
+    /**
+     * Changes the total amount of storage that this workspace uses. The new value must be between
+     * 0 and the quota of the workspace.
+     *
+     * @param offset size of bytes added or removed from the text file
+     */
+
+    public void changeStorageUsed(int offset)
+            throws StorageOverLimitException {
+        int newStorageSpace = this.usedStorage + offset;
+
+        System.out.println("STORAGE:");
+        System.out.println("storage: "+ this.usedStorage);
+        System.out.println("offset: "+ offset);
+
+        if (newStorageSpace > quota || newStorageSpace < 0)
+            throw new StorageOverLimitException(0, quota, newStorageSpace);
+
+        this.usedStorage += offset;
+        this.save();
+    }
+
 
     public static void deleteFile(String fileName, String wsName, String ownerMail){
 
@@ -274,4 +303,5 @@ public class Workspace {
         user.addForeign(this);
         user.save();
     }
+
 }

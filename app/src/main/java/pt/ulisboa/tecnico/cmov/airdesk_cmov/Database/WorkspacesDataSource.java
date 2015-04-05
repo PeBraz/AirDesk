@@ -20,7 +20,8 @@ public class WorkspacesDataSource extends DataSource<Workspace>{
                                     MySQLiteHelper.WS_PRIVACY,
                                     MySQLiteHelper.WS_TAGS,
                                     MySQLiteHelper.WS_ACCESS,
-                                    MySQLiteHelper.WS_USER};
+                                    MySQLiteHelper.WS_USER,
+                                    MySQLiteHelper.WS_STORAGE};
 
     public WorkspacesDataSource(Context context) {
         super(context);
@@ -39,7 +40,8 @@ public class WorkspacesDataSource extends DataSource<Workspace>{
         values.put(MySQLiteHelper.WS_PRIVACY, ws.getPrivacy()?1:0);
         values.put(MySQLiteHelper.WS_TAGS, ws.getTags());
         values.put(MySQLiteHelper.WS_ACCESS, ws.getAccessListSerialized());
-        values.put(MySQLiteHelper.WS_USER, ws.getOwner().getUsername());
+        values.put(MySQLiteHelper.WS_USER, ws.populateUser().getOwner().getUsername());
+        values.put(MySQLiteHelper.WS_STORAGE, ws.getStorage());
         database.insert(MySQLiteHelper.TABLE_WORKSPACES, null, values);
 
     }
@@ -49,29 +51,16 @@ public class WorkspacesDataSource extends DataSource<Workspace>{
         ContentValues values = new ContentValues();
         values.put(MySQLiteHelper.WS_NAME, ws.getName());
         values.put(MySQLiteHelper.WS_QUOTA, ws.getQuota());
-        values.put(MySQLiteHelper.WS_PRIVACY, ws.getPrivacy()?1:0);
+        values.put(MySQLiteHelper.WS_PRIVACY, ws.getPrivacy() ? 1 : 0);
         values.put(MySQLiteHelper.WS_TAGS, ws.getTags());
         values.put(MySQLiteHelper.WS_ACCESS, ws.getAccessListSerialized());
         values.put(MySQLiteHelper.WS_USER, ws.getOwner().getEmail());
+        values.put(MySQLiteHelper.WS_STORAGE, ws.getStorage());
         database.update(MySQLiteHelper.TABLE_WORKSPACES, values,
-                String.format(" %1$s=? ", MySQLiteHelper.WS_NAME), new String[] {ws.getName()});
-
+                String.format(" %1$s=? ", MySQLiteHelper.WS_NAME), new String[]{ws.getName()});
     }
-   // @Override
-    /*
-    public Workspace get(final String wsKey) {
-        final Workspace ws;
-        Cursor cursor = database.rawQuery("select * from "+MySQLiteHelper.TABLE_WORKSPACES+" where "+MySQLiteHelper.WS_NAME+" = ? ",
-                new String[] {wsKey});
-        cursor.moveToFirst();
-        if(cursor.isAfterLast())
-            return null;
-        ws = cursorToWorkspace(cursor);
-        cursor.close();
-        return ws;
 
-    }
-*/
+
    public Workspace get(final String wsname, final String userEmail) {
         final Workspace ws;
         final String whereQuery =   MySQLiteHelper.WS_NAME+"=? AND "+
@@ -117,6 +106,7 @@ public class WorkspacesDataSource extends DataSource<Workspace>{
         ws.setTags(cursor.getString(3));
         ws.setAccessList(cursor.getBlob(4));
         ws.setOwnerEmail(cursor.getString(5));
+        ws.setStorage(cursor.getInt(6));
         return ws;
     }
 }

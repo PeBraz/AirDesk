@@ -24,6 +24,7 @@ public class MySQLiteHelper extends SQLiteOpenHelper{
     public static final String WS_TAGS = "tags";
     public static final String WS_USER = "owner";
     public static final String WS_ACCESS ="access";
+    public static final String WS_STORAGE = "storage";
 
     public static final String TABLE_FILES = "files";
     public static final String FILE_WORKSPACE = "workspace";
@@ -47,6 +48,7 @@ public class MySQLiteHelper extends SQLiteOpenHelper{
                 WS_TAGS + " TEXT, " +
                 WS_ACCESS + " BLOB, " +
                 WS_USER + " TEXT, " +
+                WS_STORAGE + " INTEGER, " +
                 " FOREIGN KEY ("+WS_USER+") REFERENCES "+TABLE_USERS+" (" + USER_EMAIL+ ")," +
                 " PRIMARY KEY ("+WS_NAME+", "+WS_USER+"));";
 
