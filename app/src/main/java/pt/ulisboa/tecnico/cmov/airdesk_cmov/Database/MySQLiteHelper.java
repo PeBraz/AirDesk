@@ -12,6 +12,7 @@ public class MySQLiteHelper extends SQLiteOpenHelper{
    // public static final String USER_ID = "id";
     public static final String USER_USERNAME = "USER";
     public static final String USER_EMAIL = "EMAIL";
+    public static final String USER_FOREIGN = "subscribed";
 
     private static final String DATABASE_NAME = "airdeskdb";
     private static final int DATABASE_VERSION = 3;
@@ -23,6 +24,7 @@ public class MySQLiteHelper extends SQLiteOpenHelper{
     public static final String WS_TAGS = "tags";
     public static final String WS_USER = "owner";
     public static final String WS_ACCESS ="access";
+    public static final String WS_STORAGE = "storage";
 
     public static final String TABLE_FILES = "files";
     public static final String FILE_WORKSPACE = "workspace";
@@ -34,7 +36,8 @@ public class MySQLiteHelper extends SQLiteOpenHelper{
     private static final String USERS_CREATE =
             "CREATE TABLE " + TABLE_USERS + " (" +
                     USER_EMAIL + " TEXT PRIMARY KEY, "+
-                    USER_USERNAME + " TEXT); ";
+                    USER_USERNAME + " TEXT, " +
+                    USER_FOREIGN + " BLOB);";
 
 
     private static final String WORKSPACES_CREATE =
@@ -45,6 +48,7 @@ public class MySQLiteHelper extends SQLiteOpenHelper{
                 WS_TAGS + " TEXT, " +
                 WS_ACCESS + " BLOB, " +
                 WS_USER + " TEXT, " +
+                WS_STORAGE + " INTEGER, " +
                 " FOREIGN KEY ("+WS_USER+") REFERENCES "+TABLE_USERS+" (" + USER_EMAIL+ ")," +
                 " PRIMARY KEY ("+WS_NAME+", "+WS_USER+"));";
 

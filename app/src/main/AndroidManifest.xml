@@ -51,7 +51,7 @@
             android:label="@string/title_activity_workspace_settings" >
         </activity>
         <activity
-            android:name=".Activities.ListFilesActivity"
+            android:name=".Activities.FilesActivity"
             android:label="@string/title_activity_list_files" >
         </activity>
     </application>

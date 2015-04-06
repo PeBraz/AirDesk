@@ -12,15 +12,12 @@ import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
-import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.SeekBar;
 import android.widget.TextView;
 
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
 import pt.ulisboa.tecnico.cmov.airdesk_cmov.Application;
 import pt.ulisboa.tecnico.cmov.airdesk_cmov.Exceptions.InvalidQuotaException;
@@ -64,7 +61,7 @@ public class MyWorkSpacesActivity extends ActionBarActivity {
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
 
                 String itemValue = (String) listview.getItemAtPosition(position);
-                Intent intent = new Intent(MyWorkSpacesActivity.this, ListFilesActivity.class);
+                Intent intent = new Intent(MyWorkSpacesActivity.this, FilesActivity.class);
                 intent.putExtra("WSNAME", itemValue);
                 startActivity(intent);
 
@@ -90,7 +87,7 @@ public class MyWorkSpacesActivity extends ActionBarActivity {
             startActivity(intent);
 
         } else if (id == R.id.new_workspace) {
-            this.newWorkspaceDialog(Application.MAX_APPLICATION_QUOTA);
+            this.newWorkspaceDialog(Application.getDeviceStorageSpace());
 
         }else if(id == R.id.foreign) {
             startActivity(new Intent(getApplicationContext(), ForeignWorkspacesActivity.class));

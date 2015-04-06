@@ -1,9 +1,13 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    tools:context="pt.ulisboa.tecnico.cmov.airdesk_cmov.Activities.ListFilesActivity">
+    tools:context="pt.ulisboa.tecnico.cmov.airdesk_cmov.Activities.FilesActivity">
     <item android:id="@+id/create_file" android:title="@string/menu_new_file"
         android:orderInCategory="100" app:showAsAction="never" />
     <item android:id="@+id/ws_settings" android:title="@string/settings"
+        android:orderInCategory="100" app:showAsAction="never" />
+    <item android:id="@+id/invite_user" android:title="@string/title_invite_dialog"
+        android:orderInCategory="100" app:showAsAction="never" />
+    <item android:id="@+id/ws_remove" android:title="@string/title_ws_remove_dialog"
         android:orderInCategory="100" app:showAsAction="never" />
 </menu>

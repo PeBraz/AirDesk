@@ -191,10 +191,12 @@ public final class FileUtil {
             synchronized (FileUtil.DATA_LOCK) {
                 if ((file != null) && file.canRead()) {
                     sb = new StringBuilder();
-                    String line = null;
                     BufferedReader in = new BufferedReader(new FileReader(file), 1024);
-                    while ((line = in.readLine()) != null) {
-                        sb.append(line + System.getProperty("line.separator"));
+                    String line = in.readLine();
+                    if (line != null)
+                        sb.append(line);
+                    while ((line=in.readLine()) != null) {
+                        sb.append(System.getProperty("line.separator") + line);
                     }
                 }
             }

@@ -2,6 +2,7 @@ package pt.ulisboa.tecnico.cmov.airdesk_cmov.Activities;
 
 
 import android.app.Dialog;
+import android.content.Intent;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -17,26 +18,38 @@ import android.widget.ListView;
 import android.widget.SeekBar;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import junit.framework.Assert;
+
 import java.io.File;
 
 import pt.ulisboa.tecnico.cmov.airdesk_cmov.Application;
 
+import pt.ulisboa.tecnico.cmov.airdesk_cmov.BuildConfig;
+import pt.ulisboa.tecnico.cmov.airdesk_cmov.Exceptions.StorageOverLimitException;
+import pt.ulisboa.tecnico.cmov.airdesk_cmov.Exceptions.UserAlreadyAddedException;
+import pt.ulisboa.tecnico.cmov.airdesk_cmov.Exceptions.UserIsMyselfException;
+import pt.ulisboa.tecnico.cmov.airdesk_cmov.Exceptions.UserNotFoundException;
 import pt.ulisboa.tecnico.cmov.airdesk_cmov.Files.FileUtil;
 import pt.ulisboa.tecnico.cmov.airdesk_cmov.R;
 import pt.ulisboa.tecnico.cmov.airdesk_cmov.Workspace;
 
 
-public class ListFilesActivity extends ActionBarActivity {
+public class FilesActivity extends ActionBarActivity {
 
     private String wsName;
-
+    private boolean isMyWs;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_list_files);
+        setContentView(R.layout.activity_files);
 
         Bundle info = getIntent().getExtras();
         if (info != null) wsName = info.getString("WSNAME");
+
+        setTitle("Workspace - " + wsName);
+        isMyWs = Application.getOwner().getWorkspace(wsName) != null;
+
 
         final ListView listview = (ListView) findViewById(R.id.listView2);
         showList();
@@ -54,8 +67,14 @@ public class ListFilesActivity extends ActionBarActivity {
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-
-        getMenuInflater().inflate(R.menu.menu_list_files, menu);
+        if (isMyWs) {
+            getMenuInflater().inflate(R.menu.menu_files_owned, menu);
+            MenuItem delete = menu.findItem(R.id.ws_remove);
+            delete.setTitle("Remove - " + wsName);
+        }
+        else {
+            getMenuInflater().inflate(R.menu.menu_files_foreign, menu);
+        }
         return true;
     }
 
@@ -69,6 +88,10 @@ public class ListFilesActivity extends ActionBarActivity {
             return true;
         }else if (id == R.id.ws_settings) {
             this.changeSettings();
+        }else if (id == R.id.invite_user) {
+            this.inviteDialog();
+        }else if (id == R.id.ws_remove){
+            this.removeWorkspaceDialog();
         }
 
         return super.onOptionsItemSelected(item);
@@ -94,7 +117,7 @@ public class ListFilesActivity extends ActionBarActivity {
                 TextView fileTitle = (TextView) dialog.findViewById(R.id.editText6);
 
                 if (fileTitle.getText().toString().isEmpty()) {
-                    Toast.makeText(ListFilesActivity.this, "A value is missing.", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(FilesActivity.this, "A value is missing.", Toast.LENGTH_SHORT).show();
                     return;
                 }
 
@@ -202,15 +225,34 @@ public class ListFilesActivity extends ActionBarActivity {
         Button save = (Button) dialog.findViewById(R.id.button12);
         final EditText text = (EditText) dialog.findViewById(R.id.editText7);
 
-        String actualText = read(filename);
+        final String actualText = read(filename);
+        //checks space being used, so that id doesn't get counted again
+        final int oldSize = (actualText!=null)? actualText.getBytes().length: 0;
 
-        if (actualText!=null) text.setText(actualText);
+        if (actualText!=null)
+            text.setText(actualText);
+
 
         save.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                write(filename, text.getText().toString());
-                dialog.dismiss();
+                String newText = text.getText().toString();
+                int newSize = newText.getBytes().length;
+
+                try {
+                    Application.getOwner().getWorkspace(wsName).changeStorageUsed(newSize - oldSize);
+                    boolean success = write(filename, newText);
+                    if (!success)
+                        Application.getOwner().getWorkspace(wsName).changeStorageUsed(-(newSize-oldSize));
+                    dialog.dismiss();
+                }catch(StorageOverLimitException e) {
+                     // not possible in exception
+                    if (BuildConfig.DEBUG && (newSize - oldSize) < 0)
+                        throw new AssertionError("size had negative value, not possible");
+
+                    Toast.makeText(getApplicationContext(),
+                            "Can't save file, quota over limit.", Toast.LENGTH_SHORT).show();
+                }
             }
         });
 
@@ -250,22 +292,29 @@ public class ListFilesActivity extends ActionBarActivity {
             @Override
             public void onClick(View v) {
                 Workspace.deleteFile(filename, wsName, Application.getOwner().getEmail());
-                deleteFileStorage(filename);
+                int weightLost = deleteFileStorage(filename);
+                try {
+                    Application.getOwner().getWorkspace(wsName).changeStorageUsed(-weightLost);
+                }catch(StorageOverLimitException e){
+                    System.out.println(e.getMessage());
+                }
                 dialog.dismiss();
                 showList();
             }
         });
     }
 
-    private void write(String title, String text) {
+    private boolean write(String title, String text) {
 
         if (FileUtil.isExternalStorageWritable()) {
             File dir = FileUtil.getExternalFilesDirAllApiLevels(this.getPackageName() + "/" + wsName + "." + Application.getOwner().getEmail());
             File file = new File(dir, title);
             FileUtil.writeStringAsFile(text, file);
             Toast.makeText(this, "File written", Toast.LENGTH_SHORT).show();
+            return true;
         } else {
             Toast.makeText(this, "External storage not writable", Toast.LENGTH_SHORT).show();
+            return false;
         }
     }
 
@@ -283,15 +332,35 @@ public class ListFilesActivity extends ActionBarActivity {
         return null;
     }
 
-    private void deleteFileStorage(String name){
+    /**
+     *  Deletes a file from the application storage.
+     *
+     * @param name of the file to be deleted
+     * @return number of bytes released
+     */
+    private int deleteFileStorage(String name){
 
         if (FileUtil.isExternalStorageReadable()) {
+
             File dir = FileUtil.getExternalFilesDirAllApiLevels(this.getPackageName() + "/" + wsName + "." + Application.getOwner().getEmail());
             File file = new File(dir, name);
             if (file.exists()) file.delete();
 
-            else Toast.makeText(this, "File does not exist.", Toast.LENGTH_SHORT).show();
+            if (file.exists()) {
+
+                String filetext = read(name);
+                if (file.delete()) {
+                    return filetext.getBytes().length;
+                }
+                else {
+                    Toast.makeText(this, "Unable to delete file.", Toast.LENGTH_SHORT).show();
+                }
+            }
+            else {
+                Toast.makeText(this, "File does not exist.", Toast.LENGTH_SHORT).show();
+            }
         }
+        return 0;
     }
 
     private void showList(){
@@ -313,12 +382,15 @@ public class ListFilesActivity extends ActionBarActivity {
         dialog.show();
         final Workspace ws = Application.getOwner().getWorkspace(wsName);
 
-        final int currentQuota = ws.getQuota();
-        int deviceSpace = Application.getDeviceStorageSpace();
+        final int usedWSSpace = ws.getStorage();
+
+        int deviceSpace = Application.getDeviceStorageSpace() + ws.getQuota();
 
 
         final SeekBar quota = (SeekBar) dialog.findViewById(R.id.ws_settings_quota);
-        quota.setMax(deviceSpace - currentQuota);
+        quota.setMax(deviceSpace - usedWSSpace);
+        quota.setProgress(ws.getQuota() - usedWSSpace);
+
 
         final CheckBox isPrivate = (CheckBox) dialog.findViewById(R.id.private_checkbox);
         isPrivate.setChecked(ws.getPrivacy());
@@ -327,7 +399,7 @@ public class ListFilesActivity extends ActionBarActivity {
         tags.setText(ws.getTags());
 
         final TextView quotaTag = (TextView) dialog.findViewById(R.id.ws_settings_quota_tag);
-        quotaTag.setText(Integer.toString(currentQuota));
+        quotaTag.setText(Integer.toString(ws.getQuota()));
 
         Button confirm = (Button) dialogView.findViewById(R.id.ws_settings_confirm);
         Button cancel = (Button) dialogView.findViewById(R.id.ws_settings_cancel);
@@ -339,7 +411,7 @@ public class ListFilesActivity extends ActionBarActivity {
             public void onStopTrackingTouch(SeekBar seekBar) { }
             @Override
             public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
-                quotaTag.setText(Integer.toString(currentQuota + progress));
+                quotaTag.setText(Integer.toString(usedWSSpace + progress));
             }
         });
 
@@ -348,7 +420,7 @@ public class ListFilesActivity extends ActionBarActivity {
             public void onClick(View v) {
 
             ws.setPrivacy(isPrivate.isChecked());
-            ws.setQuota(quota.getProgress() + currentQuota);
+            ws.setQuota(quota.getProgress() + usedWSSpace);
             System.out.println("TAGS: "+ tags.getText().toString());
             ws.setTags(tags.getText().toString());
             ws.save();
@@ -364,21 +436,96 @@ public class ListFilesActivity extends ActionBarActivity {
         });
     }
 
-    public long workspaceSize(){
+    /**
+     * Displays a Dialog that allows the workspace owner to invite a different user into the
+     * workspace
+     *
+     */
+    public void inviteDialog () {
+        final Dialog dialog = new Dialog(this);
+        dialog.setTitle(R.string.title_invite_dialog);
 
-        long size = 0;
+        final LayoutInflater inflater = this.getLayoutInflater();
+        final View dialogView = inflater.inflate(R.layout.dialog_invite , null);
+        dialog.setContentView(dialogView);
 
-        String path = "/sdcard/Android/data/" + this.getPackageName() + "/" + wsName + "." + Application.getOwner().getEmail() + "/files/";
-        System.out.println(path);
-        File folder = new File(path);
-        File[] listOfFiles = folder.listFiles();
+        dialog.show();
+        final Workspace ws = Application.getOwner().getWorkspace(wsName);
 
-        for(File f : listOfFiles)
-            size = size + f.length();
+        final TextView error = (TextView)dialog.findViewById(R.id.invite_error);
 
-        System.out.println(size + " bytes");
+        Button confirm = (Button) dialog.findViewById(R.id.dialog_invite_confirm);
+        Button cancel = (Button) dialog.findViewById(R.id.dialog_invite_cancel);
 
-        return size;
+
+        confirm.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                EditText text = (EditText) dialog.findViewById(R.id.invite_user_email);
+                String email = text.getText().toString();
+                if (email.isEmpty()) {
+                    error.setText("No email given");
+                    return;
+                }
+                try {
+                    ws.invite(Application.getNetworkUser(email));
+                    dialog.dismiss();
+                }catch(UserIsMyselfException | UserNotFoundException | UserAlreadyAddedException e) {
+                    error.setText(e.getMessage());
+                }
+            }
+        });
+
+        cancel.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                dialog.dismiss();
+            }
+        });
     }
 
+    /**
+     * Removes the current workspace.
+     * Can be used in the foreign or owned context, but the deletion is done in different ways.
+     * Removing a owned workspace will affect all users that are subscribed to the workspace.
+     * Removing a foreign workspace will only affect the real owner of the workspace.
+     */
+    public void removeWorkspaceDialog() {
+
+        final Dialog dialog = new Dialog(this);
+        dialog.setTitle(R.string.last_warning);
+
+        final LayoutInflater inflater = this.getLayoutInflater();
+        final View dialogView = inflater.inflate(R.layout.dialog_ws_remove , null);
+        dialog.setContentView(dialogView);
+
+        dialog.show();
+        final Workspace ws = Application.getOwner().getWorkspace(wsName);
+
+
+        Button confirm = (Button) dialog.findViewById(R.id.dialog_ws_confirm);
+        Button cancel = (Button) dialog.findViewById(R.id.dialog_ws_cancel);
+
+
+        confirm.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                boolean isMyWs  = Application.getOwner().getEmail()
+                                    .equals(ws.populateUser().getOwner().getEmail());
+                Application.getOwner().remove(ws);
+
+                dialog.dismiss();
+                startActivity(new Intent(getApplicationContext(),
+                        (isMyWs)? MyWorkSpacesActivity.class : ForeignWorkspacesActivity.class));
+            }
+        });
+
+        cancel.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                dialog.dismiss();
+            }
+        });
+
+    }
 }

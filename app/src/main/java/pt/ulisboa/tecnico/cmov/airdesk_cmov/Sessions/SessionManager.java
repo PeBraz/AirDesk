@@ -9,7 +9,6 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
 import pt.ulisboa.tecnico.cmov.airdesk_cmov.Activities.MainActivity;
-import pt.ulisboa.tecnico.cmov.airdesk_cmov.Activities.WorkSpacesActivity;
 
 public class SessionManager {
 

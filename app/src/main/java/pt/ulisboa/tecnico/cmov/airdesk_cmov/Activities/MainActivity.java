@@ -29,7 +29,7 @@ public class MainActivity extends ActionBarActivity {
             try {
                 Application.login(email);
                 startActivity(new Intent(this, MyWorkSpacesActivity.class));
-            }catch (NotRegisteredException | WrongPasswordException e) {
+            }catch (NotRegisteredException  | WrongPasswordException  e ) {
                System.out.println(e.getMessage());
             }
         }

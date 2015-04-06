@@ -4,14 +4,7 @@
     android:layout_width="wrap_content"
     android:layout_height="wrap_content">
 
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:textAppearance="?android:attr/textAppearanceLarge"
-            android:text="Workspace Settings"
-            android:id="@+id/settings_title" />
-
-        <CheckBox
+    <CheckBox
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Private"
@@ -51,7 +44,7 @@
             android:layout_gravity="center_horizontal" />
 
         <EditText
-            android:layout_width="match_parent"
+            android:layout_width="181dp"
             android:layout_height="wrap_content"
             android:id="@+id/ws_settings_tags"
             android:layout_gravity="center_horizontal" />
