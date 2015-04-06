@@ -87,7 +87,7 @@ public class MyWorkSpacesActivity extends ActionBarActivity {
             startActivity(intent);
 
         } else if (id == R.id.new_workspace) {
-            this.newWorkspaceDialog(Application.MAX_APPLICATION_QUOTA);
+            this.newWorkspaceDialog(Application.getDeviceStorageSpace());
 
         }else if(id == R.id.foreign) {
             startActivity(new Intent(getApplicationContext(), ForeignWorkspacesActivity.class));

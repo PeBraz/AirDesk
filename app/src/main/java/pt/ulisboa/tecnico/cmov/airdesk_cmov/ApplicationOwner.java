@@ -25,7 +25,7 @@ public final class ApplicationOwner extends User {
     public final void createWorkspace(final String name, final int quota)
             throws WorkspaceAlreadyExistsException, InvalidQuotaException {
 
-        if (quota > Application.MAX_APPLICATION_QUOTA) throw new InvalidQuotaException(quota);  // needs to be changed to mirror the device's real space
+        if (quota > Application.getDeviceStorageSpace()) throw new InvalidQuotaException(quota);  // needs to be changed to mirror the device's real space
         if (getWorkspaceDataSource().get(name, this.getEmail()) != null) throw new WorkspaceAlreadyExistsException(name);
         Workspace ws = new Workspace(name, quota, this);
         getWorkspaceDataSource().create(ws);

@@ -36,7 +36,7 @@ public class Application {
     private static WorkspacesDataSource workspaceData = null;
 
     //Application quota int bytes
-    public static final int MAX_APPLICATION_QUOTA = 20;
+    private static final int MAX_APPLICATION_QUOTA = 20;
 
     public static final Set<Workspace> foreignWorkspaces = new HashSet<Workspace>();
 
@@ -178,16 +178,28 @@ public class Application {
     }
     /**
     * Returns the device storage available in the internal storage of the device (as bytes)
-    * gives no information on how the space limited by the quota values
     *
     *  @return space available in the device as bytes
     */
     public static int getDeviceStorageSpace() {
-        return  Application.MAX_APPLICATION_QUOTA;
+        return  Application.MAX_APPLICATION_QUOTA - getReservedStorage();
        // StatFs stat = new StatFs(Environment.getDataDirectory().getPath());
         //return (int) ((long)stat.getBlockSize() * (long)stat.getBlockCount());
     }
 
+    /**
+     * Calculates the total quota reserved being used in the device by all workspaces,
+     * even from other local users (as bytes).
+     *
+     * @return storage reserved by the application in bytes
+     */
+    public static int getReservedStorage() {
+        int totalStorage = 0;
+        for (Workspace ws: Application.workspaceData.getAll()) {
+            totalStorage += ws.getQuota();
+        }
+        return totalStorage;
+    }
     /**
      * Saves a modified user in the application
      * @param u user to be changed

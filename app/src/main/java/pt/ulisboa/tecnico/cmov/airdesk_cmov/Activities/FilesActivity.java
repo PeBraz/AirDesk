@@ -380,12 +380,15 @@ public class FilesActivity extends ActionBarActivity {
         dialog.show();
         final Workspace ws = Application.getOwner().getWorkspace(wsName);
 
-        final int currentQuota = ws.getQuota();
-        int deviceSpace = Application.getDeviceStorageSpace();
+        final int usedWSSpace = ws.getStorage();
+
+        int deviceSpace = Application.getDeviceStorageSpace() + ws.getQuota();
 
 
         final SeekBar quota = (SeekBar) dialog.findViewById(R.id.ws_settings_quota);
-        quota.setMax(deviceSpace - currentQuota);
+        quota.setMax(deviceSpace - usedWSSpace);
+        quota.setProgress(ws.getQuota() - usedWSSpace);
+
 
         final CheckBox isPrivate = (CheckBox) dialog.findViewById(R.id.private_checkbox);
         isPrivate.setChecked(ws.getPrivacy());
@@ -394,7 +397,7 @@ public class FilesActivity extends ActionBarActivity {
         tags.setText(ws.getTags());
 
         final TextView quotaTag = (TextView) dialog.findViewById(R.id.ws_settings_quota_tag);
-        quotaTag.setText(Integer.toString(currentQuota));
+        quotaTag.setText(Integer.toString(ws.getQuota()));
 
         Button confirm = (Button) dialogView.findViewById(R.id.ws_settings_confirm);
         Button cancel = (Button) dialogView.findViewById(R.id.ws_settings_cancel);
@@ -406,7 +409,7 @@ public class FilesActivity extends ActionBarActivity {
             public void onStopTrackingTouch(SeekBar seekBar) { }
             @Override
             public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
-                quotaTag.setText(Integer.toString(currentQuota + progress));
+                quotaTag.setText(Integer.toString(usedWSSpace + progress));
             }
         });
 
@@ -415,7 +418,7 @@ public class FilesActivity extends ActionBarActivity {
             public void onClick(View v) {
 
             ws.setPrivacy(isPrivate.isChecked());
-            ws.setQuota(quota.getProgress() + currentQuota);
+            ws.setQuota(quota.getProgress() + usedWSSpace);
             System.out.println("TAGS: "+ tags.getText().toString());
             ws.setTags(tags.getText().toString());
             ws.save();
