@@ -123,7 +123,6 @@ public class FilesActivity extends ActionBarActivity {
 
                 String title = fileTitle.getText().toString() + ".txt";
                 Workspace.createFile(title, wsName, Application.getOwner().getEmail());
-
                 dialog.dismiss();
                 showList();
 
@@ -231,7 +230,6 @@ public class FilesActivity extends ActionBarActivity {
 
         if (actualText!=null)
             text.setText(actualText);
-
 
         save.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -344,7 +342,6 @@ public class FilesActivity extends ActionBarActivity {
 
             File dir = FileUtil.getExternalFilesDirAllApiLevels(this.getPackageName() + "/" + wsName + "." + Application.getOwner().getEmail());
             File file = new File(dir, name);
-            if (file.exists()) file.delete();
 
             if (file.exists()) {
 
