@@ -2,9 +2,11 @@ package pt.ulisboa.tecnico.cmov.airdesk_cmov.Activities;
 
 
 import android.app.Dialog;
+import android.content.Context;
 import android.content.Intent;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -19,9 +21,12 @@ import android.widget.SeekBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import junit.framework.Assert;
-
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.util.Scanner;
 
 import pt.ulisboa.tecnico.cmov.airdesk_cmov.Application;
 
@@ -30,12 +35,15 @@ import pt.ulisboa.tecnico.cmov.airdesk_cmov.Exceptions.StorageOverLimitException
 import pt.ulisboa.tecnico.cmov.airdesk_cmov.Exceptions.UserAlreadyAddedException;
 import pt.ulisboa.tecnico.cmov.airdesk_cmov.Exceptions.UserIsMyselfException;
 import pt.ulisboa.tecnico.cmov.airdesk_cmov.Exceptions.UserNotFoundException;
+import pt.ulisboa.tecnico.cmov.airdesk_cmov.Files.Constants;
 import pt.ulisboa.tecnico.cmov.airdesk_cmov.Files.FileUtil;
 import pt.ulisboa.tecnico.cmov.airdesk_cmov.R;
 import pt.ulisboa.tecnico.cmov.airdesk_cmov.Workspace;
 
 
 public class FilesActivity extends ActionBarActivity {
+
+    private static final String LINE_SEP = System.getProperty("line.separator");
 
     private String wsName;
     private boolean isMyWs;
@@ -124,6 +132,7 @@ public class FilesActivity extends ActionBarActivity {
                 String title = fileTitle.getText().toString() + ".txt";
                 Workspace.createFile(title, wsName, Application.getOwner().getEmail());
                 dialog.dismiss();
+                createFileStorage(title);
                 showList();
 
             }
@@ -192,7 +201,7 @@ public class FilesActivity extends ActionBarActivity {
         dialog.show();
 
         TextView text = (TextView) dialog.findViewById(R.id.textView16);
-        String fileText = read(filename);
+        String fileText = readFileStorage(filename);
 
         if (fileText == null)
             Toast.makeText(this, "File is still empty.", Toast.LENGTH_SHORT).show();
@@ -224,7 +233,7 @@ public class FilesActivity extends ActionBarActivity {
         Button save = (Button) dialog.findViewById(R.id.button12);
         final EditText text = (EditText) dialog.findViewById(R.id.editText7);
 
-        final String actualText = read(filename);
+        final String actualText = readFileStorage(filename);
         //checks space being used, so that id doesn't get counted again
         final int oldSize = (actualText!=null)? actualText.getBytes().length: 0;
 
@@ -239,7 +248,7 @@ public class FilesActivity extends ActionBarActivity {
 
                 try {
                     Application.getOwner().getWorkspace(wsName).changeStorageUsed(newSize - oldSize);
-                    boolean success = write(filename, newText);
+                    boolean success = writeFileStorage(filename, newText);
                     if (!success)
                         Application.getOwner().getWorkspace(wsName).changeStorageUsed(-(newSize-oldSize));
                     dialog.dismiss();
@@ -302,7 +311,7 @@ public class FilesActivity extends ActionBarActivity {
         });
     }
 
-    private boolean write(String title, String text) {
+/*    private boolean writeFileStorage(String title, String text) {
 
         if (FileUtil.isExternalStorageWritable()) {
             File dir = FileUtil.getExternalFilesDirAllApiLevels(this.getPackageName() + "/" + wsName + "." + Application.getOwner().getEmail());
@@ -314,9 +323,76 @@ public class FilesActivity extends ActionBarActivity {
             Toast.makeText(this, "External storage not writable", Toast.LENGTH_SHORT).show();
             return false;
         }
+    }*/
+
+    private void createFileStorage(String title){
+        FileOutputStream fos = null;
+        try {
+            fos = openFileOutput(wsName + "." + Application.getOwner().getEmail() + title, Context.MODE_PRIVATE);
+            Toast.makeText(this, "File created.", Toast.LENGTH_SHORT).show();
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        }finally {
+            try {
+                fos.close();
+            } catch (IOException e) {
+                Log.d("FileExplorer", "Close error.");
+            }
+        }
     }
 
-    private String read(String fileName) {
+    private boolean writeFileStorage(String title, String text) {
+        FileOutputStream fos = null;
+        try {
+            fos = openFileOutput(wsName + "." + Application.getOwner().getEmail() + title, Context.MODE_PRIVATE);
+            fos.write(text.getBytes());
+            Toast.makeText(this, "File written", Toast.LENGTH_SHORT).show();
+            return true;
+        } catch (FileNotFoundException e) {
+            Log.e(Constants.LOG_TAG, "File not found", e);
+        } catch (IOException e) {
+            Log.e(Constants.LOG_TAG, "IO problem", e);
+        } finally {
+            try {
+                fos.close();
+            } catch (IOException e) {
+                Log.d("FileExplorer", "Close error.");
+            }
+        }
+        return false;
+    }
+
+    private String readFileStorage(String fileName) {
+        FileInputStream fis = null;
+        Scanner scanner = null;
+        StringBuilder sb = new StringBuilder();
+        try {
+            fis = openFileInput(wsName + "." + Application.getOwner().getEmail() + fileName);
+            scanner = new Scanner(fis);
+            while (scanner.hasNextLine()) {
+                sb.append(scanner.nextLine() + LINE_SEP);
+            }
+
+        } catch (FileNotFoundException e) {
+            Log.e(Constants.LOG_TAG, "File not found", e);
+        } finally {
+            if (fis != null) {
+                try {
+                    fis.close();
+                } catch (IOException e) {
+                    Log.d("FileExplorer", "Close error.");
+                }
+            }
+            if (scanner != null) {
+                scanner.close();
+            }
+        }
+
+        return sb.toString();
+    }
+
+
+/*    private String readFileStorage(String fileName) {
 
         if (FileUtil.isExternalStorageReadable()) {
             File dir = FileUtil.getExternalFilesDirAllApiLevels(this.getPackageName() + "/" + wsName + "." + Application.getOwner().getEmail());
@@ -328,15 +404,33 @@ public class FilesActivity extends ActionBarActivity {
         else Toast.makeText(this, "External storage not readable", Toast.LENGTH_SHORT).show();
 
         return null;
+    }*/
+
+    private int deleteFileStorage(String fileName){
+
+        File dir = getFilesDir();
+        File file = new File(dir, fileName);
+
+        if(file.exists()){
+
+            String filetext = readFileStorage(fileName);
+
+            if(file.delete()){
+                return filetext.getBytes().length;
+            }
+            else Toast.makeText(this, "Unable to delete file.", Toast.LENGTH_SHORT).show();
+        }
+        else Toast.makeText(this, "File does not exist.", Toast.LENGTH_SHORT).show();
+
+        return 0;
     }
 
     /**
      *  Deletes a file from the application storage.
      *
-     * @param name of the file to be deleted
      * @return number of bytes released
      */
-    private int deleteFileStorage(String name){
+/*    private int deleteFileStorage(String name){
 
         if (FileUtil.isExternalStorageReadable()) {
 
@@ -345,7 +439,7 @@ public class FilesActivity extends ActionBarActivity {
 
             if (file.exists()) {
 
-                String filetext = read(name);
+                String filetext = readFileStorage(name);
                 if (file.delete()) {
                     return filetext.getBytes().length;
                 }
@@ -358,7 +452,7 @@ public class FilesActivity extends ActionBarActivity {
             }
         }
         return 0;
-    }
+    }*/
 
     private void showList(){
 
