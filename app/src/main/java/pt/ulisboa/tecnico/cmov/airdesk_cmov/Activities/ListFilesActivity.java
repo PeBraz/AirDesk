@@ -260,8 +260,8 @@ public class ListFilesActivity extends ActionBarActivity {
     private void write(String title, String text) {
 
         if (FileUtil.isExternalStorageWritable()) {
-            File dir = FileUtil.getExternalFilesDirAllApiLevels(this.getPackageName());
-            File file = new File(dir, title + "|" + Application.getOwner().getEmail());
+            File dir = FileUtil.getExternalFilesDirAllApiLevels(this.getPackageName() + "/" + wsName + "." + Application.getOwner().getEmail());
+            File file = new File(dir, title);
             FileUtil.writeStringAsFile(text, file);
             Toast.makeText(this, "File written", Toast.LENGTH_SHORT).show();
         } else {
@@ -272,8 +272,8 @@ public class ListFilesActivity extends ActionBarActivity {
     private String read(String fileName) {
 
         if (FileUtil.isExternalStorageReadable()) {
-            File dir = FileUtil.getExternalFilesDirAllApiLevels(this.getPackageName());
-            File file = new File(dir, fileName + "|" + Application.getOwner().getEmail());
+            File dir = FileUtil.getExternalFilesDirAllApiLevels(this.getPackageName() + "/" + wsName + "." + Application.getOwner().getEmail());
+            File file = new File(dir, fileName);
 
             if (file.exists() && file.canRead())
                 return FileUtil.readFileAsString(file);
@@ -286,9 +286,8 @@ public class ListFilesActivity extends ActionBarActivity {
     private void deleteFileStorage(String name){
 
         if (FileUtil.isExternalStorageReadable()) {
-            File dir = FileUtil.getExternalFilesDirAllApiLevels(this.getPackageName());
-            File file = new File(dir, name + "|" + Application.getOwner().getEmail());
-
+            File dir = FileUtil.getExternalFilesDirAllApiLevels(this.getPackageName() + "/" + wsName + "." + Application.getOwner().getEmail());
+            File file = new File(dir, name);
             if (file.exists()) file.delete();
 
             else Toast.makeText(this, "File does not exist.", Toast.LENGTH_SHORT).show();
@@ -364,4 +363,22 @@ public class ListFilesActivity extends ActionBarActivity {
             }
         });
     }
+
+    public long workspaceSize(){
+
+        long size = 0;
+
+        String path = "/sdcard/Android/data/" + this.getPackageName() + "/" + wsName + "." + Application.getOwner().getEmail() + "/files/";
+        System.out.println(path);
+        File folder = new File(path);
+        File[] listOfFiles = folder.listFiles();
+
+        for(File f : listOfFiles)
+            size = size + f.length();
+
+        System.out.println(size + " bytes");
+
+        return size;
+    }
+
 }
