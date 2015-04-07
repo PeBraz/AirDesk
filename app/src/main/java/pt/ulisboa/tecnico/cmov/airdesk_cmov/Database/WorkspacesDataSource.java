@@ -8,6 +8,7 @@ import android.database.sqlite.SQLiteDatabase;
 import java.util.ArrayList;
 import java.util.List;
 
+import pt.ulisboa.tecnico.cmov.airdesk_cmov.Application;
 import pt.ulisboa.tecnico.cmov.airdesk_cmov.Exceptions.NoDatabaseException;
 import pt.ulisboa.tecnico.cmov.airdesk_cmov.User;
 import pt.ulisboa.tecnico.cmov.airdesk_cmov.Workspace;
@@ -47,27 +48,28 @@ public class WorkspacesDataSource extends DataSource<Workspace>{
     }
     @Override
     public void save(Workspace ws) {
-
+        String user = ws.populateUser().getOwner().getEmail();
         ContentValues values = new ContentValues();
         values.put(MySQLiteHelper.WS_NAME, ws.getName());
         values.put(MySQLiteHelper.WS_QUOTA, ws.getQuota());
         values.put(MySQLiteHelper.WS_PRIVACY, ws.getPrivacy() ? 1 : 0);
         values.put(MySQLiteHelper.WS_TAGS, ws.getTags());
         values.put(MySQLiteHelper.WS_ACCESS, ws.getAccessListSerialized());
-        values.put(MySQLiteHelper.WS_USER, ws.getOwner().getEmail());
+        values.put(MySQLiteHelper.WS_USER, user);
         values.put(MySQLiteHelper.WS_STORAGE, ws.getStorage());
         database.update(MySQLiteHelper.TABLE_WORKSPACES, values,
-                String.format(" %1$s=? ", MySQLiteHelper.WS_NAME), new String[]{ws.getName()});
+                String.format(" %1$s=? AND %2$s=? ", MySQLiteHelper.WS_NAME, MySQLiteHelper.WS_USER),
+                        new String[]{ws.getName(), user});
     }
 
 
    public Workspace get(final String wsname, final String userEmail) {
         final Workspace ws;
-        final String whereQuery =   MySQLiteHelper.WS_NAME+"=? AND "+
+        final String whereQuery =  " " + MySQLiteHelper.WS_NAME+"=? AND "+
                 MySQLiteHelper.WS_USER+"=? ";
         Cursor cursor = database.query(MySQLiteHelper.TABLE_WORKSPACES, null, whereQuery,
                 new String[] {wsname, userEmail}, null, null, null);
-        cursor.moveToFirst();
+       cursor.moveToFirst();
         if(cursor.isAfterLast())
             return null;
         ws = cursorToWorkspace(cursor);

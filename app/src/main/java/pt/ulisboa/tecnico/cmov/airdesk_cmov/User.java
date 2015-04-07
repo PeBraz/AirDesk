@@ -13,6 +13,8 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.SortedSet;
+import java.util.TreeSet;
 
 import pt.ulisboa.tecnico.cmov.airdesk_cmov.Database.WorkspacesDataSource;
 import pt.ulisboa.tecnico.cmov.airdesk_cmov.Exceptions.InvalidQuotaException;
@@ -23,7 +25,7 @@ public class User {
     private final WorkspacesDataSource workspacedb;
     private String username;
     private String email;
-    private Set<String> foreignWs;
+    private Set<WorkspaceDto> foreignWs;
 
 
     public User(final String username, final String email) {
@@ -63,21 +65,22 @@ public class User {
         this.workspacedb.save(ws);
     }
 
-    public final Set<String> getForeign() {
+    public final Set<WorkspaceDto> getForeign() {
         return this.foreignWs;
     }
 
-    protected final void setForeign(Set<String> foreign) {
+    protected final void setForeign(Set<WorkspaceDto> foreign) {
         this.foreignWs = foreign;
     }
 
     public final void addForeign(Workspace ws) {
-        this.foreignWs.add(ws.getName());
+        WorkspaceDto dto = new WorkspaceDto(ws.populateUser().getOwner().getEmail(), ws.getName());
+        this.foreignWs.add(dto);
         this.save();
     }
 
     public final void remForeign(Workspace ws) {
-        this.foreignWs.remove(ws.getName());
+        this.foreignWs.remove(new WorkspaceDto(ws.populateUser().getOwner().getEmail(), ws.getName()));
         this.save();
     }
 
@@ -91,7 +94,7 @@ public class User {
         ObjectInput in = null;
         try {
             in = new ObjectInputStream(bais);
-            this.foreignWs = (Set<String>) in.readObject();
+            this.foreignWs = (Set<WorkspaceDto>) in.readObject();
         }catch (StreamCorruptedException e){
             this.foreignWs = new HashSet<>();
         }catch(IOException | ClassNotFoundException  e) {

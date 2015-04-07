@@ -23,6 +23,7 @@ import java.util.Set;
 import pt.ulisboa.tecnico.cmov.airdesk_cmov.Application;
 import pt.ulisboa.tecnico.cmov.airdesk_cmov.R;
 import pt.ulisboa.tecnico.cmov.airdesk_cmov.Workspace;
+import pt.ulisboa.tecnico.cmov.airdesk_cmov.WorkspaceDto;
 
 public class ForeignWorkspacesActivity extends ActionBarActivity {
 
@@ -67,15 +68,16 @@ public class ForeignWorkspacesActivity extends ActionBarActivity {
 
     private void listWorkspaces() {
 
-        Set<Workspace> foreignWorkspaces = Application.getOwner().getForeignWorkspaces();
-        List<String> foreignws = new ArrayList<>();
+        List<WorkspaceDto> foreignWorkspaces =
+                new ArrayList<>(Application.getOwner().getForeignWorkspacesAsDto());
+  //      List<String> foreignws = new ArrayList<>();
 
         final ListView listview = (ListView) findViewById(R.id.foreign_list);
 
-        for(Workspace w : foreignWorkspaces) foreignws.add(w.getName());
+//        for(WorkspaceDto w : foreignWorkspaces) foreignws.add(w.getWSName() + " - " + w.getUserEmail());
 
-        final ArrayAdapter<String> adapter = new ArrayAdapter<>(this,
-                                android.R.layout.simple_list_item_1, android.R.id.text1, foreignws);
+        final ArrayAdapter<WorkspaceDto> adapter = new ArrayAdapter(this,
+                                android.R.layout.simple_list_item_1, android.R.id.text1, foreignWorkspaces);
 
         listview.setAdapter(adapter);
 
@@ -84,9 +86,10 @@ public class ForeignWorkspacesActivity extends ActionBarActivity {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
 
-                String itemValue = (String) listview.getItemAtPosition(position);
+                WorkspaceDto itemValue = (WorkspaceDto) listview.getItemAtPosition(position);
                 Intent intent = new Intent(ForeignWorkspacesActivity.this, FilesActivity.class);
-                intent.putExtra("WSNAME", itemValue);
+                intent.putExtra("WSNAME", itemValue.getWSName());
+                intent.putExtra("WSUSEREMAIL", itemValue.getUserEmail());
                 startActivity(intent);
 
             }

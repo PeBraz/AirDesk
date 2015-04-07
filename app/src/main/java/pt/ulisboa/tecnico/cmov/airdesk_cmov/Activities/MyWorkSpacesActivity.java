@@ -62,6 +62,7 @@ public class MyWorkSpacesActivity extends ActionBarActivity {
 
                 String itemValue = (String) listview.getItemAtPosition(position);
                 Intent intent = new Intent(MyWorkSpacesActivity.this, FilesActivity.class);
+                intent.putExtra("WSUSEREMAIL", Application.getOwner().getEmail());
                 intent.putExtra("WSNAME", itemValue);
                 startActivity(intent);
 

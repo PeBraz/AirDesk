@@ -2,11 +2,9 @@ package pt.ulisboa.tecnico.cmov.airdesk_cmov.Activities;
 
 
 import android.app.Dialog;
-import android.content.Context;
 import android.content.Intent;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -22,11 +20,6 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.util.Scanner;
 
 import pt.ulisboa.tecnico.cmov.airdesk_cmov.Application;
 
@@ -35,17 +28,18 @@ import pt.ulisboa.tecnico.cmov.airdesk_cmov.Exceptions.StorageOverLimitException
 import pt.ulisboa.tecnico.cmov.airdesk_cmov.Exceptions.UserAlreadyAddedException;
 import pt.ulisboa.tecnico.cmov.airdesk_cmov.Exceptions.UserIsMyselfException;
 import pt.ulisboa.tecnico.cmov.airdesk_cmov.Exceptions.UserNotFoundException;
-import pt.ulisboa.tecnico.cmov.airdesk_cmov.Files.Constants;
 import pt.ulisboa.tecnico.cmov.airdesk_cmov.Files.FileUtil;
 import pt.ulisboa.tecnico.cmov.airdesk_cmov.R;
 import pt.ulisboa.tecnico.cmov.airdesk_cmov.Workspace;
+import pt.ulisboa.tecnico.cmov.airdesk_cmov.WorkspaceDto;
 
 
 public class FilesActivity extends ActionBarActivity {
 
-    private static final String LINE_SEP = System.getProperty("line.separator");
 
-    private String wsName;
+    private String wsName = null;
+    private String wsEmail = null;
+    private Workspace ws = null;
     private boolean isMyWs;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -53,11 +47,15 @@ public class FilesActivity extends ActionBarActivity {
         setContentView(R.layout.activity_files);
 
         Bundle info = getIntent().getExtras();
-        if (info != null) wsName = info.getString("WSNAME");
+        if (info != null){
+            wsName = info.getString("WSNAME");
+            wsEmail = info.getString("WSUSEREMAIL");
+            isMyWs = Application.getOwner().getEmail().equals(wsEmail);
 
+            ws = (isMyWs)? Application.getOwner().getWorkspace(wsName)
+                        : Application.getUser(wsEmail).getWorkspace(wsName);
+        }
         setTitle("Workspace - " + wsName);
-        isMyWs = Application.getOwner().getWorkspace(wsName) != null;
-
 
         final ListView listview = (ListView) findViewById(R.id.listView2);
         showList();
@@ -246,10 +244,11 @@ public class FilesActivity extends ActionBarActivity {
                 int newSize = newText.getBytes().length;
 
                 try {
-                    Application.getOwner().getWorkspace(wsName).changeStorageUsed(newSize - oldSize);
+
+                    ws.changeStorageUsed(newSize - oldSize);
                     boolean success = writeFileStorage(filename, newText);
                     if (!success)
-                        Application.getOwner().getWorkspace(wsName).changeStorageUsed(-(newSize-oldSize));
+                       ws.changeStorageUsed(-(newSize - oldSize));
                     dialog.dismiss();
                 }catch(StorageOverLimitException e) {
                      // not possible in exception
@@ -300,7 +299,7 @@ public class FilesActivity extends ActionBarActivity {
                 Workspace.deleteFile(filename, wsName, Application.getOwner().getEmail());
                 int weightLost = deleteFileStorage(filename);
                 try {
-                    Application.getOwner().getWorkspace(wsName).changeStorageUsed(-weightLost);
+                    ws.changeStorageUsed(-weightLost);
                 }catch(StorageOverLimitException e){
                     System.out.println(e.getMessage());
                 }
@@ -313,7 +312,7 @@ public class FilesActivity extends ActionBarActivity {
     private boolean writeFileStorage(String title, String text) {
 
         if (FileUtil.isExternalStorageWritable()) {
-            File dir = FileUtil.getExternalFilesDirAllApiLevels(this.getPackageName() + "/" + wsName + "." + Application.getOwner().getEmail());
+            File dir = FileUtil.getExternalFilesDirAllApiLevels(this.getFilesPath());
             File file = new File(dir, title);
             FileUtil.writeStringAsFile(text, file);
             Toast.makeText(this, "File written", Toast.LENGTH_SHORT).show();
@@ -327,7 +326,7 @@ public class FilesActivity extends ActionBarActivity {
     private String readFileStorage(String fileName) {
 
         if (FileUtil.isExternalStorageReadable()) {
-            File dir = FileUtil.getExternalFilesDirAllApiLevels(this.getPackageName() + "/" + wsName + "." + Application.getOwner().getEmail());
+            File dir = FileUtil.getExternalFilesDirAllApiLevels(this.getFilesPath());
             File file = new File(dir, fileName);
 
             if (file.exists() && file.canRead())
@@ -347,7 +346,7 @@ public class FilesActivity extends ActionBarActivity {
 
         if (FileUtil.isExternalStorageReadable()) {
 
-            File dir = FileUtil.getExternalFilesDirAllApiLevels(this.getPackageName() + "/" + wsName + "." + Application.getOwner().getEmail());
+            File dir = FileUtil.getExternalFilesDirAllApiLevels(this.getFilesPath());
             File file = new File(dir, name);
 
             if (file.exists()) {
@@ -370,7 +369,7 @@ public class FilesActivity extends ActionBarActivity {
     private void showList(){
 
         final ListView listview = (ListView) findViewById(R.id.listView2);
-        final ArrayAdapter<String> adapter = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, android.R.id.text1, Workspace.getAllFiles(wsName));
+        final ArrayAdapter<String> adapter = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, android.R.id.text1,ws.getFiles());
         listview.setAdapter(adapter);
     }
 
@@ -384,7 +383,7 @@ public class FilesActivity extends ActionBarActivity {
         dialog.setContentView(dialogView);
 
         dialog.show();
-        final Workspace ws = Application.getOwner().getWorkspace(wsName);
+        final Workspace ws = this.ws;
 
         final int usedWSSpace = ws.getStorage();
 
@@ -454,7 +453,7 @@ public class FilesActivity extends ActionBarActivity {
         dialog.setContentView(dialogView);
 
         dialog.show();
-        final Workspace ws = Application.getOwner().getWorkspace(wsName);
+        final Workspace ws = this.ws;
 
         final TextView error = (TextView)dialog.findViewById(R.id.invite_error);
 
@@ -504,7 +503,7 @@ public class FilesActivity extends ActionBarActivity {
         dialog.setContentView(dialogView);
 
         dialog.show();
-        final Workspace ws = Application.getOwner().getWorkspace(wsName);
+        final Workspace ws = this.ws;
 
 
         Button confirm = (Button) dialog.findViewById(R.id.dialog_ws_confirm);
@@ -531,5 +530,8 @@ public class FilesActivity extends ActionBarActivity {
             }
         });
 
+    }
+    public String getFilesPath() {
+        return this.getPackageName() + "/" + wsName + "." + wsEmail;
     }
 }

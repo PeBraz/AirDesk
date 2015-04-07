@@ -83,7 +83,6 @@ public class Application {
     private static boolean checkUser(User u){
 
         User user = userData.get(u.getEmail());
-
         return user != null;
     }
 

@@ -11,7 +11,10 @@ import java.io.ObjectOutput;
 import java.io.ObjectOutputStream;
 import java.io.StreamCorruptedException;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
+
 import pt.ulisboa.tecnico.cmov.airdesk_cmov.Database.FilesDataSource;
 import pt.ulisboa.tecnico.cmov.airdesk_cmov.Exceptions.NotOwnerException;
 import pt.ulisboa.tecnico.cmov.airdesk_cmov.Exceptions.StorageOverLimitException;
@@ -137,10 +140,6 @@ public class Workspace {
             throws StorageOverLimitException {
         int newStorageSpace = this.usedStorage + offset;
 
-        System.out.println("STORAGE:");
-        System.out.println("storage: "+ this.usedStorage);
-        System.out.println("offset: "+ offset);
-
         if (newStorageSpace > quota || newStorageSpace < 0)
             throw new StorageOverLimitException(0, quota, newStorageSpace);
 
@@ -239,12 +238,14 @@ public class Workspace {
     /**
      * Checks if this workspace is the same as another
      *
-     * @param w workspace to be compared with
+     * @param o workspace to be compared with
      * @return if workspaces are the same or not
      */
-    public boolean equals(Workspace w) {
-        return this.getName().equals(w.getName())
-               && this.getOwner().getEmail().equals(w.getOwner().getEmail());
+    @Override
+    public boolean equals(Object o) {
+        return this.getName().equals(((Workspace) o).getName())
+               && this.getOwner().getEmail().equals(
+                ((Workspace) o).populateUser().getOwner().getEmail());
     }
 
     /**
@@ -305,4 +306,10 @@ public class Workspace {
         user.save();
     }
 
+    public final List<String> getFiles() {
+        List<String> res = new ArrayList<>();
+        for (File f : this.filedb.getAll())
+            res.add(f.getName());
+        return res;
+    }
 }

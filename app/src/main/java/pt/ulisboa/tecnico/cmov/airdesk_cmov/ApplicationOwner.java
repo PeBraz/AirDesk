@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.TreeSet;
 
 import pt.ulisboa.tecnico.cmov.airdesk_cmov.Exceptions.InvalidQuotaException;
 import pt.ulisboa.tecnico.cmov.airdesk_cmov.Exceptions.WorkspaceAlreadyExistsException;
@@ -67,16 +68,19 @@ public final class ApplicationOwner extends User {
      * @return set of workspaces that were found
      */
     public final Set<Workspace> getForeignWorkspaces() {
-        Set<Workspace> foreign = new HashSet<>();
+        Set<Workspace> foreign = new TreeSet<>();
         for (Workspace ws : Application.getAllNetworkWS()) {
-            for (String name : super.getForeign()) {
-                if (ws.getName().equals(name))
+            for (WorkspaceDto dto : super.getForeign()) {
+                if (ws.getName().equals(dto.getWSName())
+                    && ws.populateUser().getOwner().getEmail().equals(dto.getUserEmail()))
                     foreign.add(ws);
             }
         }
         return foreign;
     }
-
+    public final Set<WorkspaceDto> getForeignWorkspacesAsDto() {
+       return super.getForeign();
+    }
     /**
      *  Removes the workspace from this user
      *  If the workspace belongs to this user, users in the access list need to be informed.
