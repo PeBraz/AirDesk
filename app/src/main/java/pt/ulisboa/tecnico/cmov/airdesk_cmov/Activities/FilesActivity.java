@@ -359,9 +359,6 @@ public class FilesActivity extends ActionBarActivity {
                     Toast.makeText(this, "Unable to delete file.", Toast.LENGTH_SHORT).show();
                 }
             }
-            else {
-                Toast.makeText(this, "File does not exist.", Toast.LENGTH_SHORT).show();
-            }
         }
         return 0;
     }

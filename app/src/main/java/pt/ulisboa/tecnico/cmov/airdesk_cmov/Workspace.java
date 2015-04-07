@@ -309,7 +309,9 @@ public class Workspace {
     public final List<String> getFiles() {
         List<String> res = new ArrayList<>();
         for (File f : this.filedb.getAll())
-            res.add(f.getName());
+            if (f.getWorkspace().equals(this.getName())
+                    && f.getUser().equals(this.populateUser().getOwner().getEmail()))
+                res.add(f.getName());
         return res;
     }
 }
