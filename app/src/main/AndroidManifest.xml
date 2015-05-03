@@ -2,6 +2,8 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="pt.ulisboa.tecnico.cmov.airdesk_cmov" >
 
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+
     <application
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
@@ -54,8 +56,10 @@
             android:name=".Activities.FilesActivity"
             android:label="@string/title_activity_list_files" >
         </activity>
+        <activity
+            android:name=".Activities.NetworkActivity"
+            android:label="@string/title_activity_network" >
+        </activity>
     </application>
-
-    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
 
 </manifest>

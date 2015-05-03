@@ -39,4 +39,5 @@
     <string name="title_activity_main_activity2">MainActivity2Activity</string>
 
     <string name="last_warning">Are you sure?</string>
+    <string name="title_activity_network">NetworkActivity</string>
 </resources>
