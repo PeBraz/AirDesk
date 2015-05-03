@@ -1,18 +1,31 @@
 package pt.ulisboa.tecnico.cmov.airdesk_cmov.Activities;
 
+import android.content.IntentFilter;
+import android.net.wifi.p2p.WifiP2pManager;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
 
+import pt.ulisboa.tecnico.cmov.airdesk_cmov.NetworkedVersion.WiFiDirectBroadcastReceiver;
 import pt.ulisboa.tecnico.cmov.airdesk_cmov.R;
 
 public class NetworkActivity extends ActionBarActivity {
+
+    private WiFiDirectBroadcastReceiver receiver;
+    private IntentFilter intentFilter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_network);
+
+        intentFilter = new IntentFilter();
+        //type of intents to be received
+        intentFilter.addAction(WifiP2pManager.WIFI_P2P_STATE_CHANGED_ACTION);
+        intentFilter.addAction(WifiP2pManager.WIFI_P2P_PEERS_CHANGED_ACTION);
+        intentFilter.addAction(WifiP2pManager.WIFI_P2P_CONNECTION_CHANGED_ACTION);
+        intentFilter.addAction(WifiP2pManager.WIFI_P2P_THIS_DEVICE_CHANGED_ACTION);
     }
 
 
