@@ -17,14 +17,12 @@ import pt.ulisboa.tecnico.cmov.airdesk_cmov.NetworkedVersion.WiFiDirectBroadcast
 import pt.ulisboa.tecnico.cmov.airdesk_cmov.R;
 import pt.ulisboa.tecnico.cmov.airdesk_cmov.Sessions.SessionManager;
 
-
 public class MainActivity extends ActionBarActivity {
 
-    IntentFilter mIntentFilter;
-    WifiP2pManager mManager;
-
-    Channel mChannel;
-    BroadcastReceiver mReceiver;
+    private IntentFilter mIntentFilter;
+    private WifiP2pManager mManager;
+    private Channel mChannel;
+    private BroadcastReceiver mReceiver;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -73,6 +71,18 @@ public class MainActivity extends ActionBarActivity {
                     startActivity(intent);
             }
             });
+
+        mManager.discoverPeers(mChannel, new WifiP2pManager.ActionListener() {
+            @Override
+            public void onSuccess() {
+                //TODO
+            }
+
+            @Override
+            public void onFailure(int reasonCode) {
+                //TODO
+            }
+        });
     }
 
     /* register the broadcast receiver with the intent values to be matched */
@@ -87,6 +97,5 @@ public class MainActivity extends ActionBarActivity {
         super.onPause();
         unregisterReceiver(mReceiver);
     }
-
 
 }
