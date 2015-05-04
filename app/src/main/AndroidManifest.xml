@@ -1,9 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="pt.ulisboa.tecnico.cmov.airdesk_cmov" >
-
+    <uses-sdk android:minSdkVersion="14" />
+    <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
+    <uses-permission android:name="android.permission.CHANGE_WIFI_STATE" />
+    <uses-permission android:name="android.permission.CHANGE_NETWORK_STATE" />
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
-
     <application
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
@@ -19,10 +23,6 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".Activities.WorkSpacesActivity"
-            android:label="@string/title_activity_work_spaces" >
-        </activity>
-        <activity
             android:name=".Activities.LoginActivity"
             android:label="@string/title_activity_login" >
         </activity>
@@ -34,12 +34,6 @@
             android:name=".Activities.UserSettingsActivity"
             android:label="@string/title_activity_user_settings" >
         </activity>
-        <!--
-        <activity
-            android:name=".Activities.NewWorkspaceActivity"
-            android:label="@string/title_activity_new_workspace" >
-        </activity>
-        -->
         <activity
             android:name=".Activities.MyWorkSpacesActivity"
             android:label="@string/title_activity_my_work_spaces" >
@@ -47,10 +41,6 @@
         <activity
             android:name=".Activities.ForeignWorkspacesActivity"
             android:label="@string/title_activity_foreign_workspaces" >
-        </activity>
-        <activity
-            android:name=".Activities.WorkspaceSettings"
-            android:label="@string/title_activity_workspace_settings" >
         </activity>
         <activity
             android:name=".Activities.FilesActivity"
