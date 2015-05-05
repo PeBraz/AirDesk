@@ -7,7 +7,7 @@ import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
 
-import pt.ulisboa.tecnico.cmov.airdesk_cmov.NetworkedVersion.WiFiDirectBroadcastReceiver;
+import pt.ulisboa.tecnico.cmov.airdesk_cmov.Network.WiFiDirectBroadcastReceiver;
 import pt.ulisboa.tecnico.cmov.airdesk_cmov.R;
 
 public class NetworkActivity extends ActionBarActivity {

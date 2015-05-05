@@ -4,6 +4,9 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.net.wifi.WpsInfo;
+import android.net.wifi.p2p.WifiP2pConfig;
+import android.net.wifi.p2p.WifiP2pDevice;
 import android.net.wifi.p2p.WifiP2pManager;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
@@ -13,11 +16,11 @@ import android.net.wifi.p2p.WifiP2pManager.Channel;
 import pt.ulisboa.tecnico.cmov.airdesk_cmov.Application;
 import pt.ulisboa.tecnico.cmov.airdesk_cmov.Exceptions.NotRegisteredException;
 import pt.ulisboa.tecnico.cmov.airdesk_cmov.Exceptions.WrongPasswordException;
-import pt.ulisboa.tecnico.cmov.airdesk_cmov.NetworkedVersion.WiFiDirectBroadcastReceiver;
+import pt.ulisboa.tecnico.cmov.airdesk_cmov.Network.WiFiDirectBroadcastReceiver;
 import pt.ulisboa.tecnico.cmov.airdesk_cmov.R;
 import pt.ulisboa.tecnico.cmov.airdesk_cmov.Sessions.SessionManager;
 
-public class MainActivity extends ActionBarActivity {
+public class MainActivity extends ActionBarActivity  {
 
     private IntentFilter mIntentFilter;
     private WifiP2pManager mManager;
@@ -72,17 +75,7 @@ public class MainActivity extends ActionBarActivity {
             }
             });
 
-        mManager.discoverPeers(mChannel, new WifiP2pManager.ActionListener() {
-            @Override
-            public void onSuccess() {
-                //TODO
-            }
-
-            @Override
-            public void onFailure(int reasonCode) {
-                //TODO
-            }
-        });
+       this.discoverPeers();
     }
 
     /* register the broadcast receiver with the intent values to be matched */
@@ -98,4 +91,18 @@ public class MainActivity extends ActionBarActivity {
         unregisterReceiver(mReceiver);
     }
 
+    /**
+     * Detect peers that are in range in the network
+     */
+    void discoverPeers(){
+        this.mManager.discoverPeers(mChannel, new WifiP2pManager.ActionListener() {
+            @Override
+            public void onSuccess() {
+            }
+
+            @Override
+            public void onFailure(int reasonCode) {
+            }
+        });
+    }
 }
