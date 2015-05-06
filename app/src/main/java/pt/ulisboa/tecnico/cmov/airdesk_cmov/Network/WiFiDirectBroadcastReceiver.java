@@ -22,6 +22,7 @@ import java.util.List;
 import pt.ulisboa.tecnico.cmov.airdesk_cmov.Activities.MainActivity;
 import pt.ulisboa.tecnico.cmov.airdesk_cmov.File;
 import pt.ulisboa.tecnico.cmov.airdesk_cmov.Network.messages.Message;
+import pt.ulisboa.tecnico.cmov.airdesk_cmov.Network.messages.PingMessage;
 import pt.ulisboa.tecnico.cmov.airdesk_cmov.User;
 
 public class WiFiDirectBroadcastReceiver extends BroadcastReceiver {
@@ -30,7 +31,7 @@ public class WiFiDirectBroadcastReceiver extends BroadcastReceiver {
     private Channel channel;
     private MainActivity activity;
     private List<WifiP2pDevice> peers = new ArrayList();
-    private List<Socket> conns = new ArrayList<>();
+    private final List<Socket> conns = new ArrayList<>();
     private final int DEFAULT_PORT = 9876;
     public WiFiDirectBroadcastReceiver(WifiP2pManager manager, Channel channel, MainActivity mActivity){
 
@@ -109,12 +110,15 @@ public class WiFiDirectBroadcastReceiver extends BroadcastReceiver {
         WifiP2pConfig config = new WifiP2pConfig();
         config.deviceAddress = dev.deviceAddress;
 
-
         manager.connect(channel, config, new WifiP2pManager.ActionListener(){
             @Override
-            public void onSuccess() { }
+            public void onSuccess() {
+
+            }
             @Override
-            public void onFailure(int errorCode) { }
+            public void onFailure(int errorCode) {
+
+            }
         });
     }
     private WifiP2pManager.ConnectionInfoListener getConnectionInfoListener(){
@@ -127,9 +131,10 @@ public class WiFiDirectBroadcastReceiver extends BroadcastReceiver {
                 serverThread(DEFAULT_PORT).start();
 
                 if (info.groupFormed && info.isGroupOwner) {
+                    //TODO
 
                 } else if (info.groupFormed) {
-
+                    //TODO
                 }
             }
         };
@@ -159,14 +164,12 @@ public class WiFiDirectBroadcastReceiver extends BroadcastReceiver {
                     System.out.println(e.getMessage());
                     System.exit(-1);
                 }
-
-
             }
         };
 
     }
 
-    public void connect(String ip, int port) {
+    public void join(String ip, int port) {
         try {
             Socket sock = new Socket(ip, port);
             synchronized (this) {
@@ -186,7 +189,7 @@ public class WiFiDirectBroadcastReceiver extends BroadcastReceiver {
                 ObjectInputStream ois;
                 try {
                     while (true) {
-                        ois = new ObjectInputStream(sock.getInputStream());
+                        ois = new ObjectInputStream(sock.getInputStream()); //recebe mensagens
                         Message msg = (Message) ois.readObject();
                         handleMsg(msg, sock);
                     }
@@ -211,8 +214,20 @@ public class WiFiDirectBroadcastReceiver extends BroadcastReceiver {
     public List<User> netUsers = new ArrayList<>();
     public List<File> netFiles = new ArrayList<>();
 
-    public void handleMsg(Message msg, Socket sock) {
-        switch(msg.getMessageType()) {
+    public void handleMsg(Message msg, Socket sock) throws IOException{
+        switch (msg.getMessageType()){
+            case PING:
+                PingMessage pmsg = (PingMessage) msg;
+                System.out.println("Received message with id: " + pmsg.id);
+                User u = new User(pmsg.email);
+                netUsers.add(u);
+                break;
+            case FIND_WORKSPACE:
+                break;
+            case INVITE:
+                break;
+        }
+/*        switch(msg.getMessageType()) {
             case PING:
                 netUsers.add(new User(msg.email));
                 break;
@@ -224,7 +239,7 @@ public class WiFiDirectBroadcastReceiver extends BroadcastReceiver {
 
                 break;
 
-        }
+        }*/
     }
 
 }

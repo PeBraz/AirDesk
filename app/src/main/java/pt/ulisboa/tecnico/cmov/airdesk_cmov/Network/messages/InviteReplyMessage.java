@@ -1,6 +1,5 @@
 package pt.ulisboa.tecnico.cmov.airdesk_cmov.Network.messages;
 
-
 public class InviteReplyMessage extends Message{
 
     public String workspace;
