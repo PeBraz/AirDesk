@@ -3,7 +3,6 @@ package pt.ulisboa.tecnico.cmov.airdesk_cmov.Network;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
-import android.net.wifi.WpsInfo;
 import android.net.wifi.p2p.WifiP2pConfig;
 import android.net.wifi.p2p.WifiP2pDevice;
 import android.net.wifi.p2p.WifiP2pDeviceList;
@@ -22,6 +21,7 @@ import java.util.List;
 
 import pt.ulisboa.tecnico.cmov.airdesk_cmov.Activities.MainActivity;
 import pt.ulisboa.tecnico.cmov.airdesk_cmov.File;
+import pt.ulisboa.tecnico.cmov.airdesk_cmov.Network.messages.Message;
 import pt.ulisboa.tecnico.cmov.airdesk_cmov.User;
 
 public class WiFiDirectBroadcastReceiver extends BroadcastReceiver {
@@ -207,7 +207,6 @@ public class WiFiDirectBroadcastReceiver extends BroadcastReceiver {
             }
         };
     }
-    // (.)(.)
 
     public List<User> netUsers = new ArrayList<>();
     public List<File> netFiles = new ArrayList<>();
@@ -219,7 +218,7 @@ public class WiFiDirectBroadcastReceiver extends BroadcastReceiver {
                 break;
 
             case FILE_INFO:
-                netFIles.add();
+                netFiles.add();
                 break;
             case WORKSPACE_INFO:
 
