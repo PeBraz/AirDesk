@@ -13,6 +13,8 @@ import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
 import android.net.wifi.p2p.WifiP2pManager.Channel;
+import android.widget.Toast;
+
 import pt.ulisboa.tecnico.cmov.airdesk_cmov.Application;
 import pt.ulisboa.tecnico.cmov.airdesk_cmov.Exceptions.NotRegisteredException;
 import pt.ulisboa.tecnico.cmov.airdesk_cmov.Exceptions.WrongPasswordException;
@@ -20,12 +22,13 @@ import pt.ulisboa.tecnico.cmov.airdesk_cmov.Network.WiFiDirectBroadcastReceiver;
 import pt.ulisboa.tecnico.cmov.airdesk_cmov.R;
 import pt.ulisboa.tecnico.cmov.airdesk_cmov.Sessions.SessionManager;
 
-public class MainActivity extends ActionBarActivity  {
+public class MainActivity extends ActionBarActivity {
 
     private IntentFilter mIntentFilter;
     private WifiP2pManager mManager;
     private Channel mChannel;
     private BroadcastReceiver mReceiver;
+    private boolean isWifiOn = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -75,34 +78,36 @@ public class MainActivity extends ActionBarActivity  {
             }
             });
 
-       this.discoverPeers();
+        if (!isWifiOn) Toast.makeText(MainActivity.this, "Wifi is off. Please, enable it.", Toast.LENGTH_SHORT).show();
     }
 
-    /* register the broadcast receiver with the intent values to be matched */
     @Override
     protected void onResume() {
         super.onResume();
         registerReceiver(mReceiver, mIntentFilter);
     }
-    /* unregister the broadcast receiver */
+
     @Override
     protected void onPause() {
         super.onPause();
         unregisterReceiver(mReceiver);
     }
 
-    /**
-     * Detect peers that are in range in the network
-     */
-    void discoverPeers(){
+    public void discoverPeers(){
         this.mManager.discoverPeers(mChannel, new WifiP2pManager.ActionListener() {
             @Override
             public void onSuccess() {
+                Toast.makeText(MainActivity.this, "Discovery started.", Toast.LENGTH_SHORT).show();
             }
 
             @Override
             public void onFailure(int reasonCode) {
+                Toast.makeText(MainActivity.this, "Discovery failed.", Toast.LENGTH_SHORT).show();
             }
         });
+    }
+
+    public void setWifiConnection(boolean isWifiOn) {
+        this.isWifiOn = isWifiOn;
     }
 }
