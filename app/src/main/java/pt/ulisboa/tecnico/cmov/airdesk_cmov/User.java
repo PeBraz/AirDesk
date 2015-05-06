@@ -35,6 +35,14 @@ public class User {
         this.workspacedb = new WorkspacesDataSource();
     }
 
+    public User(final String email) {
+        this.username =  null;
+        this.email = email;
+        this.foreignWs = new HashSet<>();
+        this.workspacedb = new WorkspacesDataSource();
+    }
+
+
 
     public User(){
         this.workspacedb = new WorkspacesDataSource();

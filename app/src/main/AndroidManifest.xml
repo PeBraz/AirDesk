@@ -46,10 +46,6 @@
             android:name=".Activities.FilesActivity"
             android:label="@string/title_activity_list_files" >
         </activity>
-        <activity
-            android:name=".Activities.NetworkActivity"
-            android:label="@string/title_activity_network" >
-        </activity>
     </application>
 
 </manifest>
