@@ -82,12 +82,12 @@ public class WiFiDirectBroadcastReceiver extends BroadcastReceiver {
 
             @Override
             public void onSuccess() {
-
+                //TODO
             }
 
             @Override
             public void onFailure(int reason) {
-
+                //TODO
             }
         });
     }
