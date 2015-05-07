@@ -7,22 +7,38 @@ import android.content.IntentFilter;
 import android.net.wifi.WpsInfo;
 import android.net.wifi.p2p.WifiP2pConfig;
 import android.net.wifi.p2p.WifiP2pDevice;
+import android.net.wifi.p2p.WifiP2pDeviceList;
+import android.net.wifi.p2p.WifiP2pInfo;
 import android.net.wifi.p2p.WifiP2pManager;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.net.wifi.p2p.WifiP2pManager.Channel;
 import android.widget.Toast;
 
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+import java.net.InetAddress;
+import java.net.ServerSocket;
+import java.net.Socket;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Random;
+
 import pt.ulisboa.tecnico.cmov.airdesk_cmov.Application;
 import pt.ulisboa.tecnico.cmov.airdesk_cmov.Exceptions.NotRegisteredException;
 import pt.ulisboa.tecnico.cmov.airdesk_cmov.Exceptions.WrongPasswordException;
+import pt.ulisboa.tecnico.cmov.airdesk_cmov.Network.ServerThread;
 import pt.ulisboa.tecnico.cmov.airdesk_cmov.Network.WiFiDirectBroadcastReceiver;
+import pt.ulisboa.tecnico.cmov.airdesk_cmov.Network.messages.Message;
+import pt.ulisboa.tecnico.cmov.airdesk_cmov.Network.messages.MessageType;
 import pt.ulisboa.tecnico.cmov.airdesk_cmov.R;
 import pt.ulisboa.tecnico.cmov.airdesk_cmov.Sessions.SessionManager;
 
-public class MainActivity extends ActionBarActivity {
+public class MainActivity extends ActionBarActivity{
 
     private IntentFilter mIntentFilter;
     private WifiP2pManager mManager;
@@ -32,6 +48,7 @@ public class MainActivity extends ActionBarActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
@@ -79,25 +96,36 @@ public class MainActivity extends ActionBarActivity {
             });
 
         if (!isWifiOn) Toast.makeText(MainActivity.this, "Wifi is off. Please, enable it.", Toast.LENGTH_SHORT).show();
+
+        this.discoverPeers();
     }
 
     @Override
     protected void onResume() {
+
         super.onResume();
         registerReceiver(mReceiver, mIntentFilter);
     }
 
     @Override
     protected void onPause() {
+
+        try {
+            ServerThread.getOut();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
         super.onPause();
         unregisterReceiver(mReceiver);
     }
 
     public void discoverPeers(){
+
         this.mManager.discoverPeers(mChannel, new WifiP2pManager.ActionListener() {
             @Override
             public void onSuccess() {
                 Toast.makeText(MainActivity.this, "Discovery started.", Toast.LENGTH_SHORT).show();
+                connect();
             }
 
             @Override
@@ -108,6 +136,31 @@ public class MainActivity extends ActionBarActivity {
     }
 
     public void setWifiConnection(boolean isWifiOn) {
+
         this.isWifiOn = isWifiOn;
+    }
+
+    public void connect(){
+
+        if(WiFiDirectBroadcastReceiver.peers.size() == 0) return;
+
+        WifiP2pConfig config = new WifiP2pConfig();
+        config.deviceAddress = WiFiDirectBroadcastReceiver.peers.get(0).deviceAddress;
+
+        mManager.connect(mChannel, config, new WifiP2pManager.ActionListener(){
+
+            @Override
+            public void onFailure(int arg0) {
+                // TODO Auto-generated method stub
+
+            }
+
+            @Override
+            public void onSuccess() {
+                System.out.println("correu bem");
+
+            }
+
+        });
     }
 }
