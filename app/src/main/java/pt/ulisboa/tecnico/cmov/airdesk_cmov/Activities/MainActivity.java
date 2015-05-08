@@ -109,7 +109,6 @@ public class MainActivity extends ActionBarActivity{
 
     @Override
     protected void onPause() {
-
         try {
             ServerThread.getOut();
         } catch (IOException e) {
@@ -151,14 +150,12 @@ public class MainActivity extends ActionBarActivity{
 
             @Override
             public void onFailure(int arg0) {
-                // TODO Auto-generated method stub
-
+                System.out.println("correu mal");
             }
 
             @Override
             public void onSuccess() {
                 System.out.println("correu bem");
-
             }
 
         });

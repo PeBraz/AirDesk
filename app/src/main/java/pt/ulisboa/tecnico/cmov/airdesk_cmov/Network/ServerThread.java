@@ -9,13 +9,19 @@ import java.net.Socket;
 import java.util.ArrayList;
 import java.util.List;
 import pt.ulisboa.tecnico.cmov.airdesk_cmov.Network.messages.Message;
+import pt.ulisboa.tecnico.cmov.airdesk_cmov.Network.messages.MessageType;
+import pt.ulisboa.tecnico.cmov.airdesk_cmov.Network.messages.PingMessage;
+import pt.ulisboa.tecnico.cmov.airdesk_cmov.Network.messages.PongMessage;
 
 public class ServerThread extends Thread{
 
     private static final List<Socket> conns = new ArrayList<>();
+    private static final List<InetAddress> listIP = new ArrayList<>();
 
     private int port;
     private static ServerSocket server = null;
+
+    public static final int PORT = 6969;
 
     public ServerThread(int port){
         this.port = port;
@@ -67,6 +73,14 @@ public class ServerThread extends Thread{
                 }
                 synchronized (conns) {
                     conns.add(sock);
+                    listIP.add(sock.getInetAddress());
+                }
+                if(isGroupOwner(ip)){
+                    try {
+                        send(new PingMessage(),sock);
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
                 }
                 ObjectInputStream ois;
                 try {
@@ -79,6 +93,7 @@ public class ServerThread extends Thread{
                     System.out.println(e.getMessage());
                     synchronized (conns) {
                         conns.remove(sock);
+                        listIP.remove(sock.getInetAddress());
                     }
                     try {
                         sock.close();
@@ -109,6 +124,7 @@ public class ServerThread extends Thread{
                     System.out.println(e.getMessage());
                     synchronized (conns) {
                         conns.remove(sock);
+                        listIP.remove(sock.getInetAddress());
                     }
                     try {
                         sock.close();
@@ -121,18 +137,44 @@ public class ServerThread extends Thread{
             }
         };
     }
-    public static void join(InetAddress ip, int port) {
-
+    public static void join(InetAddress ip, int port) throws IOException {
+        System.out.println("joining group");
         clientThread(ip,port).start();
     }
 
     public static void send(Message message, Socket socket) throws IOException {
-        System.out.println("entrou no send");
+        System.out.println("send message started");
         new ObjectOutputStream(socket.getOutputStream()).writeObject(message);
-
     }
 
-    public static void handleMsg(Message msg, Socket sock) throws IOException{
-        System.out.println(msg.toString() + sock.toString());
+    public static void connectToAll(List<InetAddress> iList) throws IOException{
+        for(InetAddress i : iList){
+            join(i, PORT);
+        }
+    }
+
+    public static void sendPong(Socket s) throws IOException {
+        send(new PongMessage(listIP),s);
+    }
+
+    public static void handleMsg(Message msg, Socket sock) throws IOException {
+        switch (msg.getMessageType()) {
+            case PING:
+                System.out.println("ping received");
+                sendPong(sock);
+                break;
+            case PONG:
+                System.out.println("pong sent");
+                PongMessage p = (PongMessage) msg;
+                connectToAll(p.allPeers);
+                break;
+        }
+        System.out.println("RECEIVED MESSAGE:");
+    }
+
+    public static boolean isGroupOwner(InetAddress ip){
+
+        return WiFiDirectBroadcastReceiver.groupOwnerIp != null
+               && WiFiDirectBroadcastReceiver.groupOwnerIp == ip;
     }
 }

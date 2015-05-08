@@ -11,6 +11,7 @@ import android.net.wifi.p2p.WifiP2pManager;
 import android.net.wifi.p2p.WifiP2pManager.Channel;
 import android.widget.Toast;
 
+import java.io.IOException;
 import java.net.InetAddress;
 import java.util.ArrayList;
 import java.util.List;
@@ -23,6 +24,7 @@ public class WiFiDirectBroadcastReceiver extends BroadcastReceiver {
     private Channel channel;
     private MainActivity activity;
     public static List<WifiP2pDevice> peers = new ArrayList<>();
+    public static InetAddress groupOwnerIp;
 
     public WiFiDirectBroadcastReceiver(WifiP2pManager manager, Channel channel, MainActivity mActivity){
 
@@ -82,13 +84,19 @@ public class WiFiDirectBroadcastReceiver extends BroadcastReceiver {
                 System.out.println("Is group formed: " + info.groupFormed);
 
                 InetAddress groupOwnerAddress = info.groupOwnerAddress;
-                new ServerThread(15002).start();
+                new ServerThread(ServerThread.PORT).start();
 
                 if (info.groupFormed && info.isGroupOwner) {
                     System.out.println("SOU O GROUP OWNER");
 
                 } else if (info.groupFormed) {
-                    ServerThread.join(groupOwnerAddress, 15002); //group owner connection
+                    groupOwnerIp = info.groupOwnerAddress;
+                    System.out.println("NAO SOU O GROUP OWNER");
+                    try {
+                        ServerThread.join(groupOwnerAddress, ServerThread.PORT); //group owner connection
+                    }catch (IOException e) {
+                        e.printStackTrace();
+                    }
                 }
             }
         };

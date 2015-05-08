@@ -1,13 +1,8 @@
 package pt.ulisboa.tecnico.cmov.airdesk_cmov.Network.messages;
 
-public class PingMessage extends Message{
+import java.io.Serializable;
 
-    public String email;
-
-    public PingMessage(String mail){
-        super();
-        this.email = mail;
-    }
+public class PingMessage extends Message implements Serializable{
 
     @Override
     public MessageType getMessageType(){
