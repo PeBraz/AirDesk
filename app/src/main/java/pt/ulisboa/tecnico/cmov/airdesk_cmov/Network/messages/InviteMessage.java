@@ -1,6 +1,8 @@
 package pt.ulisboa.tecnico.cmov.airdesk_cmov.Network.messages;
 
-public class InviteMessage extends Message{
+import java.io.Serializable;
+
+public class InviteMessage extends Message implements Serializable{
 
     public String workspace;
     public String email;

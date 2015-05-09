@@ -8,8 +8,10 @@ import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.ArrayList;
 import java.util.List;
+
+import pt.ulisboa.tecnico.cmov.airdesk_cmov.Network.messages.FindWorkspaceMessage;
+import pt.ulisboa.tecnico.cmov.airdesk_cmov.Network.messages.FindWorkspaceReplyMessage;
 import pt.ulisboa.tecnico.cmov.airdesk_cmov.Network.messages.Message;
-import pt.ulisboa.tecnico.cmov.airdesk_cmov.Network.messages.MessageType;
 import pt.ulisboa.tecnico.cmov.airdesk_cmov.Network.messages.PingMessage;
 import pt.ulisboa.tecnico.cmov.airdesk_cmov.Network.messages.PongMessage;
 
@@ -142,19 +144,28 @@ public class ServerThread extends Thread{
         clientThread(ip,port).start();
     }
 
+    public static void connectToAll(List<InetAddress> iList) throws IOException{
+        for(InetAddress i : iList){
+            System.out.println("IP: " + i);
+            join(i, PORT);
+        }
+    }
+
     public static void send(Message message, Socket socket) throws IOException {
         System.out.println("send message started");
         new ObjectOutputStream(socket.getOutputStream()).writeObject(message);
     }
 
-    public static void connectToAll(List<InetAddress> iList) throws IOException{
-        for(InetAddress i : iList){
-            join(i, PORT);
-        }
-    }
-
     public static void sendPong(Socket s) throws IOException {
         send(new PongMessage(listIP),s);
+    }
+
+    public static void sendFindWorkspaceMessage(String query, Socket socket) throws IOException{
+        send(new FindWorkspaceMessage(query), socket);
+    }
+
+    public static void sendFoundWorkspaces(List<String> workspaces, Socket socket) throws IOException{
+        send(new FindWorkspaceReplyMessage(workspaces), socket);
     }
 
     public static void handleMsg(Message msg, Socket sock) throws IOException {
@@ -164,12 +175,24 @@ public class ServerThread extends Thread{
                 sendPong(sock);
                 break;
             case PONG:
-                System.out.println("pong sent");
+                System.out.println("pong received");
                 PongMessage p = (PongMessage) msg;
                 connectToAll(p.allPeers);
                 break;
+            case FIND_WORKSPACE:
+                System.out.println("find workspace message received");
+                FindWorkspaceMessage wsMessage = (FindWorkspaceMessage) msg;
+                System.out.println("QUERY RECEIVED: " + wsMessage.getQuery());
+                //verificar a existencia do workspace com este query
+                //enviar find workspace reply com os worspaces
+                break;
+            case FIND_WORKSPACE_REPLY:
+                System.out.println("workspace reply received");
+                FindWorkspaceReplyMessage replyMessage = (FindWorkspaceReplyMessage) msg;
+                System.out.println("FOUND WORKSPACES: " + replyMessage.getWorkspaces());
+                //adicionar os ws's recebidos a lista de foreigns ws's
+                break;
         }
-        System.out.println("RECEIVED MESSAGE:");
     }
 
     public static boolean isGroupOwner(InetAddress ip){

@@ -1,12 +1,10 @@
 package pt.ulisboa.tecnico.cmov.airdesk_cmov.Network.messages;
 
+import java.io.Serializable;
 
-import pt.ulisboa.tecnico.cmov.airdesk_cmov.Network.messages.Message;
-import pt.ulisboa.tecnico.cmov.airdesk_cmov.Network.messages.MessageType;
+public class FindWorkspaceMessage extends Message implements Serializable{
 
-public class FindWorkspaceMessage extends Message {
-
-    public String query;
+    private String query;
 
     public FindWorkspaceMessage(String query) {
         super();
@@ -15,5 +13,9 @@ public class FindWorkspaceMessage extends Message {
     @Override
     public MessageType getMessageType(){
         return MessageType.FIND_WORKSPACE;
+    }
+
+    public String getQuery() {
+        return query;
     }
 }
