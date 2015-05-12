@@ -3,6 +3,7 @@ package pt.ulisboa.tecnico.cmov.airdesk_cmov;
 import java.io.IOException;
 import java.net.Socket;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -202,8 +203,10 @@ public class Application {
 
     public static void subscribe(Set<WorkspaceDto> targetWs) {
            // Application.foreignWorkspaces.addAll(targetWs);
-        for (WorkspaceDto ws: targetWs)
-            ;//ws.getUserEmail()
+        for (WorkspaceDto ws: targetWs){
+            Application.foreignWorkspaces.addAll(new ArrayList<Workspace>((Collection)targetWs));
+        }
+            //ws.getUserEmail()
             //Application.getOwner().addForeign(ws.getUserEmail(), ws.getWSName());
     }
     /**

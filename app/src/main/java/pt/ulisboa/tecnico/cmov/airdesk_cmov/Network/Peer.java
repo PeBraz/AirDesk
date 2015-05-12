@@ -13,7 +13,7 @@ public class Peer {
         return workspaces;
     }
 
-   
+
     private Map<String, String[]> workspaces = new HashMap<>();
 
     private Socket s;
