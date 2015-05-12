@@ -23,7 +23,7 @@ public class ServerThread extends Thread{
     private int port;
     private static ServerSocket server = null;
 
-    public static final int PORT = 6969;
+    public static final int PORT = 6066;
 
     public ServerThread(int port){
         this.port = port;
@@ -145,6 +145,7 @@ public class ServerThread extends Thread{
     }
 
     public static void connectToAll(List<InetAddress> iList) throws IOException{
+        System.out.println("aqui");
         for(InetAddress i : iList){
             System.out.println("IP: " + i);
             join(i, PORT);

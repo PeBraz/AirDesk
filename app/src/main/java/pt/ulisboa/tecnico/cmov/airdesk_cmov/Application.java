@@ -1,14 +1,8 @@
 package pt.ulisboa.tecnico.cmov.airdesk_cmov;
 
-import android.os.Environment;
-import android.os.StatFs;
-import android.test.ApplicationTestCase;
-
-import java.util.ArrayList;
+import java.io.IOException;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
-
 import pt.ulisboa.tecnico.cmov.airdesk_cmov.Database.FilesDataSource;
 import pt.ulisboa.tecnico.cmov.airdesk_cmov.Database.UsersDataSource;
 import pt.ulisboa.tecnico.cmov.airdesk_cmov.Database.WorkspacesDataSource;
@@ -145,7 +139,7 @@ public class Application {
      *  (don't confuse workspacesInNetwork with foreignWorkspace)
      *
      */
-    public static Set<Workspace> networkSearch(String query) {
+    public static Set<Workspace> networkSearch(String query) throws IOException {
         String[] queryArr = query.split("\\s+");
         Set<Workspace> availableWS = new HashSet<>();
 

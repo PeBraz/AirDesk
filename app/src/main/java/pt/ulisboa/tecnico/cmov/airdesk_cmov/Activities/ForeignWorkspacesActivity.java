@@ -15,6 +15,7 @@ import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.TextView;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -132,7 +133,11 @@ public class ForeignWorkspacesActivity extends ActionBarActivity {
                 EditText text = (EditText) dialog.findViewById(R.id.subscribe_query);
 
                 availableWS.clear();
-                availableWS.addAll(Application.networkSearch(text.getText().toString()));
+                try {
+                    availableWS.addAll(Application.networkSearch(text.getText().toString()));
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
 
 
                 TextView list = (TextView) dialog.findViewById(R.id.subscribe_list);

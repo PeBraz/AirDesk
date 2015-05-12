@@ -8,4 +8,6 @@
         android:orderInCategory="100" app:showAsAction="never" />
     <item android:id="@+id/foreign" android:title="@string/title_activity_foreign_workspaces"
         android:orderInCategory="100" app:showAsAction="never" />
+    <item android:id="@+id/list_peers" android:title="@string/list_of_peers"
+        android:orderInCategory="100" app:showAsAction="never" />
 </menu>

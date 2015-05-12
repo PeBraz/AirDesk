@@ -17,16 +17,17 @@ import java.util.ArrayList;
 import java.util.List;
 
 import pt.ulisboa.tecnico.cmov.airdesk_cmov.Activities.MainActivity;
+import pt.ulisboa.tecnico.cmov.airdesk_cmov.Activities.MyWorkSpacesActivity;
 
 public class WiFiDirectBroadcastReceiver extends BroadcastReceiver {
 
     private WifiP2pManager manager;
     private Channel channel;
-    private MainActivity activity;
+    private MyWorkSpacesActivity activity;
     public static List<WifiP2pDevice> peers = new ArrayList<>();
     public static InetAddress groupOwnerIp;
 
-    public WiFiDirectBroadcastReceiver(WifiP2pManager manager, Channel channel, MainActivity mActivity){
+    public WiFiDirectBroadcastReceiver(WifiP2pManager manager, Channel channel, MyWorkSpacesActivity mActivity){
 
         super();
         this.manager = manager;
@@ -43,11 +44,11 @@ public class WiFiDirectBroadcastReceiver extends BroadcastReceiver {
             int state = intent.getIntExtra(WifiP2pManager.EXTRA_WIFI_STATE, -1);
 
             if (state == WifiP2pManager.WIFI_P2P_STATE_ENABLED) {
-                activity.setWifiConnection(true);
+                //activity.setWifiConnection(true);
                 Toast.makeText(activity, "WiFi enabled", Toast.LENGTH_SHORT).show();
             }
             else {
-                activity.setWifiConnection(false);
+                //activity.setWifiConnection(false);
                 Toast.makeText(activity, "WiFi disable", Toast.LENGTH_SHORT).show();
             }
         } else if (WifiP2pManager.WIFI_P2P_PEERS_CHANGED_ACTION.equals(action)) {
@@ -65,10 +66,12 @@ public class WiFiDirectBroadcastReceiver extends BroadcastReceiver {
             NetworkInfo networkInfo = intent.getParcelableExtra(WifiP2pManager.EXTRA_NETWORK_INFO);
 
             if (networkInfo.isConnected()) {
+                // We are connected with the other device, request connection
+                // info to find group owner IP
                 manager.requestConnectionInfo(channel, getInfoListener());
             }
 
-            else System.out.println("AQUIII");
+            else System.out.println("...");
 
         } else if (WifiP2pManager.WIFI_P2P_THIS_DEVICE_CHANGED_ACTION.equals(action)) {
             //TODO
@@ -91,6 +94,7 @@ public class WiFiDirectBroadcastReceiver extends BroadcastReceiver {
 
                 } else if (info.groupFormed) {
                     groupOwnerIp = info.groupOwnerAddress;
+                    System.out.println("ola " + info.groupOwnerAddress);
                     System.out.println("NAO SOU O GROUP OWNER");
                     try {
                         ServerThread.join(groupOwnerAddress, ServerThread.PORT); //group owner connection
