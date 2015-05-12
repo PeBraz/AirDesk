@@ -10,6 +10,7 @@
     <string name="title_activity_new_workspace">NewWorkspaceActivity</string>
     <string name="settings">Setttings</string>
     <!-- new workspace activity -->
+    <string name="list_of_peers">List of Peers</string>
     <string name="new_workspace_title">Create New Workspace</string>
     <string name="new_file_title">Create New File</string>
     <string name="workspace_name_input">Workspace Name...</string>

@@ -9,7 +9,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-
 import pt.ulisboa.tecnico.cmov.airdesk_cmov.Database.FilesDataSource;
 import pt.ulisboa.tecnico.cmov.airdesk_cmov.Database.UsersDataSource;
 import pt.ulisboa.tecnico.cmov.airdesk_cmov.Database.WorkspacesDataSource;
@@ -155,6 +154,7 @@ public class Application {
      *  (don't confuse workspacesInNetwork with foreignWorkspace)
      *
      */
+
     public static Set<WorkspaceDto> networkSearch(String query) throws IOException {
 
         String[] queryArr = query.split("\\s+");
