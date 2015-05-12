@@ -1,7 +1,5 @@
 package pt.ulisboa.tecnico.cmov.airdesk_cmov;
 
-import android.test.ApplicationTestCase;
-
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -11,10 +9,7 @@ import java.io.ObjectOutput;
 import java.io.ObjectOutputStream;
 import java.io.StreamCorruptedException;
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
-
 import pt.ulisboa.tecnico.cmov.airdesk_cmov.Database.FilesDataSource;
 import pt.ulisboa.tecnico.cmov.airdesk_cmov.Exceptions.NotOwnerException;
 import pt.ulisboa.tecnico.cmov.airdesk_cmov.Exceptions.StorageOverLimitException;
@@ -302,7 +297,7 @@ public class Workspace {
         *  The invite just stores it automatically into the target user foreign workspace list
         *
         */
-        user.addForeign(this);
+        user.addForeign(this.populateUser().getOwner().getEmail(),this.name);
         user.save();
     }
 

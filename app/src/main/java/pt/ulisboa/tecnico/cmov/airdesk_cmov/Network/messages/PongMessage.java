@@ -7,12 +7,22 @@ import java.util.List;
 
 public class PongMessage extends Message implements Serializable{
 
+
+    public String getOwner() {
+        return owner;
+    }
+
+    private String owner;
+
     public List<InetAddress> allPeers = new ArrayList<>();
 
-    public PongMessage(List<InetAddress> list){
+    public PongMessage(List<InetAddress> list, String owner){
         super();
         this.allPeers = list;
+        this.owner = owner;
     }
+
+
 
     @Override
     public MessageType getMessageType(){

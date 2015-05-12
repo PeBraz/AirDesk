@@ -8,6 +8,9 @@ import java.util.TreeSet;
 
 import pt.ulisboa.tecnico.cmov.airdesk_cmov.Exceptions.InvalidQuotaException;
 import pt.ulisboa.tecnico.cmov.airdesk_cmov.Exceptions.WorkspaceAlreadyExistsException;
+import pt.ulisboa.tecnico.cmov.airdesk_cmov.Network.Peer;
+import pt.ulisboa.tecnico.cmov.airdesk_cmov.Network.messages.FindWorkspaceReplyMessage;
+import pt.ulisboa.tecnico.cmov.airdesk_cmov.Network.messages.MyWorkspacesMessage;
 
 
 public final class ApplicationOwner extends User {
@@ -94,17 +97,15 @@ public final class ApplicationOwner extends User {
         Removing the workspaces is performed locally, the real users are not informed,
         only their database information is updated
     */
+
+        List<String> lista = new ArrayList<>();
+
         boolean isMyWs = Application.getOwner().getEmail().equals(ws.getOwner().getEmail());
         if (isMyWs) {
-            for (User u : ws.getAccessList()) {
-                u.remForeign(ws);
-            }
             ws.remove();
-        }
-        else {
-            ws.remAccessListUser(this);
-            this.remForeign(ws);
-        }
+            }
+
+        //check locally for subscription
     }
 
 }

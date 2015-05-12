@@ -81,14 +81,14 @@ public class User {
         this.foreignWs = foreign;
     }
 
-    public final void addForeign(Workspace ws) {
-        WorkspaceDto dto = new WorkspaceDto(ws.populateUser().getOwner().getEmail(), ws.getName());
+    public final void addForeign(String name, String wsName) {
+        WorkspaceDto dto = new WorkspaceDto(name, wsName);
         this.foreignWs.add(dto);
         this.save();
     }
 
-    public final void remForeign(Workspace ws) {
-        this.foreignWs.remove(new WorkspaceDto(ws.populateUser().getOwner().getEmail(), ws.getName()));
+    public final void remForeign(String name, String wsName) {
+        this.foreignWs.remove(new WorkspaceDto(name, wsName));
         this.save();
     }
 

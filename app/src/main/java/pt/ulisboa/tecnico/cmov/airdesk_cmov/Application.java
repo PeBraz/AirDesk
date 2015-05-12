@@ -1,12 +1,12 @@
 package pt.ulisboa.tecnico.cmov.airdesk_cmov;
 
-import android.os.Environment;
-import android.os.StatFs;
-import android.test.ApplicationTestCase;
-
+import java.io.IOException;
+import java.net.Socket;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import pt.ulisboa.tecnico.cmov.airdesk_cmov.Database.FilesDataSource;
@@ -18,6 +18,10 @@ import pt.ulisboa.tecnico.cmov.airdesk_cmov.Exceptions.NotRegisteredException;
 import pt.ulisboa.tecnico.cmov.airdesk_cmov.Exceptions.UserAlreadyExistsException;
 import pt.ulisboa.tecnico.cmov.airdesk_cmov.Exceptions.UserNotFoundException;
 import pt.ulisboa.tecnico.cmov.airdesk_cmov.Exceptions.WrongPasswordException;
+import pt.ulisboa.tecnico.cmov.airdesk_cmov.Network.Peer;
+import pt.ulisboa.tecnico.cmov.airdesk_cmov.Network.ServerThread;
+import pt.ulisboa.tecnico.cmov.airdesk_cmov.Network.messages.FindWorkspaceReplyMessage;
+import pt.ulisboa.tecnico.cmov.airdesk_cmov.Network.messages.Message;
 import pt.ulisboa.tecnico.cmov.airdesk_cmov.Sessions.SessionManager;
 
 
@@ -31,6 +35,10 @@ public class Application {
     private static UsersDataSource userData = null;
 
     private static FilesDataSource fileData = null;
+
+    public static List<Map<String,String[]>> networkWorkspaces = null;
+
+    private static Map<String,Peer> peers = new HashMap<>();
 
     //The Data source should not be called from here, should instead be called from the owner
     private static WorkspacesDataSource workspaceData = null;
@@ -140,40 +148,63 @@ public class Application {
         return  new HashSet<>(Application.workspaceData.getAll());
     }
 
+
     /**
      * Will search for workspaces available in the network
      *  (don't confuse workspacesInNetwork with foreignWorkspace)
      *
      */
-    public static Set<Workspace> networkSearch(String query) {
+    public static Set<WorkspaceDto> networkSearch(String query) throws IOException {
+
         String[] queryArr = query.split("\\s+");
-        Set<Workspace> availableWS = new HashSet<>();
+        Set<WorkspaceDto> availableWS = new HashSet<>();
+
+/*
+        List<WorkspaceDto> allPublicWorkspaces = new ArrayList<>();
 
         //By default providing no arguments to the query will show all available workspaces
         if (query.trim().isEmpty())
-            return new HashSet<Workspace>(Application.getPublicNetworkWS());
+            return new HashSet<>(allPublicWorkspaces);
+*/
 
-        for (Workspace ws : Application.getPublicNetworkWS()) {
-
-            //Dont' allow owned workspaces to appear
-            if (ws.populateUser().getOwner().getEmail().equals(Application.getOwner().getEmail()))
-                continue;
-
-            for (String tag : ws.getTagsAsArray()) {
-                for (String q: queryArr) {
-                    if (q.equals(tag)) {
-                        availableWS.add(ws);
+        for(Peer p : peers.values()) {
+            for (Map.Entry<String, String[]> workspaces : p.getWorkspaces().entrySet()) {
+                if (query.trim().isEmpty())
+                    availableWS.add(new WorkspaceDto(p.getOwner(), workspaces.getKey()));
+                else {
+                    for (String s : workspaces.getValue()) {
+                        for (String tag : queryArr) {
+                            if (s.equals(tag)) {
+                                availableWS.add(new WorkspaceDto(p.getOwner(), workspaces.getKey()));
+                            }
+                        }
                     }
                 }
             }
         }
+
         return availableWS;
     }
 
-    public static void subscribe(Set<Workspace> targetWs) {
+    public static Peer getPeer(String email){
+
+        if(peers.containsKey(email)){
+            return peers.get(email);
+        }
+/*
+        else{
+            Peer p = new Peer(email);
+            peers.put(email,p);
+            return p;
+        }*/
+        return null;
+    }
+
+    public static void subscribe(Set<WorkspaceDto> targetWs) {
            // Application.foreignWorkspaces.addAll(targetWs);
-        for (Workspace ws: targetWs)
-            Application.getOwner().addForeign(ws);
+        for (WorkspaceDto ws: targetWs)
+            ;//ws.getUserEmail()
+            //Application.getOwner().addForeign(ws.getUserEmail(), ws.getWSName());
     }
     /**
     * Returns the device storage available in the internal storage of the device (as bytes)
@@ -182,7 +213,7 @@ public class Application {
     */
     public static int getDeviceStorageSpace() {
         return  Application.MAX_APPLICATION_QUOTA - getReservedStorage();
-       // StatFs stat = new StatFs(Environment.getDataDirectory().getPath());
+        // StatFs stat = new StatFs(Environment.getDataDirectory().getPath());
         //return (int) ((long)stat.getBlockSize() * (long)stat.getBlockCount());
     }
 
@@ -211,4 +242,13 @@ public class Application {
         Application.workspaceData.remove(ws.getName(), ws.populateUser().getOwner().getEmail());
     }
 
+    public static void createPeer(String email, Socket s){
+        if (!Application.peers.containsKey(email)) {
+            Application.peers.put(email, new Peer(email,s));
+        }
+    }
+
+    public static List<Peer> getPeers(){
+        return new ArrayList<>(peers.values());
+    }
 }

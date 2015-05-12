@@ -17,6 +17,7 @@
     <string name="title_activity_foreign_workspaces">Foreign Workspaces</string>
     <string name="new_workspace_quota">Quota</string>
     <string name="input_workspace">Workspace Name</string>
+    <string name="title_all_peers">List of users</string>
 
     <!-- menu options -->
     <string name="action_settings">My account</string>

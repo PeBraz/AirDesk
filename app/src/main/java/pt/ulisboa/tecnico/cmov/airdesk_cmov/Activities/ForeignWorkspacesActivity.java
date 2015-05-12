@@ -15,6 +15,7 @@ import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.TextView;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -113,7 +114,7 @@ public class ForeignWorkspacesActivity extends ActionBarActivity {
         Button cancel = (Button) dialogView.findViewById(R.id.subscribe_cancel_button);
 
         //Store the contents searched, for when finalizing the action
-        final Set<Workspace> availableWS = new HashSet<>();
+        final Set<WorkspaceDto> availableWS = new HashSet<>();
 
         ok.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -132,7 +133,11 @@ public class ForeignWorkspacesActivity extends ActionBarActivity {
                 EditText text = (EditText) dialog.findViewById(R.id.subscribe_query);
 
                 availableWS.clear();
-                availableWS.addAll(Application.networkSearch(text.getText().toString()));
+                try {
+                    availableWS.addAll(Application.networkSearch(text.getText().toString()));
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
 
 
                 TextView list = (TextView) dialog.findViewById(R.id.subscribe_list);
@@ -140,8 +145,8 @@ public class ForeignWorkspacesActivity extends ActionBarActivity {
                     list.setText("No Workspaces found.");
                 } else {
                     list.setText("");
-                    for (Workspace ws : availableWS) {
-                        list.setText(list.getText() + "\n" + ws.getName());
+                    for (WorkspaceDto ws : availableWS) {
+                        list.setText(list.getText() + "\n" + ws.getWSName() + " - " + ws.getUserEmail());
                     }
                 }
             }
