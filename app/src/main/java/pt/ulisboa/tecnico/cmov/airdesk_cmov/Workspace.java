@@ -24,7 +24,7 @@ public class Workspace {
     private ArrayList<User> clients = new ArrayList<>();
 
     /**
-     *  Retrieved by the database when initializing this workspace, can be used to populate the user
+     * Retrieved by the database when initializing this workspace, can be used to populate the user
      */
     private String ownerEmail;
 
@@ -37,22 +37,24 @@ public class Workspace {
     private List<String> accessList = new ArrayList<>();
 
 
-
-    public Workspace(final String name,final int quota, final User owner) {
+    public Workspace(final String name, final int quota, final User owner) {
         this.name = name;
         this.quota = quota;
         this.owner = owner;
         this.isPrivate = true;
         this.usedStorage = 0;
     }
+
     public Workspace(final String name, final int quota, final User owner,
                      final boolean privacy, final String tags) {
-        this(name,quota,owner);
+        this(name, quota, owner);
         this.isPrivate = privacy;
         this.tags = tags;
     }
 
-    public Workspace () {this.filedb = new FilesDataSource();}
+    public Workspace() {
+        this.filedb = new FilesDataSource();
+    }
 
     public final int getQuota() {
         return quota;
@@ -66,16 +68,20 @@ public class Workspace {
         return name;
     }
 
-    public final boolean getPrivacy() { return isPrivate; }
+    public final boolean getPrivacy() {
+        return isPrivate;
+    }
 
-    public final String getTags() { return tags; }
+    public final String getTags() {
+        return tags;
+    }
 
     public final int getStorage() {
         return this.usedStorage;
     }
 
     public final String[] getTagsAsArray() {
-        return  (tags != null)? this.tags.split("\\s+"): new String[]{};
+        return (tags != null) ? this.tags.split("\\s+") : new String[]{};
     }
 
     public final ArrayList<User> getClients() {
@@ -90,13 +96,17 @@ public class Workspace {
         this.name = name;
     }
 
-    public final void  setQuota(final int maxQuota) {
+    public final void setQuota(final int maxQuota) {
         this.quota = maxQuota;
     }
 
-    public final void setPrivacy (final boolean isPrivate) { this.isPrivate = isPrivate; }
+    public final void setPrivacy(final boolean isPrivate) {
+        this.isPrivate = isPrivate;
+    }
 
-    public final void setTags(final String tags) { this.tags = tags; }
+    public final void setTags(final String tags) {
+        this.tags = tags;
+    }
 
     public final void setOwnerEmail(String email) {
         this.ownerEmail = email;
@@ -106,17 +116,17 @@ public class Workspace {
         this.usedStorage = storage;
     }
 
-    public static void createFile(String name, String workspace, String user){
-        File file = new File(name,workspace, user);
+    public static void createFile(String name, String workspace, String user) {
+        File file = new File(name, workspace, user);
         filedb.create(file);
     }
 
-    public static List<String> getAllFiles(String workspace){
+    public static List<String> getAllFiles(String workspace) {
 
         ArrayList<String> allFiles = new ArrayList<>();
 
-        List<File> listFiles =  filedb.getAll();
-        for(File f : listFiles){
+        List<File> listFiles = filedb.getAll();
+        for (File f : listFiles) {
             if (f.getWorkspace().equals(workspace) && f.getUser().equals(Application.getOwner().getEmail()))
                 allFiles.add(f.getName());
         }
@@ -143,16 +153,17 @@ public class Workspace {
     }
 
 
-    public static void deleteFile(String fileName, String wsName, String ownerMail){
+    public static void deleteFile(String fileName, String wsName, String ownerMail) {
 
-        filedb.delete(fileName,wsName,ownerMail);
+        filedb.delete(fileName, wsName, ownerMail);
     }
 
     public final void addAccessListUser(User u) {
         this.accessList.add(u.getEmail());
     }
+
     public final void remAccessListUser(User u) {
-        for (String email: this.accessList)
+        for (String email : this.accessList)
             if (email.equals(u.getEmail()))
                 this.accessList.remove(email);
     }
@@ -160,11 +171,12 @@ public class Workspace {
     /**
      * Returns the list of users stored in the access list by going to the database and getting all
      * This can't be used to perform changes on the access list.
+     *
      * @return list of users
      */
     public final List<User> getAccessList() {
         List<User> users = new ArrayList<>();
-        for (String email: this.accessList)
+        for (String email : this.accessList)
             users.add(Application.getUser(email));
         return users;
     }
@@ -180,20 +192,20 @@ public class Workspace {
         try {
             in = new ObjectInputStream(bais);
             this.accessList = (List<String>) in.readObject();
-        }catch (StreamCorruptedException e){
+        } catch (StreamCorruptedException e) {
             this.accessList = new ArrayList<>();
-        }catch(IOException | ClassNotFoundException  e) {
+        } catch (IOException | ClassNotFoundException e) {
             System.out.println(e.getMessage());
             this.accessList = new ArrayList<>();
-        }finally {
-            try{
+        } finally {
+            try {
                 if (in != null) in.close();
-            }catch (IOException e){
+            } catch (IOException e) {
                 System.out.println(e.getMessage());
             }
-            try{
+            try {
                 bais.close();
-            }catch(IOException e){
+            } catch (IOException e) {
                 System.out.println(e.getMessage());
             }
         }
@@ -212,17 +224,17 @@ public class Workspace {
             oo = new ObjectOutputStream(baos);
             oo.writeObject(this.accessList);
             bytes = baos.toByteArray();
-        }catch(IOException e) {
+        } catch (IOException e) {
             System.out.println(e.getMessage());
-        }finally {
-            try{
+        } finally {
+            try {
                 if (oo != null) oo.close();
-            }catch(IOException e) {
+            } catch (IOException e) {
                 System.out.println(e.getMessage());
             }
-            try{
+            try {
                 baos.close();
-            }catch(IOException e){
+            } catch (IOException e) {
                 System.out.println(e.getMessage());
             }
 
@@ -239,7 +251,7 @@ public class Workspace {
     @Override
     public boolean equals(Object o) {
         return this.getName().equals(((Workspace) o).getName())
-               && this.getOwner().getEmail().equals(
+                && this.getOwner().getEmail().equals(
                 ((Workspace) o).populateUser().getOwner().getEmail());
     }
 
@@ -261,24 +273,25 @@ public class Workspace {
     public final void save() {
         this.populateUser().getOwner().saveWorkspace(this);
     }
+
     /**
      * Utility method for removing the workspace
      */
     public final void remove() {
         final User u = this.populateUser().getOwner();
-        boolean notOwner = ! Application.getOwner().getEmail().equals(u.getEmail());
+        boolean notOwner = !Application.getOwner().getEmail().equals(u.getEmail());
 
         if (notOwner)
-               throw new NotOwnerException();
+            throw new NotOwnerException();
         Application.remove(this);
     }
 
     /**
      * Adds the user to the the application owner access list.
-     *
+     * <p/>
      * Invites a foreign user to the workspace, attempting to connect to that foreign client
      * and requesting the invite.
-     *
+     * <p/>
      * The provided user is confirmed to be available in the network.
      *
      * @param user that is invited
@@ -297,7 +310,7 @@ public class Workspace {
         *  The invite just stores it automatically into the target user foreign workspace list
         *
         */
-        user.addForeign(this.populateUser().getOwner().getEmail(),this.name);
+        user.addForeign(this.populateUser().getOwner().getEmail(), this.name);
         user.save();
     }
 

@@ -12,6 +12,8 @@ import java.util.List;
 
 import pt.ulisboa.tecnico.cmov.airdesk_cmov.Application;
 import pt.ulisboa.tecnico.cmov.airdesk_cmov.ApplicationOwner;
+import pt.ulisboa.tecnico.cmov.airdesk_cmov.Network.messages.FilesMessage;
+import pt.ulisboa.tecnico.cmov.airdesk_cmov.Network.messages.FilesMessageReply;
 import pt.ulisboa.tecnico.cmov.airdesk_cmov.Network.messages.FindWorkspaceMessage;
 import pt.ulisboa.tecnico.cmov.airdesk_cmov.Network.messages.FindWorkspaceReplyMessage;
 import pt.ulisboa.tecnico.cmov.airdesk_cmov.Network.messages.Message;
@@ -197,6 +199,14 @@ public class ServerThread extends Thread{
                 MyWorkspacesMessage msge = (MyWorkspacesMessage) msg;
                 System.out.println("MEEAS " + msge.getOwner());
                 Application.getPeer(msge.getOwner()).addTags(msge.getWorkspaces());
+            case FILES_MESSAGE:
+                FilesMessage msgee = (FilesMessage) msg;
+                List<String> lista = Application.getOwner().getWorkspace(msgee.getWorkspaceName()).getFiles();
+                send(new FilesMessageReply(Application.getOwner().getEmail(), msgee.getWorkspaceName(),lista), sock);
+            case FILES_MESSAGE_REPLY:
+                FilesMessageReply msger = (FilesMessageReply) msg;
+                Application.getPeer(msger.getEmail()).setFiles(msger.getWorkspace(), msger.getFiles());
+
         }
     }
 

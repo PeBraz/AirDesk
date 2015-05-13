@@ -19,7 +19,9 @@ import android.widget.SeekBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import java.io.ByteArrayInputStream;
 import java.io.File;
+import java.util.List;
 
 import pt.ulisboa.tecnico.cmov.airdesk_cmov.Application;
 
@@ -29,6 +31,7 @@ import pt.ulisboa.tecnico.cmov.airdesk_cmov.Exceptions.UserAlreadyAddedException
 import pt.ulisboa.tecnico.cmov.airdesk_cmov.Exceptions.UserIsMyselfException;
 import pt.ulisboa.tecnico.cmov.airdesk_cmov.Exceptions.UserNotFoundException;
 import pt.ulisboa.tecnico.cmov.airdesk_cmov.Files.FileUtil;
+import pt.ulisboa.tecnico.cmov.airdesk_cmov.Network.Peer;
 import pt.ulisboa.tecnico.cmov.airdesk_cmov.R;
 import pt.ulisboa.tecnico.cmov.airdesk_cmov.Workspace;
 import pt.ulisboa.tecnico.cmov.airdesk_cmov.WorkspaceDto;
@@ -39,8 +42,12 @@ public class FilesActivity extends ActionBarActivity {
 
     private String wsName = null;
     private String wsEmail = null;
+    private WorkspaceDto wsfor = null;
     private Workspace ws = null;
+    private Peer peer;
     private boolean isMyWs;
+    private boolean rcvd = false;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -52,13 +59,22 @@ public class FilesActivity extends ActionBarActivity {
             wsEmail = info.getString("WSUSEREMAIL");
             isMyWs = Application.getOwner().getEmail().equals(wsEmail);
 
-            ws = (isMyWs)? Application.getOwner().getWorkspace(wsName)
-                        : Application.getUser(wsEmail).getWorkspace(wsName);
+            if (isMyWs) {
+                ws = Application.getOwner().getWorkspace(wsName);
+            }else
+            {
+                this.peer = Application.getPeer(wsEmail);
+                this.syncGetFiles();
+            }
+
         }
         setTitle("Workspace - " + wsName);
 
         final ListView listview = (ListView) findViewById(R.id.listView2);
-        showList();
+
+
+
+
 
         listview.setOnItemClickListener(new AdapterView.OnItemClickListener() {
 
@@ -69,6 +85,35 @@ public class FilesActivity extends ActionBarActivity {
             fileOptionsDialog(fileTitle);
             }
         });
+    }
+
+    public void syncGetFiles(){
+        peer.getRemoteFiles(wsName);
+
+        /*
+        *   Thread for updating files Activity
+        * */
+        (new Thread() {
+
+            @Override
+            public void run(){
+                while (true) {
+                    try {
+                        Thread.sleep(50);
+                        if (peer.filesChanged()) {
+                            showList();
+                            break;
+                        }
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+
+                }
+            }
+
+        }).start();
+
+
     }
 
     @Override
@@ -365,8 +410,10 @@ public class FilesActivity extends ActionBarActivity {
 
     private void showList(){
 
+        List<String> files = (isMyWs ? ws.getFiles() : peer.getLocalFiles(wsfor.getWSName()));
+
         final ListView listview = (ListView) findViewById(R.id.listView2);
-        final ArrayAdapter<String> adapter = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, android.R.id.text1,ws.getFiles());
+        final ArrayAdapter<String> adapter = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, android.R.id.text1,files);
         listview.setAdapter(adapter);
     }
 
