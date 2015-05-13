@@ -42,7 +42,6 @@ public class FilesActivity extends ActionBarActivity {
 
     private String wsName = null;
     private String wsEmail = null;
-    private WorkspaceDto wsfor = null;
     private Workspace ws = null;
     private Peer peer;
     private boolean isMyWs;
@@ -410,7 +409,7 @@ public class FilesActivity extends ActionBarActivity {
 
     private void showList(){
 
-        List<String> files = (isMyWs ? ws.getFiles() : peer.getLocalFiles(wsfor.getWSName()));
+        List<String> files = (isMyWs ? ws.getFiles() : peer.getLocalFiles(wsName));
 
         final ListView listview = (ListView) findViewById(R.id.listView2);
         final ArrayAdapter<String> adapter = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, android.R.id.text1,files);
