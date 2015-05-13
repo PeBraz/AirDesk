@@ -3,6 +3,8 @@ package pt.ulisboa.tecnico.cmov.airdesk_cmov.Activities;
 
 import android.app.Dialog;
 import android.content.Intent;
+import android.os.Handler;
+import android.os.Looper;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -42,11 +44,10 @@ public class FilesActivity extends ActionBarActivity {
 
     private String wsName = null;
     private String wsEmail = null;
-    private WorkspaceDto wsfor = null;
     private Workspace ws = null;
     private Peer peer;
     private boolean isMyWs;
-    private boolean rcvd = false;
+    private Handler filesHandler;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -63,6 +64,7 @@ public class FilesActivity extends ActionBarActivity {
                 ws = Application.getOwner().getWorkspace(wsName);
             }else
             {
+
                 this.peer = Application.getPeer(wsEmail);
                 this.syncGetFiles();
             }
@@ -88,32 +90,28 @@ public class FilesActivity extends ActionBarActivity {
     }
 
     public void syncGetFiles(){
-        peer.getRemoteFiles(wsName);
-
-        /*
-        *   Thread for updating files Activity
-        * */
         (new Thread() {
-
             @Override
             public void run(){
-                while (true) {
-                    try {
+                peer.getRemoteFiles(wsName);
+                try {
+                    while (true) {
                         Thread.sleep(50);
                         if (peer.filesChanged()) {
-                            showList();
+                            runOnUiThread(new Runnable() {
+                                @Override
+                                public void run() {
+                                    showList();
+                                }
+                            });
                             break;
                         }
-                    } catch (InterruptedException e) {
-                        e.printStackTrace();
                     }
-
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
                 }
             }
-
         }).start();
-
-
     }
 
     @Override
@@ -410,7 +408,7 @@ public class FilesActivity extends ActionBarActivity {
 
     private void showList(){
 
-        List<String> files = (isMyWs ? ws.getFiles() : peer.getLocalFiles(wsfor.getWSName()));
+        List<String> files = (isMyWs ? ws.getFiles() : peer.getLocalFiles(wsName));
 
         final ListView listview = (ListView) findViewById(R.id.listView2);
         final ArrayAdapter<String> adapter = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, android.R.id.text1,files);
