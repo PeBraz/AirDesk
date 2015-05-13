@@ -70,14 +70,11 @@ public class ForeignWorkspacesActivity extends ActionBarActivity {
     private void listWorkspaces() {
 
         List<WorkspaceDto> foreignWorkspaces =
-                new ArrayList<>(Application.getOwner().getForeignWorkspacesAsDto());
-  //      List<String> foreignws = new ArrayList<>();
+                new ArrayList<>(Application.getForeign());
 
         final ListView listview = (ListView) findViewById(R.id.foreign_list);
 
-//        for(WorkspaceDto w : foreignWorkspaces) foreignws.add(w.getWSName() + " - " + w.getUserEmail());
-
-        final ArrayAdapter<WorkspaceDto> adapter = new ArrayAdapter(this,
+        final ArrayAdapter<WorkspaceDto> adapter = new ArrayAdapter<>(this,
                                 android.R.layout.simple_list_item_1, android.R.id.text1, foreignWorkspaces);
 
         listview.setAdapter(adapter);

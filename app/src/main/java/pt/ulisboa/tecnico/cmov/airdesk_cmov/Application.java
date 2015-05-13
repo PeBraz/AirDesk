@@ -46,7 +46,7 @@ public class Application {
     //Application quota int bytes
     private static final int MAX_APPLICATION_QUOTA = 20;
 
-    public static final Set<Workspace> foreignWorkspaces = new HashSet<Workspace>();
+    public static final Set<WorkspaceDto> foreignWorkspaces = new HashSet<>();
 
     public static void init(android.content.Context AppContext) {
         Application.setUsersDataSource(new UsersDataSource(AppContext));
@@ -204,7 +204,7 @@ public class Application {
     public static void subscribe(Set<WorkspaceDto> targetWs) {
            // Application.foreignWorkspaces.addAll(targetWs);
         for (WorkspaceDto ws: targetWs){
-            Application.foreignWorkspaces.addAll(new ArrayList<Workspace>((Collection)targetWs));
+            Application.foreignWorkspaces.addAll(targetWs);
         }
             //ws.getUserEmail()
             //Application.getOwner().addForeign(ws.getUserEmail(), ws.getWSName());
@@ -253,5 +253,9 @@ public class Application {
 
     public static List<Peer> getPeers(){
         return new ArrayList<>(peers.values());
+    }
+
+    public static Set<WorkspaceDto> getForeign(){
+        return Application.foreignWorkspaces;
     }
 }
