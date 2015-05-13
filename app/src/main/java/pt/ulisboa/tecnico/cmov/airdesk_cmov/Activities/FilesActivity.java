@@ -99,7 +99,7 @@ public class FilesActivity extends ActionBarActivity {
                             runOnUiThread(new Runnable() {
                                 @Override
                                 public void run() {
-                                    showList();
+                                    showListWrap();
                                 }
                             });
                             break;
@@ -119,7 +119,7 @@ public class FilesActivity extends ActionBarActivity {
                 try {
                     while (true) {
                         Thread.sleep(50);
-                        if (peer.filesChanged()) {
+                        if (peer.fileBodyChanged()) {
                             runOnUiThread(new Runnable() {
                                 @Override
                                 public void run() {
@@ -272,8 +272,7 @@ public class FilesActivity extends ActionBarActivity {
 
         TextView text = (TextView) dialog.findViewById(R.id.textView16);
         String fileText = isMyWs? readFileStorage(wsEmail, wsName, filename) : peer.getLocalFileBody();
-        if (fileText == null)
-        {
+        if (fileText == null) {
             Toast.makeText(this, "File is still empty.", Toast.LENGTH_SHORT).show();
         }
         else {
@@ -449,6 +448,12 @@ public class FilesActivity extends ActionBarActivity {
     }
 
     private void showList(){
+        if (isMyWs)
+            showListWrap();
+        else syncGetFiles();
+
+    }
+    private void showListWrap(){
 
         List<String> files = (isMyWs ? ws.getFiles() : peer.getLocalFiles(wsName));
 

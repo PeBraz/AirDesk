@@ -13,6 +13,7 @@ import java.util.List;
 import pt.ulisboa.tecnico.cmov.airdesk_cmov.Activities.FilesActivity;
 import pt.ulisboa.tecnico.cmov.airdesk_cmov.Application;
 import pt.ulisboa.tecnico.cmov.airdesk_cmov.ApplicationOwner;
+import pt.ulisboa.tecnico.cmov.airdesk_cmov.File;
 import pt.ulisboa.tecnico.cmov.airdesk_cmov.Network.messages.CreateFileMessage;
 import pt.ulisboa.tecnico.cmov.airdesk_cmov.Network.messages.FilesMessage;
 import pt.ulisboa.tecnico.cmov.airdesk_cmov.Network.messages.FilesMessageReply;
@@ -229,6 +230,11 @@ public class ServerThread extends Thread{
                 ReadFileMessageReply rfrmsg = (ReadFileMessageReply) msg;
                 Application.getPeer(rfrmsg.getEmail()).setFileBody(rfrmsg.getText());
                 break;
+/*
+            case WRITE_FILE_MESSAGE:
+                WriteFileMEssage wfmdg = (WriteFileMessage) msg;
+                File
+                FilesActivity.writeFileStorage(Application.getOwner().getEmail(), msg.getWsname(), msg.getText());*/
         }
     }
 

@@ -98,7 +98,7 @@ public class Peer {
     }
     public void setFileBody(String body){
         this.fileBody = body;
-        this.fileschanged = true;
+        this.fileBodyChanged = true;
     }
     public boolean fileBodyChanged(){
         return this.fileBodyChanged;
