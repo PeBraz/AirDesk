@@ -1,6 +1,5 @@
 package pt.ulisboa.tecnico.cmov.airdesk_cmov.Network;
 
-import java.io.IOException;
 import java.net.Socket;
 import java.util.HashMap;
 import java.util.List;
@@ -13,7 +12,6 @@ import pt.ulisboa.tecnico.cmov.airdesk_cmov.Workspace;
 class SendThread extends Thread {
     final int FIVE_SECOND = 5000;
 
-    private final List<Socket> allPeers = ServerThread.conns;
     private Map<String, String[]> workspaces = new HashMap<>();
 
     public SendThread() {
