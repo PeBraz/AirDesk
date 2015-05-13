@@ -10,8 +10,10 @@ import java.net.Socket;
 import java.util.ArrayList;
 import java.util.List;
 
+import pt.ulisboa.tecnico.cmov.airdesk_cmov.Activities.FilesActivity;
 import pt.ulisboa.tecnico.cmov.airdesk_cmov.Application;
 import pt.ulisboa.tecnico.cmov.airdesk_cmov.ApplicationOwner;
+import pt.ulisboa.tecnico.cmov.airdesk_cmov.Network.messages.CreateFileMessage;
 import pt.ulisboa.tecnico.cmov.airdesk_cmov.Network.messages.FilesMessage;
 import pt.ulisboa.tecnico.cmov.airdesk_cmov.Network.messages.FilesMessageReply;
 import pt.ulisboa.tecnico.cmov.airdesk_cmov.Network.messages.FindWorkspaceMessage;
@@ -20,6 +22,9 @@ import pt.ulisboa.tecnico.cmov.airdesk_cmov.Network.messages.Message;
 import pt.ulisboa.tecnico.cmov.airdesk_cmov.Network.messages.MyWorkspacesMessage;
 import pt.ulisboa.tecnico.cmov.airdesk_cmov.Network.messages.PingMessage;
 import pt.ulisboa.tecnico.cmov.airdesk_cmov.Network.messages.PongMessage;
+import pt.ulisboa.tecnico.cmov.airdesk_cmov.Network.messages.ReadFileMessage;
+import pt.ulisboa.tecnico.cmov.airdesk_cmov.Network.messages.ReadFileMessageReply;
+import pt.ulisboa.tecnico.cmov.airdesk_cmov.Workspace;
 
 public class ServerThread extends Thread{
 
@@ -209,7 +214,21 @@ public class ServerThread extends Thread{
                 FilesMessageReply msger = (FilesMessageReply) msg;
                 Application.getPeer(msger.getEmail()).setFiles(msger.getWorkspace(), msger.getFiles());
                 break;
+            case CREATE_FILE_MESSAGE:
+                CreateFileMessage cfmsg = (CreateFileMessage) msg;
+                Workspace.createFile(cfmsg.getTitle(), cfmsg.getWorkspace(), Application.getOwner().getEmail());
+                break;
 
+            case READ_FILE_MESSAGE:
+                ReadFileMessage rfmsg = (ReadFileMessage) msg;
+                String text = FilesActivity.readFileStorage(Application.getOwner().getEmail(), rfmsg.getWsname(), rfmsg.getFilename());
+                send(new ReadFileMessageReply(Application.getOwner().getEmail(), text), sock);
+                break;
+
+            case READ_FILE_MESSAGE_REPLY:
+                ReadFileMessageReply rfrmsg = (ReadFileMessageReply) msg;
+                Application.getPeer(rfrmsg.getEmail()).setFileBody(rfrmsg.getText());
+                break;
         }
     }
 

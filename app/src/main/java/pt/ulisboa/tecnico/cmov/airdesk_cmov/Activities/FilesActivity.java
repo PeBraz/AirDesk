@@ -34,6 +34,8 @@ import pt.ulisboa.tecnico.cmov.airdesk_cmov.Exceptions.UserIsMyselfException;
 import pt.ulisboa.tecnico.cmov.airdesk_cmov.Exceptions.UserNotFoundException;
 import pt.ulisboa.tecnico.cmov.airdesk_cmov.Files.FileUtil;
 import pt.ulisboa.tecnico.cmov.airdesk_cmov.Network.Peer;
+import pt.ulisboa.tecnico.cmov.airdesk_cmov.Network.messages.CreateFileMessage;
+import pt.ulisboa.tecnico.cmov.airdesk_cmov.Network.messages.FilesMessage;
 import pt.ulisboa.tecnico.cmov.airdesk_cmov.R;
 import pt.ulisboa.tecnico.cmov.airdesk_cmov.Workspace;
 import pt.ulisboa.tecnico.cmov.airdesk_cmov.WorkspaceDto;
@@ -41,13 +43,13 @@ import pt.ulisboa.tecnico.cmov.airdesk_cmov.WorkspaceDto;
 
 public class FilesActivity extends ActionBarActivity {
 
+    private static final String PACKAGE_NAME = "ist.cmov";
 
     private String wsName = null;
     private String wsEmail = null;
     private Workspace ws = null;
     private Peer peer;
     private boolean isMyWs;
-    private Handler filesHandler;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -62,9 +64,9 @@ public class FilesActivity extends ActionBarActivity {
 
             if (isMyWs) {
                 ws = Application.getOwner().getWorkspace(wsName);
+                showList();
             }else
             {
-
                 this.peer = Application.getPeer(wsEmail);
                 this.syncGetFiles();
             }
@@ -73,10 +75,6 @@ public class FilesActivity extends ActionBarActivity {
         setTitle("Workspace - " + wsName);
 
         final ListView listview = (ListView) findViewById(R.id.listView2);
-
-
-
-
 
         listview.setOnItemClickListener(new AdapterView.OnItemClickListener() {
 
@@ -113,7 +111,30 @@ public class FilesActivity extends ActionBarActivity {
             }
         }).start();
     }
-
+    public void syncGetFile(final String title){
+        (new Thread() {
+            @Override
+            public void run(){
+                peer.getRemoteFileBody(wsName, title);
+                try {
+                    while (true) {
+                        Thread.sleep(50);
+                        if (peer.filesChanged()) {
+                            runOnUiThread(new Runnable() {
+                                @Override
+                                public void run() {
+                                    showReadText(title);
+                                }
+                            });
+                            break;
+                        }
+                    }
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            }
+        }).start();
+    }
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         if (isMyWs) {
@@ -169,12 +190,16 @@ public class FilesActivity extends ActionBarActivity {
                     Toast.makeText(FilesActivity.this, "A value is missing.", Toast.LENGTH_SHORT).show();
                     return;
                 }
-
                 String title = fileTitle.getText().toString() + ".txt";
-                Workspace.createFile(title, wsName, Application.getOwner().getEmail());
+
+                if(isMyWs) {
+                    Workspace.createFile(title, wsName, Application.getOwner().getEmail());
+                }
+                else{
+                    peer.send(new CreateFileMessage(wsName, title));
+                }
                 dialog.dismiss();
                 showList();
-
             }
         });
     }
@@ -205,6 +230,7 @@ public class FilesActivity extends ActionBarActivity {
         readFile.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                syncGetFile(fileName);
                 readFileDialog(fileName);
                 dialog.dismiss();
             }
@@ -213,6 +239,7 @@ public class FilesActivity extends ActionBarActivity {
         writeFile.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                syncGetFile(fileName);
                 writeFileDialog(fileName);
                 dialog.dismiss();
             }
@@ -222,6 +249,7 @@ public class FilesActivity extends ActionBarActivity {
         deleteFile.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                syncGetFile(fileName);
                 deleteFileDialog(fileName);
                 dialog.dismiss();
             }
@@ -229,7 +257,7 @@ public class FilesActivity extends ActionBarActivity {
 
     }
 
-    private void readFileDialog(String filename){
+    private void readFileDialog(String filename) {
 
         final Dialog dialog = new Dialog(this);
         dialog.setTitle(filename);
@@ -241,13 +269,16 @@ public class FilesActivity extends ActionBarActivity {
         dialog.show();
 
         TextView text = (TextView) dialog.findViewById(R.id.textView16);
-        String fileText = readFileStorage(filename);
+        String fileText = readFileStorage(wsEmail, wsName, filename);
 
         if (fileText == null)
+        {
             Toast.makeText(this, "File is still empty.", Toast.LENGTH_SHORT).show();
+        }
+        else {
 
-        else text.setText(fileText);
-
+            text.setText(fileText);
+        }
         Button cancel = (Button) dialog.findViewById(R.id.button11);
 
         cancel.setOnClickListener(new View.OnClickListener() {
@@ -273,31 +304,26 @@ public class FilesActivity extends ActionBarActivity {
         Button save = (Button) dialog.findViewById(R.id.button12);
         final EditText text = (EditText) dialog.findViewById(R.id.editText7);
 
-        final String actualText = readFileStorage(filename);
+        final String actualText = FilesActivity.readFileStorage(wsEmail, wsName,filename);
         //checks space being used, so that id doesn't get counted again
-        final int oldSize = (actualText!=null)? actualText.getBytes().length: 0;
 
         if (actualText!=null)
             text.setText(actualText);
 
+        final FilesActivity self = this;
         save.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 String newText = text.getText().toString();
-                int newSize = newText.getBytes().length;
 
                 try {
-
-                    ws.changeStorageUsed(newSize - oldSize);
-                    boolean success = writeFileStorage(filename, newText);
-                    if (!success)
-                       ws.changeStorageUsed(-(newSize - oldSize));
+                    boolean success = FilesActivity.fileWrite(wsEmail,wsName, filename, newText);
+                    if (success)
+                        Toast.makeText(self, "File written", Toast.LENGTH_SHORT).show();
+                    else
+                        Toast.makeText(self, "External storage not writable", Toast.LENGTH_SHORT).show();
                     dialog.dismiss();
                 }catch(StorageOverLimitException e) {
-                     // not possible in exception
-                    if (BuildConfig.DEBUG && (newSize - oldSize) < 0)
-                        throw new AssertionError("size had negative value, not possible");
-
                     Toast.makeText(getApplicationContext(),
                             "Can't save file, quota over limit.", Toast.LENGTH_SHORT).show();
                 }
@@ -315,6 +341,23 @@ public class FilesActivity extends ActionBarActivity {
         });
     }
 
+    private static boolean fileWrite(String email, String wsname, String filename, String text) throws StorageOverLimitException {
+
+        Workspace ws = Application.getOwner().getWorkspace(wsname);
+
+        //read old text
+        final String actualText = FilesActivity.readFileStorage(email, wsname, filename);
+
+        //calculate new size
+        int newSize = text.getBytes().length;
+        final int oldSize = (actualText!=null)? actualText.getBytes().length: 0;
+        ws.changeStorageUsed(newSize - oldSize);
+
+        boolean success = FilesActivity.writeFileStorage(email, wsname, filename, text);
+        if (!success)
+            ws.changeStorageUsed(-(newSize - oldSize));
+        return success;
+    }
     private void deleteFileDialog(final String filename){ //.txt
 
         final Dialog dialog = new Dialog(this);
@@ -339,43 +382,44 @@ public class FilesActivity extends ActionBarActivity {
         delete.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Workspace.deleteFile(filename, wsName, Application.getOwner().getEmail());
-                int weightLost = deleteFileStorage(filename);
-                try {
-                    ws.changeStorageUsed(-weightLost);
-                }catch(StorageOverLimitException e){
-                    System.out.println(e.getMessage());
-                }
+                FilesActivity.fileDelete(wsEmail, wsName, filename);
                 dialog.dismiss();
                 showList();
             }
         });
     }
 
-    private boolean writeFileStorage(String title, String text) {
-
-        if (FileUtil.isExternalStorageWritable()) {
-            File dir = FileUtil.getExternalFilesDirAllApiLevels(this.getFilesPath());
-            File file = new File(dir, title);
-            FileUtil.writeStringAsFile(text, file);
-            Toast.makeText(this, "File written", Toast.LENGTH_SHORT).show();
-            return true;
-        } else {
-            Toast.makeText(this, "External storage not writable", Toast.LENGTH_SHORT).show();
-            return false;
+    private static void fileDelete(String wsEmail, String wsName, String filename ) {
+        Workspace ws = Application.getOwner().getWorkspace(wsName);
+        Workspace.deleteFile(filename, wsName, Application.getOwner().getEmail());
+        int weightLost = FilesActivity.deleteFileStorage(wsEmail, wsName, filename);
+        try {
+            ws.changeStorageUsed(-weightLost);
+        } catch (StorageOverLimitException e) {
+            System.out.println(e.getMessage());
         }
     }
 
-    private String readFileStorage(String fileName) {
+    public static boolean writeFileStorage(String email, String workspace, String title, String text) {
+
+        if (FileUtil.isExternalStorageWritable()) {
+            File dir = FileUtil.getExternalFilesDirAllApiLevels(getFilesPath(email, workspace));
+            File file = new File(dir, title);
+            FileUtil.writeStringAsFile(text, file);
+            return true;
+        }
+        return false;
+    }
+
+    public static String readFileStorage(String email, String workspace, String fileName) {
 
         if (FileUtil.isExternalStorageReadable()) {
-            File dir = FileUtil.getExternalFilesDirAllApiLevels(this.getFilesPath());
+            File dir = FileUtil.getExternalFilesDirAllApiLevels(getFilesPath(email, workspace));
             File file = new File(dir, fileName);
 
             if (file.exists() && file.canRead())
                 return FileUtil.readFileAsString(file);
         }
-        else Toast.makeText(this, "External storage not readable", Toast.LENGTH_SHORT).show();
 
         return null;
     }
@@ -385,21 +429,18 @@ public class FilesActivity extends ActionBarActivity {
      *
      * @return number of bytes released
      */
-    private int deleteFileStorage(String name){
+    private static int deleteFileStorage(String wsEmail, String wsName, String name){
 
         if (FileUtil.isExternalStorageReadable()) {
 
-            File dir = FileUtil.getExternalFilesDirAllApiLevels(this.getFilesPath());
+            File dir = FileUtil.getExternalFilesDirAllApiLevels(getFilesPath(wsEmail,wsName));
             File file = new File(dir, name);
 
             if (file.exists()) {
 
-                String filetext = readFileStorage(name);
+                String filetext = readFileStorage(wsEmail, wsName, name);
                 if (file.delete()) {
                     return filetext.getBytes().length;
-                }
-                else {
-                    Toast.makeText(this, "Unable to delete file.", Toast.LENGTH_SHORT).show();
                 }
             }
         }
@@ -413,6 +454,23 @@ public class FilesActivity extends ActionBarActivity {
         final ListView listview = (ListView) findViewById(R.id.listView2);
         final ArrayAdapter<String> adapter = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, android.R.id.text1,files);
         listview.setAdapter(adapter);
+    }
+
+    private void showReadText(String filename){
+
+        final LayoutInflater inflater = this.getLayoutInflater();
+        final View dialogView = inflater.inflate(R.layout.dialog_read_file, null);
+        final TextView text = (TextView) dialogView.findViewById(R.id.textView16);
+
+        String fileText = isMyWs? readFileStorage(wsEmail, wsName, filename) : peer.getLocalFileBody();
+
+        if (fileText == null)
+        {
+            Toast.makeText(this, "File is still empty.", Toast.LENGTH_SHORT).show();
+        }
+        else {
+            text.setText(fileText);
+        }
     }
 
     private void changeSettings() {
@@ -573,7 +631,7 @@ public class FilesActivity extends ActionBarActivity {
         });
 
     }
-    public String getFilesPath() {
-        return this.getPackageName() + "/" + wsName + "." + wsEmail;
+    public static String getFilesPath(String wsEmail, String wsName) {
+        return PACKAGE_NAME + "/" + wsName + "." + wsEmail;
     }
 }

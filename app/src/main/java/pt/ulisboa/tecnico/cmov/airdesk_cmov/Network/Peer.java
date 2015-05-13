@@ -9,12 +9,15 @@ import java.util.Map;
 
 import pt.ulisboa.tecnico.cmov.airdesk_cmov.Network.messages.FilesMessage;
 import pt.ulisboa.tecnico.cmov.airdesk_cmov.Network.messages.Message;
+import pt.ulisboa.tecnico.cmov.airdesk_cmov.Network.messages.ReadFileMessage;
 import pt.ulisboa.tecnico.cmov.airdesk_cmov.Workspace;
 import pt.ulisboa.tecnico.cmov.airdesk_cmov.WorkspaceDto;
 
 public class Peer {
 
     private boolean fileschanged = false;
+    private boolean fileBodyChanged = false;
+    private String fileBody;
 
     public Map<String, String[]> getWorkspaces() {
         return workspaces;
@@ -84,4 +87,21 @@ public class Peer {
     public boolean filesChanged(){
         return fileschanged;
     }
+
+    public void getRemoteFileBody(String wsname, String title){
+        this.fileBodyChanged = false;
+        this.send(new ReadFileMessage(wsname, title));
+    }
+
+    public String getLocalFileBody(){
+        return this.fileBody;
+    }
+    public void setFileBody(String body){
+        this.fileBody = body;
+        this.fileschanged = true;
+    }
+    public boolean fileBodyChanged(){
+        return this.fileBodyChanged;
+    }
+
 }
