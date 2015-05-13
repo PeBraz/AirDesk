@@ -123,7 +123,8 @@ public class FilesActivity extends ActionBarActivity {
                             runOnUiThread(new Runnable() {
                                 @Override
                                 public void run() {
-                                    showReadText(title);
+                                    //showReadText(title);
+                                    readFileDialog(title);
                                 }
                             });
                             break;
@@ -216,7 +217,7 @@ public class FilesActivity extends ActionBarActivity {
         dialog.show();
 
         Button cancel = (Button) dialog.findViewById(R.id.button9);
-        Button readFile = (Button) dialog.findViewById(R.id.button10);
+        final Button readFile = (Button) dialog.findViewById(R.id.button10);
         Button writeFile = (Button) dialog.findViewById(R.id.button);
         Button deleteFile = (Button) dialog.findViewById(R.id.button8);
 
@@ -230,8 +231,9 @@ public class FilesActivity extends ActionBarActivity {
         readFile.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                syncGetFile(fileName);
-                readFileDialog(fileName);
+                if (isMyWs)
+                    readFileDialog(fileName);
+                else syncGetFile(fileName);
                 dialog.dismiss();
             }
         });
@@ -239,7 +241,7 @@ public class FilesActivity extends ActionBarActivity {
         writeFile.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                syncGetFile(fileName);
+                if (!isMyWs)syncGetFile(fileName);
                 writeFileDialog(fileName);
                 dialog.dismiss();
             }
@@ -249,7 +251,7 @@ public class FilesActivity extends ActionBarActivity {
         deleteFile.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                syncGetFile(fileName);
+                if (!isMyWs) syncGetFile(fileName);
                 deleteFileDialog(fileName);
                 dialog.dismiss();
             }
@@ -269,8 +271,7 @@ public class FilesActivity extends ActionBarActivity {
         dialog.show();
 
         TextView text = (TextView) dialog.findViewById(R.id.textView16);
-        String fileText = readFileStorage(wsEmail, wsName, filename);
-
+        String fileText = isMyWs? readFileStorage(wsEmail, wsName, filename) : peer.getLocalFileBody();
         if (fileText == null)
         {
             Toast.makeText(this, "File is still empty.", Toast.LENGTH_SHORT).show();
@@ -455,7 +456,7 @@ public class FilesActivity extends ActionBarActivity {
         final ArrayAdapter<String> adapter = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, android.R.id.text1,files);
         listview.setAdapter(adapter);
     }
-
+/*
     private void showReadText(String filename){
 
         final LayoutInflater inflater = this.getLayoutInflater();
@@ -471,7 +472,7 @@ public class FilesActivity extends ActionBarActivity {
         else {
             text.setText(fileText);
         }
-    }
+    }*/
 
     private void changeSettings() {
 
