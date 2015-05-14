@@ -384,7 +384,7 @@ public class FilesActivity extends ActionBarActivity {
                 if (isMyWs)
                     ws.unlock(filename, myKey);
                 else
-                    peer.writeFile(wsName, filename, actualText);
+                    peer.writeFile(wsName, filename, actualText != null ? actualText : "");
                 dialog.dismiss();
             }
         });
