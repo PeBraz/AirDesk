@@ -251,13 +251,17 @@ public class MyWorkSpacesActivity extends ActionBarActivity {
 
     @Override
     protected void onPause() {
+        super.onPause();
+        unregisterReceiver(mReceiver);
+    }
+    @Override
+    protected void onDestroy() {
         try {
             ServerThread.getOut();
         } catch (IOException e) {
             e.printStackTrace();
         }
-        super.onPause();
-        unregisterReceiver(mReceiver);
+        super.onDestroy();
     }
 
     public void discoverPeers(){

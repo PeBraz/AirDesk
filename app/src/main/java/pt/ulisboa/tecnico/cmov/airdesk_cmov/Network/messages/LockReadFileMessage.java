@@ -1,14 +1,14 @@
 package pt.ulisboa.tecnico.cmov.airdesk_cmov.Network.messages;
 
-
 import java.io.Serializable;
 
-public class ReadFileMessage extends Message implements Serializable{
+
+public class LockReadFileMessage extends Message implements Serializable{
 
     private String wsname;
     private String filename;
 
-    public ReadFileMessage(String wsname, String filename){
+    public LockReadFileMessage(String wsname, String filename){
         this.wsname = wsname;
         this.filename = filename;
     }
@@ -21,6 +21,6 @@ public class ReadFileMessage extends Message implements Serializable{
     }
     @Override
     public MessageType getMessageType(){
-        return MessageType.READ_FILE_MESSAGE;
+        return MessageType.LOCK_READ_FILE_MESSAGE;
     }
 }

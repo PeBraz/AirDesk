@@ -13,8 +13,16 @@ public class InviteMessage extends Message implements Serializable{
         this.workspace = workspace; //the sender's workspace
     }
 
+    public String getEmail() {
+        return email;
+    }
+
+    public String getWorkspace() {
+        return workspace;
+    }
+
     @Override
     public MessageType getMessageType(){
-        return MessageType.INVITE;
+        return MessageType.INVITE_MESSAGE;
     }
 }

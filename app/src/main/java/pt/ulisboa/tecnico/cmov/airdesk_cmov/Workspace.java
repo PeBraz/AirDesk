@@ -9,13 +9,17 @@ import java.io.ObjectOutput;
 import java.io.ObjectOutputStream;
 import java.io.StreamCorruptedException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+
 import pt.ulisboa.tecnico.cmov.airdesk_cmov.Database.FilesDataSource;
 import pt.ulisboa.tecnico.cmov.airdesk_cmov.Exceptions.NotOwnerException;
 import pt.ulisboa.tecnico.cmov.airdesk_cmov.Exceptions.StorageOverLimitException;
 import pt.ulisboa.tecnico.cmov.airdesk_cmov.Exceptions.UserAlreadyAddedException;
 import pt.ulisboa.tecnico.cmov.airdesk_cmov.Exceptions.UserIsMyselfException;
-
+import pt.ulisboa.tecnico.cmov.airdesk_cmov.Network.Peer;
+import pt.ulisboa.tecnico.cmov.airdesk_cmov.util.Util;
 
 
 public class Workspace {
@@ -36,6 +40,7 @@ public class Workspace {
     private static FilesDataSource filedb;
     private List<String> accessList = new ArrayList<>();
 
+    private final Map<String, String> locks = new HashMap<>();
 
     public Workspace(final String name, final int quota, final User owner) {
         this.name = name;
@@ -296,7 +301,7 @@ public class Workspace {
      *
      * @param user that is invited
      */
-    public final void invite(User user)
+   /* public final void invite(User user)
             throws UserIsMyselfException, UserAlreadyAddedException {
 
         if (user.getEmail().equals(Application.getOwner().getEmail()))
@@ -306,12 +311,36 @@ public class Workspace {
 
         this.addAccessListUser(user);
         this.save();
-        /*
-        *  The invite just stores it automatically into the target user foreign workspace list
-        *
-        */
+
+
         user.addForeign(this.populateUser().getOwner().getEmail(), this.name);
         user.save();
+    }
+*/
+
+    /**
+     *  Tell peer to add this workspace to the foreign workspaces
+     *
+     * @param peername name of the remote peer that was invited
+     * @throws UserIsMyselfException
+     * @throws UserAlreadyAddedException
+     */
+    public final void invite(String peername)
+        throws UserIsMyselfException, UserAlreadyAddedException {
+
+
+            if (peername.equals(Application.getOwner().getEmail()))
+                throw new UserIsMyselfException();
+            if (this.accessList.indexOf(peername) != -1)
+                throw new UserAlreadyAddedException(peername);
+
+            if (Application.hasPeer(peername)){
+                Peer peer = Application.getPeer(peername);
+                peer.getInvited(this.getName());
+            }
+            else {
+                System.out.println("Peer " + peername + " not found.");
+            }
     }
 
     public final List<String> getFiles() {
@@ -321,5 +350,35 @@ public class Workspace {
                     && f.getUser().equals(this.populateUser().getOwner().getEmail()))
                 res.add(f.getName());
         return res;
+    }
+
+    public String lock(String filename) {
+
+        synchronized (this.locks) {
+            boolean canLock = !this.locks.containsKey(filename) || this.locks.get(filename) == null;
+            if (canLock) {
+                String key = Util.generateSecureRandomString();
+                this.locks.put(filename, key);
+                return key;
+            }
+            return null;
+        }
+
+    }
+    /*
+     *   A peer wants to commit changes to a file if the original key corresponds to the one
+     *   in the lock, the changed can be accepted and the file is unlocked
+    **/
+    public boolean unlock(String filename, String originalKey) {
+        System.out.println("Attemp to unlock: " + filename +"; with key: " + originalKey);
+        synchronized (this.locks){
+            if (this.locks.get(filename) == null || this.locks.get(filename).equals(originalKey)) {
+                System.out.println("Unlock was successful, clearing lock");
+                this.locks.put(filename, null);
+                return true;
+            }
+            System.out.println("unlock failed");
+            return false;
+        }
     }
 }

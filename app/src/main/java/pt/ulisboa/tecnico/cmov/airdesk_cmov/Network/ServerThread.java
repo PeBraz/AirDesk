@@ -13,19 +13,26 @@ import java.util.List;
 import pt.ulisboa.tecnico.cmov.airdesk_cmov.Activities.FilesActivity;
 import pt.ulisboa.tecnico.cmov.airdesk_cmov.Application;
 import pt.ulisboa.tecnico.cmov.airdesk_cmov.ApplicationOwner;
+import pt.ulisboa.tecnico.cmov.airdesk_cmov.Exceptions.StorageOverLimitException;
 import pt.ulisboa.tecnico.cmov.airdesk_cmov.File;
 import pt.ulisboa.tecnico.cmov.airdesk_cmov.Network.messages.CreateFileMessage;
+import pt.ulisboa.tecnico.cmov.airdesk_cmov.Network.messages.DeleteFileMessage;
 import pt.ulisboa.tecnico.cmov.airdesk_cmov.Network.messages.FilesMessage;
 import pt.ulisboa.tecnico.cmov.airdesk_cmov.Network.messages.FilesMessageReply;
 import pt.ulisboa.tecnico.cmov.airdesk_cmov.Network.messages.FindWorkspaceMessage;
 import pt.ulisboa.tecnico.cmov.airdesk_cmov.Network.messages.FindWorkspaceReplyMessage;
+import pt.ulisboa.tecnico.cmov.airdesk_cmov.Network.messages.InviteMessage;
+import pt.ulisboa.tecnico.cmov.airdesk_cmov.Network.messages.LockReadFileMessage;
+import pt.ulisboa.tecnico.cmov.airdesk_cmov.Network.messages.LockReadFileMessageReply;
 import pt.ulisboa.tecnico.cmov.airdesk_cmov.Network.messages.Message;
 import pt.ulisboa.tecnico.cmov.airdesk_cmov.Network.messages.MyWorkspacesMessage;
 import pt.ulisboa.tecnico.cmov.airdesk_cmov.Network.messages.PingMessage;
 import pt.ulisboa.tecnico.cmov.airdesk_cmov.Network.messages.PongMessage;
 import pt.ulisboa.tecnico.cmov.airdesk_cmov.Network.messages.ReadFileMessage;
 import pt.ulisboa.tecnico.cmov.airdesk_cmov.Network.messages.ReadFileMessageReply;
+import pt.ulisboa.tecnico.cmov.airdesk_cmov.Network.messages.WriteFileMessage;
 import pt.ulisboa.tecnico.cmov.airdesk_cmov.Workspace;
+import pt.ulisboa.tecnico.cmov.airdesk_cmov.WorkspaceDto;
 
 public class ServerThread extends Thread{
 
@@ -58,10 +65,15 @@ public class ServerThread extends Thread{
                 clientThread(sock).start();
             }
         } catch (IOException e) {
-            System.out.println(e.getMessage());
+            System.out.println("My server socket went down" + e.getMessage());
             if (server != null) {
                 try {
                     server.close();
+                    synchronized (conns){
+                        for (Socket s : conns){
+                            s.close();
+                        }
+                    }
                 } catch (IOException e1) {
                     e1.printStackTrace();
                 }
@@ -74,7 +86,9 @@ public class ServerThread extends Thread{
             ServerThread.server.close();
         }
     }
-
+    /*
+    *   Connect to a listening socket
+    */
     private static Thread clientThread(final InetAddress ip, final int port) {
         return new Thread(){
 
@@ -83,51 +97,29 @@ public class ServerThread extends Thread{
                 Socket sock;
                 try {
                     sock = new Socket(ip, port);
+                    clientThread(sock).start();
                 } catch (IOException e) {
-                    e.printStackTrace();
+                    System.out.println("Attempted connection to: " + ip + ", but failed.");
                     return;
                 }
-                synchronized (conns) {
-                    conns.add(sock);
-                    listIP.add(sock.getInetAddress());
-                }
+
                 if(isGroupOwner(ip)){
-                    try {
                         send(new PingMessage(Application.getOwner().getEmail()),sock);
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                    }
-                }
-                ObjectInputStream ois;
-                try {
-                    while (true) {
-                        ois = new ObjectInputStream(sock.getInputStream());
-                        Message msg = (Message) ois.readObject();
-                        ServerThread.handleMsg(msg, sock);
-                    }
-                } catch (IOException e) {
-                    System.out.println(e.getMessage());
-                    synchronized (conns) {
-                        conns.remove(sock);
-                        listIP.remove(sock.getInetAddress());
-                    }
-                    try {
-                        sock.close();
-                    } catch (IOException e1) {
-                        e1.printStackTrace();
-                    }
-                } catch (ClassNotFoundException e) {
-                    e.printStackTrace();
                 }
             }
         };
     }
+
 
     private static Thread clientThread(final Socket sock) {
         return new Thread(){
 
             @Override
             public void run() {
+                synchronized (conns){
+                    conns.add(sock);
+                    listIP.add(sock.getInetAddress());
+                }
 
                 ObjectInputStream ois;
                 try {
@@ -137,7 +129,7 @@ public class ServerThread extends Thread{
                         ServerThread.handleMsg(msg, sock);
                     }
                 } catch (IOException e) {
-                    System.out.println(e.getMessage());
+                    System.out.println("Client Thread: " + e.getMessage());
                     synchronized (conns) {
                         conns.remove(sock);
                         listIP.remove(sock.getInetAddress());
@@ -153,6 +145,7 @@ public class ServerThread extends Thread{
             }
         };
     }
+
     public static void join(InetAddress ip, int port) throws IOException {
         System.out.println("joining group");
         clientThread(ip,port).start();
@@ -166,9 +159,19 @@ public class ServerThread extends Thread{
         }
     }
 
-    public static void send(Message message, Socket socket) throws IOException {
+    public static boolean send(Message message, Socket socket)  {
         System.out.println("send message started");
-        new ObjectOutputStream(socket.getOutputStream()).writeObject(message);
+        try {
+            new ObjectOutputStream(socket.getOutputStream()).writeObject(message);
+            return true;
+        }catch(IOException e){
+            System.out.println("Failed to send a message" + e);
+            System.out.println("Socket removed: " + socket.getInetAddress());
+            synchronized (conns){
+                conns.remove(socket);
+            }
+            return false;
+        }
     }
 
     public static void sendPong(Socket s) throws IOException {
@@ -203,7 +206,6 @@ public class ServerThread extends Thread{
             case MY_WORKSPACES:
                 System.out.println("workspaces received");
                 MyWorkspacesMessage msge = (MyWorkspacesMessage) msg;
-                System.out.println("MEEAS " + msge.getOwner());
                 Application.getPeer(msge.getOwner()).addTags(msge.getWorkspaces());
                 break;
             case FILES_MESSAGE:
@@ -225,16 +227,48 @@ public class ServerThread extends Thread{
                 String text = FilesActivity.readFileStorage(Application.getOwner().getEmail(), rfmsg.getWsname(), rfmsg.getFilename());
                 send(new ReadFileMessageReply(Application.getOwner().getEmail(), text), sock);
                 break;
-
             case READ_FILE_MESSAGE_REPLY:
                 ReadFileMessageReply rfrmsg = (ReadFileMessageReply) msg;
                 Application.getPeer(rfrmsg.getEmail()).setFileBody(rfrmsg.getText());
                 break;
-/*
+            case LOCK_READ_FILE_MESSAGE:
+                LockReadFileMessage lrfmsg = (LockReadFileMessage) msg;
+
+                Workspace ws = Application.getOwner().getWorkspace(lrfmsg.getWsname());
+                String text2 = FilesActivity.readFileStorage(Application.getOwner().getEmail(), lrfmsg.getWsname(), lrfmsg.getFilename());
+                String lockVal = ws.lock(lrfmsg.getFilename());
+
+                //lockVal is null if unable to get lock
+                send(new LockReadFileMessageReply(Application.getOwner().getEmail(), lockVal==null? "": text2, lockVal), sock);
+
+                break;
+            case LOCK_READ_FILE_MESSAGE_REPLY:
+                LockReadFileMessageReply lrfrmsg = (LockReadFileMessageReply) msg;
+                //if lock was acquired successfully, change peer state
+                if (lrfrmsg.getKey() != null)
+                    Application.getPeer(lrfrmsg.getEmail()).setKey(lrfrmsg.getKey(), lrfrmsg.getText());
+
+                break;
+
             case WRITE_FILE_MESSAGE:
-                WriteFileMEssage wfmdg = (WriteFileMessage) msg;
-                File
-                FilesActivity.writeFileStorage(Application.getOwner().getEmail(), msg.getWsname(), msg.getText());*/
+                WriteFileMessage wfmsg = (WriteFileMessage) msg;
+                Workspace ws1 = Application.getOwner().getWorkspace(wfmsg.getWorkspace());
+                try {
+                    if (ws1.unlock(wfmsg.getFilename(), wfmsg.getKey())) {
+                        FilesActivity.fileWrite(Application.getOwner().getEmail(), wfmsg.getWorkspace(), wfmsg.getFilename(), wfmsg.getText());
+                    }
+                } catch (StorageOverLimitException e) {
+                    e.printStackTrace();
+                }
+                break;
+            case DELETE_FILE_MESSAGE:
+                DeleteFileMessage dfmsg = (DeleteFileMessage) msg;
+                FilesActivity.fileDelete(Application.getOwner().getEmail(), dfmsg.getWorkspace(), dfmsg.getFilename());
+                break;
+            case INVITE_MESSAGE:
+                InviteMessage imsg = (InviteMessage) msg;
+                Application.subscribe(new WorkspaceDto(imsg.getEmail(), imsg.getWorkspace()));
+                break;
         }
     }
 

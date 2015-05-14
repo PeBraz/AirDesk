@@ -23,13 +23,13 @@ class SendThread extends Thread {
             while (true) {
                 Thread.sleep(FIVE_SECOND);
                 checkWorkspaces();
-                synchronized (ServerThread.conns) {
-                    for (Peer peer : Application.getPeers())
-                        peer.send(new MyWorkspacesMessage(
-                                workspaces,
+                boolean success;
+                for (Peer peer : Application.getPeers()) {
+                    success = peer.send(new MyWorkspacesMessage(workspaces,
                                 Application.getOwner().getEmail()));
+                    if (!success)
+                        Application.removePeer(peer);
                 }
-
             }
         } catch (InterruptedException e) {
             e.printStackTrace();

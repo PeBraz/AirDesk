@@ -1,10 +1,8 @@
 package pt.ulisboa.tecnico.cmov.airdesk_cmov.Activities;
 
-
 import android.app.Dialog;
 import android.content.Intent;
-import android.os.Handler;
-import android.os.Looper;
+
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -21,24 +19,18 @@ import android.widget.SeekBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.util.List;
 
 import pt.ulisboa.tecnico.cmov.airdesk_cmov.Application;
-
-import pt.ulisboa.tecnico.cmov.airdesk_cmov.BuildConfig;
 import pt.ulisboa.tecnico.cmov.airdesk_cmov.Exceptions.StorageOverLimitException;
 import pt.ulisboa.tecnico.cmov.airdesk_cmov.Exceptions.UserAlreadyAddedException;
 import pt.ulisboa.tecnico.cmov.airdesk_cmov.Exceptions.UserIsMyselfException;
-import pt.ulisboa.tecnico.cmov.airdesk_cmov.Exceptions.UserNotFoundException;
 import pt.ulisboa.tecnico.cmov.airdesk_cmov.Files.FileUtil;
 import pt.ulisboa.tecnico.cmov.airdesk_cmov.Network.Peer;
 import pt.ulisboa.tecnico.cmov.airdesk_cmov.Network.messages.CreateFileMessage;
-import pt.ulisboa.tecnico.cmov.airdesk_cmov.Network.messages.FilesMessage;
 import pt.ulisboa.tecnico.cmov.airdesk_cmov.R;
 import pt.ulisboa.tecnico.cmov.airdesk_cmov.Workspace;
-import pt.ulisboa.tecnico.cmov.airdesk_cmov.WorkspaceDto;
 
 
 public class FilesActivity extends ActionBarActivity {
@@ -50,6 +42,8 @@ public class FilesActivity extends ActionBarActivity {
     private Workspace ws = null;
     private Peer peer;
     private boolean isMyWs;
+    public String myKey = null;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -123,10 +117,38 @@ public class FilesActivity extends ActionBarActivity {
                             runOnUiThread(new Runnable() {
                                 @Override
                                 public void run() {
-                                    //showReadText(title);
                                     readFileDialog(title);
                                 }
                             });
+                            break;
+                        }
+                    }
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            }
+        }).start();
+    }
+    /*
+    *   Tries to open a session for writing in the file
+    **/
+    public void syncOpenSession(final String title){
+        (new Thread() {
+            @Override
+            public void run() {
+                peer.getLockedRemoteFileBody(wsName, title);
+                try {
+                    while (true) {
+                        Thread.sleep(50);
+                        if (peer.fileBodyChanged()) {
+                            if (peer.lockAcquired()) {
+                                runOnUiThread(new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        writeFileDialog(title);
+                                    }
+                                });
+                            }
                             break;
                         }
                     }
@@ -237,12 +259,21 @@ public class FilesActivity extends ActionBarActivity {
                 dialog.dismiss();
             }
         });
-
+        final FilesActivity self = this;
         writeFile.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (!isMyWs)syncGetFile(fileName);
-                writeFileDialog(fileName);
+                if (!isMyWs)syncOpenSession(fileName);
+                else {
+                    myKey = ws.lock(fileName);
+                    if (myKey != null) {
+                        writeFileDialog(fileName);
+                        Toast.makeText(self, "Acquired Lock on local file", Toast.LENGTH_SHORT).show();
+                    }
+                    else{
+                        Toast.makeText(self, "File is locked by a remote User", Toast.LENGTH_SHORT).show();
+                    }
+                }
                 dialog.dismiss();
             }
         });
@@ -251,7 +282,6 @@ public class FilesActivity extends ActionBarActivity {
         deleteFile.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (!isMyWs) syncGetFile(fileName);
                 deleteFileDialog(fileName);
                 dialog.dismiss();
             }
@@ -304,24 +334,36 @@ public class FilesActivity extends ActionBarActivity {
         Button save = (Button) dialog.findViewById(R.id.button12);
         final EditText text = (EditText) dialog.findViewById(R.id.editText7);
 
-        final String actualText = FilesActivity.readFileStorage(wsEmail, wsName,filename);
+        final String actualText = isMyWs? readFileStorage(wsEmail, wsName, filename) : peer.getLocalFileBody();
+        //final String actualText = FilesActivity.readFileStorage(wsEmail, wsName,filename);
         //checks space being used, so that id doesn't get counted again
 
-        if (actualText!=null)
-            text.setText(actualText);
+        text.setText( actualText != null ? actualText : "" );
 
         final FilesActivity self = this;
+
         save.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 String newText = text.getText().toString();
-
                 try {
-                    boolean success = FilesActivity.fileWrite(wsEmail,wsName, filename, newText);
-                    if (success)
-                        Toast.makeText(self, "File written", Toast.LENGTH_SHORT).show();
-                    else
-                        Toast.makeText(self, "External storage not writable", Toast.LENGTH_SHORT).show();
+                    if (isMyWs) {
+                        //owner must also acquire lock locally, stores the key in the activity
+                        if (ws.unlock(filename, myKey)) {
+                            boolean success = FilesActivity.fileWrite(wsEmail, wsName, filename, newText);
+                            if (success)
+                                Toast.makeText(self, "File written", Toast.LENGTH_SHORT).show();
+                            else
+                                Toast.makeText(self, "External storage not writable", Toast.LENGTH_SHORT).show();
+                        }
+                        else {
+                            Toast.makeText(self, "Tried to unlock a file with the wrong key.", Toast.LENGTH_SHORT).show();
+                        }
+                    }
+                    else {
+                        peer.writeFile(wsName, filename, newText);
+
+                    }
                     dialog.dismiss();
                 }catch(StorageOverLimitException e) {
                     Toast.makeText(getApplicationContext(),
@@ -336,12 +378,16 @@ public class FilesActivity extends ActionBarActivity {
         cancel.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                if (isMyWs)
+                    ws.unlock(filename, myKey);
+                else
+                    peer.writeFile(wsName, filename, actualText);
                 dialog.dismiss();
             }
         });
     }
 
-    private static boolean fileWrite(String email, String wsname, String filename, String text) throws StorageOverLimitException {
+    public static boolean fileWrite(String email, String wsname, String filename, String text) throws StorageOverLimitException {
 
         Workspace ws = Application.getOwner().getWorkspace(wsname);
 
@@ -382,14 +428,17 @@ public class FilesActivity extends ActionBarActivity {
         delete.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                FilesActivity.fileDelete(wsEmail, wsName, filename);
+                if (isMyWs)
+                    FilesActivity.fileDelete(wsEmail, wsName, filename);
+                else
+                    peer.deleteFile(wsName,filename);
                 dialog.dismiss();
                 showList();
             }
         });
     }
 
-    private static void fileDelete(String wsEmail, String wsName, String filename ) {
+    public static void fileDelete(String wsEmail, String wsName, String filename ) {
         Workspace ws = Application.getOwner().getWorkspace(wsName);
         Workspace.deleteFile(filename, wsName, Application.getOwner().getEmail());
         int weightLost = FilesActivity.deleteFileStorage(wsEmail, wsName, filename);
@@ -571,15 +620,15 @@ public class FilesActivity extends ActionBarActivity {
             @Override
             public void onClick(View v) {
                 EditText text = (EditText) dialog.findViewById(R.id.invite_user_email);
-                String email = text.getText().toString();
+                String email = text.getText().toString().trim();
                 if (email.isEmpty()) {
                     error.setText("No email given");
                     return;
                 }
                 try {
-                    ws.invite(Application.getNetworkUser(email));
+                    ws.invite(email);
                     dialog.dismiss();
-                }catch(UserIsMyselfException | UserNotFoundException | UserAlreadyAddedException e) {
+                }catch(UserIsMyselfException | UserAlreadyAddedException e) {
                     error.setText(e.getMessage());
                 }
             }
@@ -640,4 +689,5 @@ public class FilesActivity extends ActionBarActivity {
     public static String getFilesPath(String wsEmail, String wsName) {
         return PACKAGE_NAME + "/" + wsName + "." + wsEmail;
     }
+
 }

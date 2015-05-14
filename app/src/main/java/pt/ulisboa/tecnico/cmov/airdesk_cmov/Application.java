@@ -201,14 +201,22 @@ public class Application {
         return null;
     }
 
-    public static void subscribe(Set<WorkspaceDto> targetWs) {
-           // Application.foreignWorkspaces.addAll(targetWs);
-        for (WorkspaceDto ws: targetWs){
-            Application.foreignWorkspaces.addAll(targetWs);
-        }
-            //ws.getUserEmail()
-            //Application.getOwner().addForeign(ws.getUserEmail(), ws.getWSName());
+    public static boolean hasPeer(String email){
+        return Application.getPeer(email) != null;
     }
+
+    public static void subscribe(WorkspaceDto ws){
+        //Application.foreignWorkspaces.add(ws);
+        Application.owner.addForeign(ws.getUserEmail(), ws.getWSName());
+    }
+
+    public static void subscribe(Set<WorkspaceDto> targetWs) {
+        //Application.foreignWorkspaces.addAll(targetWs);
+        for (WorkspaceDto ws : targetWs){
+            Application.owner.addForeign(ws.getUserEmail(), ws.getWSName());
+        }
+    }
+
     /**
     * Returns the device storage available in the internal storage of the device (as bytes)
     *
@@ -255,7 +263,30 @@ public class Application {
         return new ArrayList<>(peers.values());
     }
 
+
     public static Set<WorkspaceDto> getForeign(){
-        return Application.foreignWorkspaces;
+        Set<WorkspaceDto> returnDtos = new HashSet<>();
+        System.out.println("Im subscribed to:");
+        for (WorkspaceDto dto : Application.getOwner().getForeign()){   //all my foreign workspaces
+            System.out.print(dto.getWSName());
+            if (Application.hasPeer(dto.getUserEmail())) {              // if is connected on the network
+                System.out.print(": Is connected");
+                Peer peer = Application.getPeer(dto.getUserEmail());
+                if (peer.workspaceExists(dto.getWSName())) {        // if the owner broadcasted the workspace
+                    System.out.println(": The owner has it");
+                    returnDtos.add(dto);
+                } else {
+                    System.out.println(": The owner does not have it");
+                    Application.getOwner().remForeign(dto.getUserEmail(), dto.getWSName());
+                }
+            }
+        }
+        return returnDtos;
+    //    return Application.foreignWorkspaces;
+    }
+
+    public static void removePeer(Peer peer){
+        System.out.println("Removed peer: " + peer.getOwner());
+        Application.peers.remove(peer.getOwner());
     }
 }

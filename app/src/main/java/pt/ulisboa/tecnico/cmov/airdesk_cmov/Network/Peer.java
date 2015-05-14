@@ -7,9 +7,14 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import pt.ulisboa.tecnico.cmov.airdesk_cmov.Application;
+import pt.ulisboa.tecnico.cmov.airdesk_cmov.Network.messages.DeleteFileMessage;
 import pt.ulisboa.tecnico.cmov.airdesk_cmov.Network.messages.FilesMessage;
+import pt.ulisboa.tecnico.cmov.airdesk_cmov.Network.messages.InviteMessage;
+import pt.ulisboa.tecnico.cmov.airdesk_cmov.Network.messages.LockReadFileMessage;
 import pt.ulisboa.tecnico.cmov.airdesk_cmov.Network.messages.Message;
 import pt.ulisboa.tecnico.cmov.airdesk_cmov.Network.messages.ReadFileMessage;
+import pt.ulisboa.tecnico.cmov.airdesk_cmov.Network.messages.WriteFileMessage;
 import pt.ulisboa.tecnico.cmov.airdesk_cmov.Workspace;
 import pt.ulisboa.tecnico.cmov.airdesk_cmov.WorkspaceDto;
 
@@ -18,6 +23,9 @@ public class Peer {
     private boolean fileschanged = false;
     private boolean fileBodyChanged = false;
     private String fileBody;
+    private Boolean lock = false;
+    private final Object localLock = new Object();
+    private String key = "";
 
     public Map<String, String[]> getWorkspaces() {
         return workspaces;
@@ -52,14 +60,10 @@ public class Peer {
         this.workspaces = ws;
     }
 
-    public void send(Message msg){
-        try {
-            ServerThread.send(msg,this.s);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+    public boolean send(Message msg){
+            return ServerThread.send(msg,this.s);
     }
-/*
+    /*
     public WorkspaceDto getWorkspace(String wsName) {
         return ;
     }*/
@@ -94,7 +98,9 @@ public class Peer {
     }
 
     public String getLocalFileBody(){
-        return this.fileBody;
+        String ret = this.fileBody;
+        this.fileBody = "";
+        return ret;
     }
     public void setFileBody(String body){
         this.fileBody = body;
@@ -104,4 +110,46 @@ public class Peer {
         return this.fileBodyChanged;
     }
 
+    /*
+     * Check if a stored foreign workspace stopped being broadcasted by the peer
+     */
+    public boolean workspaceExists(String wsname){
+        return this.workspaces.containsKey(wsname);
+    }
+
+    public void writeFile(String workspace, String filename, String text){
+        this.send(new WriteFileMessage(workspace, filename, text, this.key));
+    }
+    public void deleteFile(String workspace, String filename){
+        this.send(new DeleteFileMessage(workspace, filename));
+    }
+
+
+    public void getInvited(String workspaceName){
+        this.send(new InviteMessage(Application.getOwner().getEmail(), workspaceName));
+    }
+
+    public boolean lockAcquired(){
+        synchronized (this.localLock) {
+            if (this.lock) {
+                this.lock = false;
+                return true;
+            }
+            return false;
+        }
+    }
+
+    public void getLockedRemoteFileBody(String wsName, String title) {
+        this.fileBodyChanged = false;
+        this.send(new LockReadFileMessage(wsName, title));
+    }
+
+    //key being used to keep the current file locked
+    public void setKey(String key, String text){
+        synchronized (this.localLock) {
+            this.lock = true;
+            this.key = key;
+            this.setFileBody(text);
+        }
+    }
 }

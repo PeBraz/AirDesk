@@ -77,6 +77,8 @@ public class User {
         return this.foreignWs;
     }
 
+
+
     protected final void setForeign(Set<WorkspaceDto> foreign) {
         this.foreignWs = foreign;
     }
