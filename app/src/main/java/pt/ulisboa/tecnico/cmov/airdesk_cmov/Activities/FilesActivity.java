@@ -346,8 +346,11 @@ public class FilesActivity extends ActionBarActivity {
             @Override
             public void onClick(View v) {
                 String newText = text.getText().toString();
+                if (newText == null) newText = "";
+
                 try {
                     if (isMyWs) {
+                        System.out.println("Trying to acquire lock, on my file");
                         //owner must also acquire lock locally, stores the key in the activity
                         if (ws.unlock(filename, myKey)) {
                             boolean success = FilesActivity.fileWrite(wsEmail, wsName, filename, newText);

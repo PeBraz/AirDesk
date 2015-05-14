@@ -7,8 +7,11 @@ import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.sql.SQLOutput;
 import java.util.ArrayList;
 import java.util.List;
+
+import javax.xml.transform.Source;
 
 import pt.ulisboa.tecnico.cmov.airdesk_cmov.Activities.FilesActivity;
 import pt.ulisboa.tecnico.cmov.airdesk_cmov.Application;
@@ -233,10 +236,12 @@ public class ServerThread extends Thread{
                 break;
             case LOCK_READ_FILE_MESSAGE:
                 LockReadFileMessage lrfmsg = (LockReadFileMessage) msg;
-
+                System.out.println("USER WANTS LOCK for : " + lrfmsg.getFilename());
                 Workspace ws = Application.getOwner().getWorkspace(lrfmsg.getWsname());
                 String text2 = FilesActivity.readFileStorage(Application.getOwner().getEmail(), lrfmsg.getWsname(), lrfmsg.getFilename());
                 String lockVal = ws.lock(lrfmsg.getFilename());
+
+
 
                 //lockVal is null if unable to get lock
                 send(new LockReadFileMessageReply(Application.getOwner().getEmail(), lockVal==null? "": text2, lockVal), sock);
@@ -245,16 +250,20 @@ public class ServerThread extends Thread{
             case LOCK_READ_FILE_MESSAGE_REPLY:
                 LockReadFileMessageReply lrfrmsg = (LockReadFileMessageReply) msg;
                 //if lock was acquired successfully, change peer state
-                if (lrfrmsg.getKey() != null)
-                    Application.getPeer(lrfrmsg.getEmail()).setKey(lrfrmsg.getKey(), lrfrmsg.getText());
 
+                if (lrfrmsg.getKey() != null) {
+                    System.out.println("Received Lock");
+                    Application.getPeer(lrfrmsg.getEmail()).setKey(lrfrmsg.getKey(), lrfrmsg.getText());
+                }else System.out.println("did not receive lock");
                 break;
 
             case WRITE_FILE_MESSAGE:
                 WriteFileMessage wfmsg = (WriteFileMessage) msg;
                 Workspace ws1 = Application.getOwner().getWorkspace(wfmsg.getWorkspace());
                 try {
+                    System.out.println("foreign user wants to unlock file");
                     if (ws1.unlock(wfmsg.getFilename(), wfmsg.getKey())) {
+                        System.out.println("Unlocked, text: " + wfmsg.getText());
                         FilesActivity.fileWrite(Application.getOwner().getEmail(), wfmsg.getWorkspace(), wfmsg.getFilename(), wfmsg.getText());
                     }
                 } catch (StorageOverLimitException e) {

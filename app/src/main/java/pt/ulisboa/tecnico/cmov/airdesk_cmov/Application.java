@@ -40,6 +40,9 @@ public class Application {
 
     private static Map<String,Peer> peers = new HashMap<>();
 
+    private final static Map<String, String> locks = new HashMap<>();
+
+
     //The Data source should not be called from here, should instead be called from the owner
     private static WorkspacesDataSource workspaceData = null;
 
@@ -288,5 +291,9 @@ public class Application {
     public static void removePeer(Peer peer){
         System.out.println("Removed peer: " + peer.getOwner());
         Application.peers.remove(peer.getOwner());
+    }
+
+    public static Map<String,String> getLocks(){
+        return Application.locks;
     }
 }

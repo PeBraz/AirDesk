@@ -40,7 +40,6 @@ public class Workspace {
     private static FilesDataSource filedb;
     private List<String> accessList = new ArrayList<>();
 
-    private final Map<String, String> locks = new HashMap<>();
 
     public Workspace(final String name, final int quota, final User owner) {
         this.name = name;
@@ -353,14 +352,18 @@ public class Workspace {
     }
 
     public String lock(String filename) {
+        System.out.println("ACQUIREING LOCK for " + filename);
+        Map<String,String> locks = Application.getLocks();
+        synchronized (locks) {
 
-        synchronized (this.locks) {
-            boolean canLock = !this.locks.containsKey(filename) || this.locks.get(filename) == null;
+            boolean canLock = !locks.containsKey(filename) || locks.get(filename) == null;
             if (canLock) {
+                System.out.println("can lock");
                 String key = Util.generateSecureRandomString();
-                this.locks.put(filename, key);
+                locks.put(filename, key);
                 return key;
             }
+            System.out.println("CANT lock");
             return null;
         }
 
@@ -370,11 +373,12 @@ public class Workspace {
      *   in the lock, the changed can be accepted and the file is unlocked
     **/
     public boolean unlock(String filename, String originalKey) {
-        System.out.println("Attemp to unlock: " + filename +"; with key: " + originalKey);
-        synchronized (this.locks){
-            if (this.locks.get(filename) == null || this.locks.get(filename).equals(originalKey)) {
+        System.out.println("Attempt to unlock: " + filename +"; with key: " + originalKey);
+        Map<String, String> locks = Application.getLocks();
+        synchronized (locks){
+            if (locks.get(filename) == null || locks.get(filename).equals(originalKey)) {
                 System.out.println("Unlock was successful, clearing lock");
-                this.locks.put(filename, null);
+                locks.put(filename, null);
                 return true;
             }
             System.out.println("unlock failed");
