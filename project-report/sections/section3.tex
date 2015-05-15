@@ -1,0 +1,16 @@
+\section{Desenho da Aplicação}
+
+\subsection{Plataforma escolhida}
+O projecto, foi desenvolvido e testado para correr em dispositos reais. 
+\subsection{Arquitectura}
+Todo do estado da aplicação, é guardado de forma persistente numa base de dados relacional \textit{SQLite}. Os ficheiros são guardados internamente no dispositivo móvel. A aplicação funciona de maneira distribuída usando o \textit{Wi-Fi Direct} com o objectivo de haver partilha de informação entre diversos utilizadores na mesma rede. Na camada superior ao \textit{Wi-Fi Direct} é corrido um servidor que aceita vários pedidos em simultâneo.
+\subsection{Protocolos utilizados}
+Quando um utilizador entra na aplicação, liga-se a outros utilizadores que já estejam a usar a aplicação na tentativa de formar um grupo dentro da rede. Se o grupo já estiver formado, o novo utilizador contacta o \textit{group owner} para obter informação acerca de todos os utilizadores do grupo. Na rede, os utilizadores partilham os nomes dos \textit{workspaces} que possuem com todos os utilizadores do grupo.
+
+Em relação ao \textit{subscribe}, o utilizador tem duas opcções: subscrever a todos os \textit{workspaces} públicos fornecendo uma \textit{query} vazia ou procurar por \textit{workspaces} específicos com base em \textit{tags}. O utilizador guarda o nome do \textit{workspace} na sua base de dados. Se o dono do \textit{workspace} estiver no grupo, ele pode aceder aos ficheiros. Se o dono apagar o \textit{workspace}, esse deixa de ser propagado na rede e quem o tiver subscrito sabe que o \textit{workspace} foi apagado.
+
+Quando um \textit{user} quer aceder a ficheiros dentro de um \textit{workspace} remoto, é feito um pedido em \textit{real time} ao dono do mesmo. Este responde com os nomes dos ficheiros disponíveis e a \textit{view} da aplicação do utilizador inicial é actualizada. Todos este pedidos são feitos em \textit{background} na camada do servidor. Se um utilizador desejar aceder ao conteúdo de um ficheiro, é feito um pedido com a intenção do utilizador. Em ambos os casos(ler ou escrever), é necessária uma leitura da versão mais recente do ficheiro. A diferença é que se o utilizador quiser escrever, é criada uma sessão que impede escritas em simultâneo. Esta sessão termina quando o utilizador que escreve aceita ou cancela as alterações de escrita.
+
+A sessão referida anteriormente, é bloqueada pelo dono do ficheiro que entrega uma chave utilizador para ser devolvida quando as alterações terminarem. Se a chave for a mesma que o dono entregou inicialmente, quer dizer que foi o \textit{user} correto a submeter as alterações. Após esta verificação, o dono faz \textit{commit} ao ficheiro.
+
+Tentámos minimizar a latência na rede diminuindo a quantidade de informação que é transmida. Os ficheiros são transferidos \textit{on demand}.
